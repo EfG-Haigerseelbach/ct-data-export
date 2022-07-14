@@ -1,0 +1,29 @@
+{
+    "info": "Production config",
+    "production": true,
+    "churchtools": {
+        "url": "https://yourname.church.tools",
+        "username": "username",
+        "password": "password"
+    },
+    "storagePaths": {
+        "path": "absolute/or/relative/path",
+        "groupsData": "path/and/filename.csv",
+        "contactPersonsData": "path/and/filename.csv",
+        "appointmentData": "path/and/filename.csv"
+    },
+    "calendar": {
+        "allowedCalendarIds": [ 
+            { "id": 1, "name": "Some Name" },
+            { "id": 2, "name": "Some Other Name" }
+        ]
+    },
+    "logging": {
+        "level":"error"
+    },
+    "cronJob": {
+        "pattern": "00 00 23 * * *",
+        "example_pattern_every_day_at_23:00": "00 00 23 * * *"
+    },
+    "adminToken" : "toBeChanged"
+}
