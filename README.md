@@ -48,15 +48,15 @@ Parameter `allowedCalendarIds` is an array of objects where are each object has 
 
 ### Logging
 
-| Parameter | Data Type | Default | Possible Values                 | Explanation                                                                                |
-|-----------|-----------|---------|---------------------------------|--------------------------------------------------------------------------------------------|
-| `level`   | string    | `error` | `error`, `debug`, `info`, `off` | Refer to [https://github.com/churchtools/churchtools-js-client/blob/master/src/logging.js|https://github.com/churchtools/churchtools-js-client/blob/master/src/logging.js] |
+| Parameter | Data Type | Default | Possible Values                 | Explanation                                                                              |
+|-----------|-----------|---------|---------------------------------|------------------------------------------------------------------------------------------|
+| `level`   | string    | `error` | `error`, `debug`, `info`, `off` | Refer to https://github.com/churchtools/churchtools-js-client/blob/master/src/logging.js |
 
 ### Cron Job
 
-| Parameter | Data Type | Default          | Possible Values                 | Explanation                                                                |
-|-----------|-----------|------------------|---------------------------------|----------------------------------------------------------------------------|
-| `pattern` | string    | `00 00 23 * * *` | `error`, `debug`, `info`, `off` | Refer to chapter *Cron Syntax* at [https://github.com/node-cron/node-cron|https://github.com/node-cron/node-cron] |
+| Parameter | Data Type | Default          | Possible Values                 | Explanation                                                              |
+|-----------|-----------|------------------|---------------------------------|--------------------------------------------------------------------------|
+| `pattern` | string    | `00 00 23 * * *` | `error`, `debug`, `info`, `off` | Refer to chapter *Cron Syntax* at https://github.com/node-cron/node-cron |
 
 ### Admin Token
 
