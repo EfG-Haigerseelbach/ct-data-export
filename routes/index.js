@@ -6,7 +6,7 @@ const fs = require('fs');
 const { churchtoolsClient, activateLogging, LOG_LEVEL_DEBUG, LOG_LEVEL_INFO, LOG_LEVEL_ERROR, LOG_LEVEL_NONE, errorHelper } = require('@churchtools/churchtools-client');
 const axiosCookieJarSupport = require('axios-cookiejar-support');
 const tough = require('tough-cookie');
-const { resolve } = require('path');
+const path = require('path');
 
 
 
@@ -341,7 +341,7 @@ function storeData(data, path) {
 function storeAllGroupsData() {
   return new Promise((resolve, reject) => {
     getAllGroups()
-      .then(value => { resolve(storeData(value, config.get('storagePaths.groupsData'))); },
+      .then(value => { resolve(storeData(value, path.join(config.get('storagePaths.path').trim(),config.get('storagePaths.groupsData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -349,7 +349,7 @@ function storeAllGroupsData() {
 function storeAllContactPersons() {
   return new Promise((resolve, reject) => {
     getPersons([1,2,3,4,5,6,7])
-      .then(value => { resolve(storeData(value, config.get('storagePaths.contactPersonsData'))); },
+      .then(value => { resolve(storeData(value,  path.join(config.get('storagePaths.path').trim(),config.get('storagePaths.contactPersonsData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -357,7 +357,7 @@ function storeAllContactPersons() {
 function storeNextAppointments() {
   return new Promise((resolve, reject) => {
     getNextAppointmentForCalendars()
-      .then(value => { resolve(storeData(value, config.get('storagePaths.appointmentData'))); },
+      .then(value => { resolve(storeData(value,  path.join(config.get('storagePaths.path').trim(),config.get('storagePaths.appointmentData').trim()))); },
             reason => { reject(reason); });
   });
 }
