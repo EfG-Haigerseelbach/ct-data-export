@@ -427,16 +427,11 @@ router.get('/', checkAuthenticated,  function (req, res, next) {
   res.render('index', {});
 });
 
-router.post('/login', passport.authenticate('local'
-, {
+router.post('/login', passport.authenticate('local' , {
   successRedirect: '/',
   failureRedirect: '/login',
   failureFlush: true
-}));/*, function(req, res) {
-  //res.status(200);
-  //res.send("OK");
-  res.redirect('/');
-});*/
+}));
 
 function checkLoggedIn(req, res, next) {
   console.log('req.isAuthenticated(): '+req.isAuthenticated());
@@ -456,9 +451,6 @@ router.post("/logout", (req,res) => {
       return next(err); 
     }
     res.redirect("/login")
-    //console.log(`-------> User Logged out`);
-    //res.status(200);
-    //res.send("OK");
   });
 })
 
