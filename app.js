@@ -53,13 +53,14 @@ app.use('/', indexRouter);
 passport.use(new LocalStrategy(authUser));
 
 function authUser(user, password, done) {
+  console.log("authUser");
   if(password == 'test') {
   //Search the user, password in the DB to authenticate the user
   //Let's assume that a search within your DB returned the username and password match for "Kyle".
     let authenticated_user = { id: 123, name: "Kyle"}
     return done(null, authenticated_user); //done(error, user);
   } else {
-    return done(null, false);
+    return done(null, false, { message: 'Invalid admin token'});
   }
   /*
 1. If the user not found in DB, 
@@ -110,7 +111,6 @@ res.render("dashboard.ejs", {name: req.user.name})
 */
 
 
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
@@ -118,6 +118,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+  console.log(err);
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -126,10 +127,5 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-app.post ("/login2", passport.authenticate('local', {
-  successRedirect: "/dashboard",
-  failureRedirect: "/login",
-}));
 
 module.exports = app;

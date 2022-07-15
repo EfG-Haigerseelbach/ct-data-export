@@ -427,15 +427,21 @@ router.get('/', checkAuthenticated,  function (req, res, next) {
   res.render('index', {});
 });
 
-router.post('/login', passport.authenticate('local'), function(req, res) {
-  res.status(200);
-  res.send("OK");
-  //res.redirect('/');
-});
+router.post('/login', passport.authenticate('local'
+, {
+  successRedirect: '/',
+  failureRedirect: '/login',
+  failureFlush: true
+}));/*, function(req, res) {
+  //res.status(200);
+  //res.send("OK");
+  res.redirect('/');
+});*/
 
 function checkLoggedIn(req, res, next) {
+  console.log('req.isAuthenticated(): '+req.isAuthenticated());
   if (req.isAuthenticated()) { 
-       return res.redirect("/");
+       return res.redirect("/login");
    }
   next();
 }
@@ -446,11 +452,13 @@ router.get('/login', checkLoggedIn, function (req, res, next) {
 
 router.post("/logout", (req,res) => {
   req.logout(function(err) {
-    if (err) { return next(err); }
-  //res.redirect("/login")
-    console.log(`-------> User Logged out`);
-    res.status(200);
-    res.send("OK");
+    if (err) { 
+      return next(err); 
+    }
+    res.redirect("/login")
+    //console.log(`-------> User Logged out`);
+    //res.status(200);
+    //res.send("OK");
   });
 })
 
