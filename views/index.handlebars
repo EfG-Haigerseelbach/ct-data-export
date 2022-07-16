@@ -15,3 +15,14 @@
 <div class="container">
    <h3 style="margin-top: 3rem;">Dashboard</h3>
 </div>
+<script>
+    $(document).ready(function() {
+        $.get("/status")
+            .done(function(data) {
+                console.log(data);
+            })
+            .fail(function(error) {
+                console.log(error);
+            });
+    });
+</script>

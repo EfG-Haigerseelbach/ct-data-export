@@ -333,15 +333,21 @@ function getPersons(personIds) {
  */
 function storeData(data, path) {
   return new Promise((resolve, reject) => {
-    fs.writeFileSync(path, json2csv(data,";", true));
-    resolve("Data gathered and stored");
+    config.get('storage.mimeTypes').forEach(mimeType => {
+      if(mimeType == 'application/json') {
+        fs.writeFileSync(path+".json", JSON.stringify(data,null,4));
+      } else if(mimeType == 'text/csv') {
+        fs.writeFileSync(path+".csv", json2csv(data,";", true));
+      }
+    });
+    resolve("Data gathered and stored ");
   });
 }
 
 function storeAllGroupsData() {
   return new Promise((resolve, reject) => {
     getAllGroups()
-      .then(value => { resolve(storeData(value, path.join(config.get('storagePaths.path').trim(),config.get('storagePaths.groupsData').trim()))); },
+      .then(value => { resolve(storeData(value, path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -349,7 +355,7 @@ function storeAllGroupsData() {
 function storeAllContactPersons() {
   return new Promise((resolve, reject) => {
     getPersons([1,2,3,4,5,6,7])
-      .then(value => { resolve(storeData(value,  path.join(config.get('storagePaths.path').trim(),config.get('storagePaths.contactPersonsData').trim()))); },
+      .then(value => { resolve(storeData(value,  path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -357,7 +363,7 @@ function storeAllContactPersons() {
 function storeNextAppointments() {
   return new Promise((resolve, reject) => {
     getNextAppointmentForCalendars()
-      .then(value => { resolve(storeData(value,  path.join(config.get('storagePaths.path').trim(),config.get('storagePaths.appointmentData').trim()))); },
+      .then(value => { resolve(storeData(value,  path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -422,6 +428,40 @@ router.get('/getAllAppointments', checkAuthenticatedApi, function (req, res, nex
     res.send(reason);
   });
 });
+
+router.get('/status', checkAuthenticatedApi, function (req, res, next) {
+  try {
+    res.setHeader("Content-Type", "application/json");
+    var filesToCheck = [];
+
+    config.get('storage.mimeTypes').forEach(mimeType => {
+      if(mimeType == 'application/json') {
+        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".json");
+        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".json");
+        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".json");
+      } else if(mimeType == 'text/csv') {
+        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".csv");
+        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".csv");
+        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".csv");
+      }
+    });
+
+    var result = [];
+    filesToCheck.forEach(file => {
+      if(fs.existsSync(file)) {
+        result.push({"filename": file, "exists": true, "stats": fs.statSync(file)});
+      } else {
+        result.push({"filename": file, "exists": false});
+      }
+    });
+    res.send(result);
+  } catch(err) {
+    console.log(err);
+    res.status(500);
+    res.send("error");
+  }
+});
+
 
 router.get('/', checkAuthenticated,  function (req, res, next) {
   res.render('index', {});
