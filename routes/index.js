@@ -435,23 +435,24 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
     var filesToCheck = [];
 
     config.get('storage.mimeTypes').forEach(mimeType => {
-      if(mimeType == 'application/json') {
-        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".json");
-        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".json");
-        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".json");
-      } else if(mimeType == 'text/csv') {
-        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".csv");
-        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".csv");
-        filesToCheck.push(path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".csv");
+      /*if(mimeType == 'application/json') {
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".json", "category": "groupsData"});
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".json", "category": "contactPersonsData"});
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".json", "category": "appointmentData"});
+      } else */
+      if(mimeType == 'text/csv') {
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".csv", "category": "groupsData"});
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".csv", "category": "contactPersonsData"});
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".csv", "category": "appointmentData"});
       }
     });
 
     var result = [];
     filesToCheck.forEach(file => {
-      if(fs.existsSync(file)) {
-        result.push({"filename": file, "exists": true, "stats": fs.statSync(file)});
+      if(fs.existsSync(file.path)) {
+        result.push({"filename": file.path, "exists": true, "stats": fs.statSync(file.path)});
       } else {
-        result.push({"filename": file, "exists": false});
+        result.push({"filename": file.path, "exists": false});
       }
     });
     res.send(result);

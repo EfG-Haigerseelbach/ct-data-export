@@ -1,27 +1,53 @@
 <nav class="navbar navbar-expand-lg bg-light">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">ChurchTools Data Export</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent" role="search">
-      <form class="d-flex" action="/logout" method="POST">
-        <button class="btn btn-outline-success" type="submit">Logout</button>
-      </form>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">ChurchTools Data Export</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" role="search">
+            <form class="d-flex" action="/logout" method="POST">
+                <button class="btn btn-outline-success" type="submit">Logout</button>
+            </form>
+        </div>
     </div>
-  </div>
 </nav>
 
 <div class="container">
-   <h3 style="margin-top: 3rem;">Dashboard</h3>
+    <h3 style="margin-top: 3rem;">Dashboard</h3>
+    <h4 style="margin-top: 2rem;">Files</h4>
+    <div class="list-group" id="files-list">
+    </div>
 </div>
 <script>
-    $(document).ready(function() {
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+    $(document).ready(function () {
         $.get("/status")
-            .done(function(data) {
+            .done(function (data) {
+                data.forEach(file => {
+                    var entryTmp = `<a href="#" class="list-group-item list-group-item-action">`+
+                                   `    <div class="d-flex w-100 justify-content-between">`+
+                                   `        <h5 class="mb-1">${file.filename}</h5>`+
+                                   `        <small>${file.stats.mtime}</small>`+
+                                   `    </div>`+
+                                   `    <p class="mb-1">Some placeholder content in a paragraph.</p>`+
+                                   `    <small>${formatBytes(file.stats.size)}</small>`+
+                                   `</a>`;
+                    $('#files-list').append(entryTmp);
+                });
                 console.log(data);
             })
-            .fail(function(error) {
+            .fail(function (error) {
                 console.log(error);
             });
     });
