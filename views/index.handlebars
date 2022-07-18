@@ -18,6 +18,19 @@
     <h4 style="margin-top: 2rem;">Files</h4>
     <div class="list-group" id="files-list">
     </div>
+    <h4 style="margin-top: 2rem;">Cron</h4>
+    <table class="table table-hover">
+      <thead>
+    <tr>
+      <th scope="col">Key</th>
+      <th scope="col">ValueFirst</th>
+    </tr>
+  </thead>
+  <tbody id="config-table-body">
+  </tbody>
+
+  </table>
+    </div>
 </div>
 <script>
     function formatBytes(bytes, decimals = 2) {
@@ -41,7 +54,7 @@
     $(document).ready(function () {
         $.get("/status")
             .done(function (data) {
-                data.forEach(file => {
+                data.files.forEach(file => {
                     var entryTmp = `<a href="#" class="list-group-item list-group-item-action">`+
                                    `    <div class="d-flex w-100 justify-content-between">`+
                                    `        <h5 class="mb-1">${file.filename}</h5>`+
@@ -52,6 +65,12 @@
                                    `</a>`;
                     $('#files-list').append(entryTmp);
                 });
+                var rowTmp = `<tr><td>ChurchTools URL</td><td>${data.config.churchtools.url}</td></tr>`;
+                $('#config-table-body').append(rowTmp);
+                var rowTmp = `<tr><td>Log Level</td><td>${data.config.logging.level}</td></tr>`;
+                $('#config-table-body').append(rowTmp);
+                var rowTmp = `<tr><td>Cron Job</td><td>${data.config.cronJob.pattern}</td></tr>`;
+                $('#config-table-body').append(rowTmp);
                 console.log(data);
             })
             .fail(function (error) {

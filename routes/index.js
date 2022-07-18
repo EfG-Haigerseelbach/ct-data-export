@@ -450,14 +450,26 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
       }
     });
 
-    var result = [];
+    var result = {
+      "files": [],
+      "config": {}
+    };
     filesToCheck.forEach(file => {
       if(fs.existsSync(file.path)) {
-        result.push({"filename": file.path, "exists": true, "stats": fs.statSync(file.path), "mimeType":file.mimeType});
+        result.files.push({"filename": file.path, "exists": true, "stats": fs.statSync(file.path), "mimeType":file.mimeType});
       } else {
-        result.push({"filename": file.path, "exists": false});
+        result.files.push({"filename": file.path, "exists": false});
       }
     });
+    result.config.churchtools = {
+      "url": config.get('churchtools.url'),
+    };
+    result.config.logging = {
+      "level": config.get('logging.level'),
+    };
+    result.config.cronJob = {
+      "pattern": config.get('cronJob.pattern'),
+    };
     res.send(result);
   } catch(err) {
     console.log(err);
