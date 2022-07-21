@@ -409,6 +409,19 @@ router.get('/storeNextAppointments', checkAuthenticatedApi, function (req, res, 
   });
 });
 
+router.get('/store', checkAuthenticatedApi, function (req, res, next) {
+  storeAllGroupsData()
+    .then(storeAllContactPersons)
+    .then(storeNextAppointments)
+    .then(value => {
+    res.setHeader("Content-Type", "text/plain");
+    res.send("OK");
+  }, reason => {
+    res.status(500);
+    res.send(reason);
+  });
+});
+
 router.get('/getAllGroups', checkAuthenticatedApi, function (req, res, next) {
   getAllGroups().then(value => {
     res.setHeader("Content-Type", "application/json");
@@ -463,6 +476,7 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
     });
     result.config.churchtools = {
       "url": config.get('churchtools.url'),
+      "username": config.get('churchtools.username'),
     };
     result.config.logging = {
       "level": config.get('logging.level'),

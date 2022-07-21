@@ -1,0 +1,26 @@
+[
+    {
+        "id": 4,
+        "firstName": "Kevin",
+        "lastName": "Debus",
+        "email": "kevin-debus@gmx.de",
+        "imageUrl": "https://efghaigerseelbach.church.tools/images/367/7c9df61e0131d98279b34a22d8e6c5454f06b14fb5d74598f4939249f0b22d3a",
+        "phone": "017683320321"
+    },
+    {
+        "id": 1,
+        "firstName": "Johannes",
+        "lastName": "Gilbert",
+        "email": "johannes.gilbert@posteo.de",
+        "imageUrl": "https://efghaigerseelbach.church.tools/images/129/80a0ffc7482bf237a537f1ddc1372bb153c09fa49382df463a9e02ce5bc6393c",
+        "phone": "+491703752093"
+    },
+    {
+        "id": 7,
+        "firstName": "Peter",
+        "lastName": "Hofmann",
+        "email": "ph@p-ho.de",
+        "imageUrl": "https://efghaigerseelbach.church.tools/images/1704/9ed36cc45a743b77cd262b12dbeed8f9ab646e6c8c922fdd176c96dae0fdf56a",
+        "phone": null
+    }
+]

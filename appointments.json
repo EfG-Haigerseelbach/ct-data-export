@@ -1,0 +1,51 @@
+[
+    {
+        "calendarId": 54,
+        "calendarName": "Donnerstagstunden",
+        "information": "",
+        "localizedStartDateString": "Donnerstag, 21. Juli, 20:00",
+        "localizedEndDateString": "Donnerstag, 21. Juli, 21:00"
+    },
+    {
+        "calendarId": 70,
+        "calendarName": "Kinderstunde",
+        "information": "",
+        "localizedStartDateString": "Sonntag, 24. Juli, 10:00",
+        "localizedEndDateString": "Sonntag, 24. Juli, 11:00"
+    },
+    {
+        "calendarId": 2,
+        "calendarName": "Gottesdienst",
+        "information": "",
+        "localizedStartDateString": "Sonntag, 24. Juli, 10:00",
+        "localizedEndDateString": "Sonntag, 24. Juli, 11:00"
+    },
+    {
+        "calendarId": 2,
+        "calendarName": "Gottesdienst",
+        "information": "",
+        "localizedStartDateString": "Sonntag, 24. Juli, 11:00",
+        "localizedEndDateString": "Sonntag, 24. Juli, 12:00"
+    },
+    {
+        "calendarId": 54,
+        "calendarName": "Donnerstagstunden",
+        "information": "# ⁣# #🌐",
+        "localizedStartDateString": "Donnerstag, 28. Juli, 20:00",
+        "localizedEndDateString": "Donnerstag, 28. Juli, 21:00"
+    },
+    {
+        "calendarId": 2,
+        "calendarName": "Gottesdienst",
+        "information": "",
+        "localizedStartDateString": "Sonntag, 31. Juli, 10:00",
+        "localizedEndDateString": "Sonntag, 31. Juli, 11:00"
+    },
+    {
+        "calendarId": 2,
+        "calendarName": "Gottesdienst",
+        "information": "",
+        "localizedStartDateString": "Sonntag, 31. Juli, 11:00",
+        "localizedEndDateString": "Sonntag, 31. Juli, 12:00"
+    }
+]
