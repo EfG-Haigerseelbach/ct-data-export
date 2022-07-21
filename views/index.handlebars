@@ -5,25 +5,35 @@
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent" role="search">
+        <div class="nav navbar-right" id="navbarSupportedContent" role="search">
             <form class="d-flex" action="/logout" method="POST">
-                <button class="btn btn-outline-success" type="submit">Logout</button>
+                <button class="btn btn-outline-success" type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
             </form>
         </div>
     </div>
 </nav>
 
+<style>
+    #refresh-files {
+        transition: transform .7s ease-in-out;
+    }
+    #refresh-files:hover {
+        transform: rotate(360deg);
+    }
+</style>
+
 <div class="container">
     <h3 style="margin-top: 3rem;">Dashboard</h3>
-    <h4 style="margin-top: 2rem;">Files</h4>
+    <h4 style="margin-top: 2rem;">Files <i class="fa-solid fa-arrows-rotate" id="refresh-files"></i></h4>
     <div class="list-group" id="files-list">
     </div>
+
     <h4 style="margin-top: 2rem;">Cron</h4>
     <table class="table table-hover">
       <thead>
     <tr>
       <th scope="col">Key</th>
-      <th scope="col">ValueFirst</th>
+      <th scope="col">Value</th>
     </tr>
   </thead>
   <tbody id="config-table-body">
@@ -51,7 +61,22 @@
             return '<i class="fa-solid fa-file"></i>';
         }
     }
+
+    function cronJobPatternToString(pattern) {
+
+    }
+
     $(document).ready(function () {
+        $('#refresh-files').click(function() {
+            $.get("/store")
+            .done(function () {
+                location.reload();
+            })
+            .fail(function (error) {
+                console.log(error);
+            });
+        });
+
         $.get("/status")
             .done(function (data) {
                 data.files.forEach(file => {
@@ -66,6 +91,8 @@
                     $('#files-list').append(entryTmp);
                 });
                 var rowTmp = `<tr><td>ChurchTools URL</td><td>${data.config.churchtools.url}</td></tr>`;
+                $('#config-table-body').append(rowTmp);
+                var rowTmp = `<tr><td>ChurchTools API user</td><td>${data.config.churchtools.username}</td></tr>`;
                 $('#config-table-body').append(rowTmp);
                 var rowTmp = `<tr><td>Log Level</td><td>${data.config.logging.level}</td></tr>`;
                 $('#config-table-body').append(rowTmp);
