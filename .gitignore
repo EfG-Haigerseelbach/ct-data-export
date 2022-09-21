@@ -131,6 +131,9 @@ dist
 
 # data export
 *.csv
+contactPersons.json
+groups.json
+appointments.json
 
 # config
 config/default.json
