@@ -28,6 +28,14 @@ All configuration settings are located at `config/default.json`. Initially this 
 | `username`  | string    | empty   | n/a             | Name of the user to authenticate against the ChurchTools API                                                 |
 | `password`  | string    | empty   | n/a             | Password of this user                                                                                        |
 
+In addition to the configuration of the parameters above you need to ensure that the user (see `username`) has appropriate authorizations:
+
+- view tags (dt. Tags einsehen)
+- view (dt. Personen & Gruppen sehen)
+- security level person according to your needs
+- security level group according to your needs
+- view grouptype according to your needs
+
 ### Storage Paths
 
 | Parameter            | Data Type | Default                   | Possible Values | Explanation                                                                                   |
