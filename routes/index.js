@@ -7,6 +7,8 @@ const { churchtoolsClient, activateLogging, LOG_LEVEL_DEBUG, LOG_LEVEL_INFO, LOG
 const axiosCookieJarSupport = require('axios-cookiejar-support');
 const tough = require('tough-cookie');
 const path = require('path');
+const { group } = require('console');
+const { has } = require('config');
 
 
 
@@ -123,6 +125,78 @@ function getAllGroups() {
   }, reason => {
     console.error(reason); 
   });
+}
+
+/**
+ * Check if the group with the specified ID has the tag used to mark for export.
+ * @param {Number} groupId ID of the group
+ * @returns {object} promise
+ */
+ function hasGroupExportTag(groupId) {
+  var url = `/groups/${groupId}/tags`;
+  console.log(`Querying tags of group via URL: ${url}`);
+  return churchtoolsClient.get(url).then(tags => {
+    return new Promise((resolve, reject) => {
+      assertIsArray(tags, reject);
+      var result = false;
+      
+      tags.forEach(tag => {
+        if(tag.name == config.get('tags.groupsToExport')) {
+            result = true;
+          }
+      });
+      resolve(result);
+    });
+  }, reason => {
+    console.error(reason); 
+  });
+}
+
+async function filterGroups(groups) {
+  var result = [];
+  for(let i = 0; i < groups.length; i++) {
+    var hasTag = await hasGroupExportTag(groups[i].id);
+    if(hasTag) {
+      result.push(groups[i]);
+    }
+  }
+  return result;
+}
+
+/**
+ * Check if the person with the specified ID has the tag used to mark for export.
+ * @param {Number} personId ID of the person
+ * @returns {object} promise
+ */
+ function hasPersonExportTag(personId) {
+  var url = `/persons/${personId}/tags`;
+  console.log(`Querying tags of person via URL: ${url}`);
+  return churchtoolsClient.get(url).then(tags => {
+    return new Promise((resolve, reject) => {
+      assertIsArray(tags, reject);
+      var result = false;
+      
+      tags.forEach(tag => {
+        if(tag.name == config.get('tags.personsToExport')) {
+            result = true;
+          }
+      });
+      resolve(result);
+    });
+  }, reason => {
+    console.error(reason); 
+  });
+}
+
+async function filterPersons(persons) {
+  var result = [];
+  for(let i = 0; i < persons.length; i++) {
+    var hasTag = await hasPersonExportTag(persons[i].id);
+    if(hasTag) {
+      result.push(persons[i]);
+    }
+  }
+  return result;
 }
 
 var options = {
@@ -347,7 +421,9 @@ function storeData(data, path) {
 function storeAllGroupsData() {
   return new Promise((resolve, reject) => {
     getAllGroups()
-      .then(value => { resolve(storeData(value, path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim()))); },
+      .then(allGroups => filterGroups(allGroups),
+            reason => { reject(reason); })    
+      .then(filteredGroups => { resolve(storeData(filteredGroups, path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -355,7 +431,9 @@ function storeAllGroupsData() {
 function storeAllContactPersons() {
   return new Promise((resolve, reject) => {
     getPersons([1,2,3,4,5,6,7])
-      .then(value => { resolve(storeData(value,  path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim()))); },
+      .then(allPersons => filterPersons(allPersons),
+            reason => { reject(reason); })    
+      .then(filteredPersons => { resolve(storeData(filteredPersons,  path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim()))); },
             reason => { reject(reason); });
   });
 }
