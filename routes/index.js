@@ -30,13 +30,13 @@ function initChurchToolsClient() {
     churchtoolsClient.setCookieJar(axiosCookieJarSupport.default, new tough.CookieJar());
     churchtoolsClient.setBaseUrl(config.get('churchtools.url'));
     var logLevel = config.get('logging.level');
-    if(logLevel == "debug") {
+    if(logLevel == "LOG_LEVEL_DEBUG") {
       // LOG_LEVEL_DEBUG (outputs every request and response including request/response data)
       activateLogging(LOG_LEVEL_DEBUG);
-    } else if(logLevel == "info") {
+    } else if(logLevel == "LOG_LEVEL_INFO") {
       // LOG_LEVEL_INFO (outputs every request and response, but only method and URL)
       activateLogging(LOG_LEVEL_INFO);
-    } else if(logLevel == "error") {
+    } else if(logLevel == "LOG_LEVEL_ERROR") {
       // LOG_LEVEL_ERROR (outputs only errors)
       activateLogging(LOG_LEVEL_ERROR);
     } else {
@@ -335,6 +335,50 @@ function getNextAppointmentForCalendars() {
 }
 
 /**
+ * Get all calendars (ID and name).
+ * @returns {object} promise
+ */
+ function getCalenders() {
+  var url = `/calendars`;
+  console.log(`Querying all calendars via URL: ${url}`);
+  return churchtoolsClient.get(url).then(calendars => {
+    return new Promise((resolve, reject) => {
+      assertIsArray(calendars, reject);
+      var result = [];
+      
+      calendars.forEach(calendar => {
+        result.push({ id: calendar.id, name: calendar.name });
+      });
+      resolve(result);
+    });
+  }, reason => {
+    console.error(reason); 
+  });
+}
+
+/**
+ * Get all tags (ID and name).
+ * @returns {object} promise
+ */
+ function getTags() {
+  var url = `/tags?type=persons`;
+  console.log(`Querying all tags for type=persons via URL: ${url}`);
+  return churchtoolsClient.get(url).then(tags => {
+    return new Promise((resolve, reject) => {
+      assertIsArray(tags, reject);
+      var result = [];
+      
+      tags.forEach(tag => {
+        result.push({ id: tag.id, name: tag.name });
+      });
+      resolve(result);
+    });
+  }, reason => {
+    console.error(reason); 
+  });
+}
+
+/**
  * Build query parameters ids from the given array of person IDs
  * @param {Array} personIds array of person IDs as numbers
  * @returns {string} query parameters ids[]=...&ids[]=...
@@ -520,6 +564,33 @@ router.get('/getAllAppointments', checkAuthenticatedApi, function (req, res, nex
   });
 });
 
+router.get('/getCalendars', checkAuthenticatedApi, function (req, res, next) {
+  getCalenders().then(calendarIdsAndNames => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(calendarIdsAndNames);
+  }, reason => {
+    res.status(500);
+    res.send(reason);
+  });
+});
+
+router.get('/getTags', checkAuthenticatedApi, function (req, res, next) {
+  getTags().then(tagIdsAndNames => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(tagIdsAndNames);
+  }, reason => {
+    res.status(500);
+    res.send(reason);
+  });
+});
+
+router.get('/reloadConfig', checkAuthenticatedApi, function (req, res, next) {
+  delete require.cache[require.resolve('config')];
+  res.setHeader("Content-Type", "application/json");
+  res.send('OK');
+});
+
+
 router.get('/status', checkAuthenticatedApi, function (req, res, next) {
   try {
     res.setHeader("Content-Type", "application/json");
@@ -556,6 +627,18 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
       "url": config.get('churchtools.url'),
       "username": config.get('churchtools.username'),
     };
+    result.config.storage = {
+      "path": config.get('storage.path'),
+      "groupsData": config.get('storage.groupsData'),
+      "contactPersonsData": config.get('storage.contactPersonsData'),
+      "appointmentData": config.get('storage.appointmentData'),
+      "mimeTypes": config.get('storage.mimeTypes'),
+    };
+    result.config.calendar = {
+      "allowedCalendarIds": config.get('calendar.allowedCalendarIds'),
+    };
+    result.config.tags = config.get('tags');
+
     result.config.logging = {
       "level": config.get('logging.level'),
     };

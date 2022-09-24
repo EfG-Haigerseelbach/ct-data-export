@@ -20,6 +20,25 @@
     #refresh-files:hover {
         transform: rotate(360deg);
     }
+    .loader {
+        width: 48px;
+        height: 48px;
+        border: 5px solid rgb(77, 77, 77);
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    } 
 </style>
 
 <div class="container">
@@ -29,7 +48,7 @@
     </div>
 
     <h4 style="margin-top: 2rem;">Configuration</h4>
-    <table class="table table-hover">
+    <table class="table table-sm table-hover table-striped">
       <thead>
     <tr>
       <th scope="col">Key</th>
@@ -66,6 +85,85 @@
 
     }
 
+
+    var allowedCalendarIds = [];
+
+    function getCalendarIdsAndNames() {
+        $.get("/getCalendars")
+            .done(function (data) {
+                var calendarIdsAndNames = data;
+                var calendarCheckBoxTemplate = '<div class="form-group"><input class="form-check-input" type="checkbox" id="##ID##" ##CHECKED##><label class="form-check-label" for="##ID##">##LABEL##</label></div>';
+                
+                var tmp = '';
+                calendarIdsAndNames.forEach(calendarIdAndName => {
+                    var checkboxTmp = calendarCheckBoxTemplate
+                        .replace(/##ID##/g, calendarIdAndName.id)
+                        .replace(/##LABEL##/g, calendarIdAndName.name);
+                    var selected = false;
+                    allowedCalendarIds.forEach(entry => {
+                        if(entry.id == calendarIdAndName.id) {
+                            selected = true;
+                        }
+                    });
+                    if(selected) {
+                        checkboxTmp = checkboxTmp.replace('##CHECKED##','checked="checked"');
+                    } else {
+                        checkboxTmp = checkboxTmp.replace('##CHECKED##','');
+                    }
+                    tmp += checkboxTmp;
+                });
+                $('#calendarIds').empty();
+                $('#calendarIds').append(tmp);
+            })
+            .fail(function (error) {
+                console.log(error);
+            });
+    }
+
+    var groupExportTag;
+    var personExportTag;
+
+    function getTagIdsAndNames() {
+        $.get("/getTags")
+            .done(function (data) {
+                var tagIdsAndNames = data;
+                var tagRadioButtonTemplate = '<div class="form-group"><input class="form-check-input" type="radio" id="##ID##" ##CHECKED##><label class="form-check-label" for="##ID##">##LABEL##</label></div>';
+                
+                var tmpPersons = '';
+                var tmpGroups = '';
+                tagIdsAndNames.forEach(tagIdAndName => {
+                    var radioButtonPersonsTmp = tagRadioButtonTemplate
+                        .replace(/##ID##/g, tagIdAndName.id)
+                        .replace(/##LABEL##/g, tagIdAndName.name);
+                    var radioButtonGroupsTmp = tagRadioButtonTemplate
+                        .replace(/##ID##/g, tagIdAndName.id)
+                        .replace(/##LABEL##/g, tagIdAndName.name);
+
+                    if(personExportTag == tagIdAndName.name) {
+                        radioButtonPersonsTmp = radioButtonPersonsTmp.replace('##CHECKED##','checked="checked"');
+                    } else {
+                        radioButtonPersonsTmp = radioButtonPersonsTmp.replace('##CHECKED##','');
+                    }
+                    if(groupExportTag == tagIdAndName.name) {
+                        radioButtonGroupsTmp = radioButtonGroupsTmp.replace('##CHECKED##','checked="checked"');
+                    } else {
+                        radioButtonGroupsTmp = radioButtonGroupsTmp.replace('##CHECKED##','');
+                    }
+                    tmpPersons += radioButtonPersonsTmp;
+                    tmpGroups += radioButtonGroupsTmp;
+                });
+
+                $('#tagForPersonsToExport').empty();
+                $('#tagForPersonsToExport').append(tmpPersons);
+
+                $('#tagForGroupsToExport').empty();
+                $('#tagForGroupsToExport').append(tmpGroups);
+            })
+            .fail(function (error) {
+                console.log(error);
+            });
+    }
+
     $(document).ready(function () {
         $('#refresh-files').click(function() {
             $.get("/store")
@@ -76,6 +174,9 @@
                 console.log(error);
             });
         });
+
+        getCalendarIdsAndNames();
+        getTagIdsAndNames();
 
         $.get("/status")
             .done(function (data) {
@@ -90,14 +191,78 @@
                                    `</a>`;
                     $('#files-list').append(entryTmp);
                 });
-                var rowTmp = `<tr><td>ChurchTools URL</td><td>${data.config.churchtools.url}</td></tr>`;
+
+                var inputRowTemplate = `<tr><td>##key##</td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
+                
+                $('#config-table-body').append(inputRowTemplate
+                    .replace('##key##','ChurchTools URL')
+                    .replace('##id##','churchtools-url')
+                    .replace('##value##',data.config.churchtools.url));
+
+                $('#config-table-body').append(inputRowTemplate
+                    .replace('##key##','ChurchTools API user')
+                    .replace('##id##','churchtools-username')
+                    .replace('##value##',data.config.churchtools.username));
+
+                $('#config-table-body').append(inputRowTemplate
+                    .replace('##key##','Path to store exported data')
+                    .replace('##id##','storage-path')
+                    .replace('##value##',data.config.storage.path));
+
+                $('#config-table-body').append(inputRowTemplate
+                    .replace('##key##','Filename for data of Groups (w/o extension)')
+                    .replace('##id##','storage-groupsData')
+                    .replace('##value##',data.config.storage.groupsData));
+
+                $('#config-table-body').append(inputRowTemplate
+                    .replace('##key##','Filename for data of Persons (w/o extension)')
+                    .replace('##id##','storage-contactPersonsData')
+                    .replace('##value##',data.config.storage.contactPersonsData));
+
+                $('#config-table-body').append(inputRowTemplate
+                    .replace('##key##','Filename for data of Appointments (w/o extension)')
+                    .replace('##id##','storage-appointmentData')
+                    .replace('##value##',data.config.storage.appointmentData));
+
+                var tmp = '';
+                if(data.config.storage.mimeTypes.includes('text/csv')) {
+                    tmp = 'checked="checked"';
+                }
+                var rowTmp = `<tr><td>Output as CSV file ('text/csv')</td><td><input class="form-check-input" type="checkbox" id="outputCsvCheckBox" ${tmp}></td></tr>`;
                 $('#config-table-body').append(rowTmp);
-                var rowTmp = `<tr><td>ChurchTools API user</td><td>${data.config.churchtools.username}</td></tr>`;
+                
+                tmp = '';
+                if(data.config.storage.mimeTypes.includes('application/json')) {
+                    tmp = 'checked="checked"';
+                }
+                rowTmp = `<tr><td>Output as JSON file ('application/json')</td><td><input class="form-check-input" type="checkbox" id="outputJsonCheckBox" ${tmp}></td></tr>`;
                 $('#config-table-body').append(rowTmp);
-                var rowTmp = `<tr><td>Log Level</td><td>${data.config.logging.level}</td></tr>`;
+                
+                allowedCalendarIds = data.config.calendar.allowedCalendarIds;
+
+                rowTmp = `<tr><td>Calendar IDs</td><td id="calendarIds"><span class="loader"></span></td></tr>`;
                 $('#config-table-body').append(rowTmp);
-                var rowTmp = `<tr><td>Cron Job</td><td>${data.config.cronJob.pattern}</td></tr>`;
+
+                groupExportTag = data.config.tags.groupsToExport;
+                $('#config-table-body').append('<tr><td>Tag for Groups to Export</td><td id="tagForGroupsToExport"><span class="loader"></span></td></tr>');
+
+                personExportTag = data.config.tags.personsToExport;
+                $('#config-table-body').append('<tr><td>Tag for Persons to Export</td><td id="tagForPersonsToExport"><span class="loader"></span></td></tr>');
+
+
+                var rowTmp = '<tr><td>Log Level</td><td><select class="custom-select" id="logLevelSelect">'+
+                    `<option value="LOG_LEVEL_DEBUG" ${data.config.logging.level == 'LOG_LEVEL_DEBUG' ? 'selected' : ''}>Debug</option>`+
+                    `<option value="LOG_LEVEL_INFO" ${data.config.logging.level == 'LOG_LEVEL_INFO' ? 'selected' : ''}>Info</option>`+
+                    `<option value="LOG_LEVEL_ERROR" ${data.config.logging.level == 'LOG_LEVEL_ERROR' ? 'selected' : ''}>Error</option>`+
+                    `<option value="LOG_LEVEL_NONE" ${data.config.logging.level == 'LOG_LEVEL_NONE' ? 'selected' : ''}>None</option>`+
+                    `</select></td></tr>`;
+                
                 $('#config-table-body').append(rowTmp);
+
+                $('#config-table-body').append(`<tr><td>Cron Job</td><td><div class="input-group input-group-sm input-inline">`+
+                    `<input id="cronJob-pattern" type="text" class="form-control" value="${data.config.cronJob.pattern}">`+
+                    `<div class="input-group-append"><button class="btn btn-outline-secondary" type="button">Help</button></div></div></td></tr>`);
+
                 console.log(data);
             })
             .fail(function (error) {
