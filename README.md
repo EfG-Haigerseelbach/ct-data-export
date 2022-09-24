@@ -50,12 +50,12 @@ You can check the user's authorization in the ChurchTools webpage by going to _P
 
 ### Storage Paths
 
-| Parameter            | Data Type | Default                   | Possible Values | Explanation                                                                                   |
-|----------------------|-----------|---------------------------|-----------------|-----------------------------------------------------------------------------------------------|
-| `path`               | string    | absolute/or/relative/path | n/a             | Absolute or relative path where to store the exported data with or without ending slash (`/`) |
-| `groupsData`         | string    | path/and/filename.csv     | n/a             | Filename for data of groups without file type extension (e.g. `.csv`)                         |
-| `contactPersonsData` | string    | path/and/filename.csv     | n/a             | Filename for data of contact persons without file type extension (e.g. `.csv`)                |
-| `appointmentData`    | string    | path/and/filename.csv     | n/a             | Filename for data of appointments without file type extension (e.g. `.csv`)                   |
+| Parameter            | Data Type | Default                     | Possible Values | Explanation                                                                                   |
+|----------------------|-----------|-----------------------------|-----------------|-----------------------------------------------------------------------------------------------|
+| `path`               | string    | `absolute/or/relative/path` | n/a             | Absolute or relative path where to store the exported data with or without ending slash (`/`) |
+| `groupsData`         | string    | `path/and/filename.csv`     | n/a             | Filename for data of groups without file type extension (e.g. `.csv`)                         |
+| `contactPersonsData` | string    | `path/and/filename.csv`     | n/a             | Filename for data of contact persons without file type extension (e.g. `.csv`)                |
+| `appointmentData`    | string    | `path/and/filename.csv`     | n/a             | Filename for data of appointments without file type extension (e.g. `.csv`)                   |
 
 ### Calendar
 
