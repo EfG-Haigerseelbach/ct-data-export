@@ -92,7 +92,7 @@
         $.get("/getCalendars")
             .done(function (data) {
                 var calendarIdsAndNames = data;
-                var calendarCheckBoxTemplate = '<div class="form-group"><input class="form-check-input" type="checkbox" id="##ID##" ##CHECKED##><label class="form-check-label" for="##ID##">##LABEL##</label></div>';
+                var calendarCheckBoxTemplate = '<div class="form-group"><input class="form-check-input" type="checkbox" id="##ID##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL## <span style="color: #bbb;">(ID: ##ID##)</span></label></div>';
                 
                 var tmp = '';
                 calendarIdsAndNames.forEach(calendarIdAndName => {
@@ -127,7 +127,7 @@
         $.get("/getTags")
             .done(function (data) {
                 var tagIdsAndNames = data;
-                var tagRadioButtonTemplate = '<div class="form-group"><input class="form-check-input" type="radio" id="##ID##" ##CHECKED##><label class="form-check-label" for="##ID##">##LABEL##</label></div>';
+                var tagRadioButtonTemplate = '<div class="form-group"><input class="form-check-input" type="radio" id="##ID##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL##</label></div>';
                 
                 var tmpPersons = '';
                 var tmpGroups = '';

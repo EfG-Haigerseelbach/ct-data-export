@@ -610,6 +610,14 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
         filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".csv", 
           "category": "appointmentData", "mimeType":"text/csv"});
       }
+      if(mimeType == 'application/json') {
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".json", 
+          "category": "groupsData", "mimeType":"application/json"});
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".json", 
+          "category": "contactPersonsData", "mimeType":"application/json"});
+        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".json", 
+          "category": "appointmentData", "mimeType":"application/json"});
+      }
     });
 
     var result = {
