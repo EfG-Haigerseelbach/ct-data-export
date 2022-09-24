@@ -204,6 +204,8 @@
                     .replace('##id##','churchtools-username')
                     .replace('##value##',data.config.churchtools.username));
 
+                $('#config-table-body').append(`<tr><td>ChurchTools API password</td><td><div class="input-group input-group-sm input-inline"><input id="churchtools-password" type="password" class="form-control" placeholder="Enter the new password here"></div></td></tr>`);
+
                 $('#config-table-body').append(inputRowTemplate
                     .replace('##key##','Path to store exported data')
                     .replace('##id##','storage-path')
@@ -261,7 +263,7 @@
 
                 $('#config-table-body').append(`<tr><td>Cron Job</td><td><div class="input-group input-group-sm input-inline">`+
                     `<input id="cronJob-pattern" type="text" class="form-control" value="${data.config.cronJob.pattern}">`+
-                    `<div class="input-group-append"><button class="btn btn-outline-secondary" type="button">Help</button></div></div></td></tr>`);
+                    `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" >Help</a></div></div></td></tr>`);
 
                 console.log(data);
             })
