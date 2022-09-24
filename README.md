@@ -30,11 +30,23 @@ All configuration settings are located at `config/default.json`. Initially this 
 
 In addition to the configuration of the parameters above you need to ensure that the user (see `username`) has appropriate authorizations:
 
-- view tags (dt. Tags einsehen)
-- view (dt. Personen & Gruppen sehen)
-- security level person according to your needs
-- security level group according to your needs
-- view grouptype according to your needs
+```
+...
+|
++- Persons & Groups
+|  |
+|  +- view (dt. Personen & Gruppen sehen)  
+|  +- security level person according to your needs
+|  +- security level group according to your needs
+|  ...
+|  +- view grouptype according to your needs
+|  ...
+|  +- view tags (dt. Tags einsehen)
+|  ...
+...
+```
+
+You can check the user's authorization in the ChurchTools webpage by going to _Persons & Groups_ > _Persons_ > the user in question > _Authorizations_ > _Edit Authorizations_.
 
 ### Storage Paths
 
