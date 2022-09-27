@@ -6,14 +6,14 @@
 
 <nav class="navbar navbar-expand-lg bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">ChurchTools Data Export</a>
+        <a class="navbar-brand" href="#" data-i18n="navbar.title"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="nav navbar-right" id="navbarSupportedContent" role="search">
             <form class="d-flex" action="/logout" method="POST">
-                <button class="btn btn-outline-success" type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+                <button class="btn btn-outline-success" type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-i18n="navbar.logout"></span></button>
             </form>
         </div>
     </div>
@@ -52,22 +52,22 @@
 <div class="container">
     <select name="language" id="languageSwitcher"></select>
     <h3 style="margin-top: 3rem;" data-i18n="dashboard"></h3>
-    <h4 style="margin-top: 2rem;">Files <i class="fa-solid fa-arrows-rotate" id="refresh-files"></i></h4>
+    <h4 style="margin-top: 2rem;"><span data-i18n="files"></span> <i class="fa-solid fa-arrows-rotate" id="refresh-files"></i></h4>
     <div class="list-group" id="files-list">
     </div>
 
-    <h4 style="margin-top: 2rem;">Configuration</h4>
+    <h4 style="margin-top: 2rem;" data-i18n="configuration"></h4>
     <table class="table table-sm table-hover table-striped">
         <thead>
             <tr>
-                <th scope="col">Key</th>
-                <th scope="col">Value</th>
+                <th scope="col" data-i18n="key"></th>
+                <th scope="col" data-i18n="value"></th>
             </tr>
         </thead>
         <tbody id="config-table-body">
         </tbody>
     </table>
-    <button type="button" class="btn btn-success" id="saveConfig"><i class="fa-regular fa-floppy-disk"></i> Save</button>
+    <button type="button" class="btn btn-success" id="saveConfig"><i class="fa-regular fa-floppy-disk"></i> <span data-i18n="save"></span></button>
 </div>
 <script>
     function formatBytes(bytes, decimals = 2) {
@@ -266,37 +266,37 @@
                     
                 });
 
-                var inputRowTemplate = `<tr><td>##key##</td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
+                var inputRowTemplate = `<tr><td data-i18n="##key##"</td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
                 
                 $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','ChurchTools URL')
+                    .replace('##key##','config.churchtools.url')
                     .replace('##id##','churchtools-url')
                     .replace('##value##',data.config.churchtools.url));
 
                 $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','ChurchTools API user')
+                    .replace('##key##','config.churchtools.username')
                     .replace('##id##','churchtools-username')
                     .replace('##value##',data.config.churchtools.username));
 
-                $('#config-table-body').append(`<tr><td>ChurchTools API password</td><td><div class="input-group input-group-sm input-inline"><input id="churchtools-password" type="password" class="form-control" placeholder="Enter the new password here"></div></td></tr>`);
+                $('#config-table-body').append(`<tr><td data-i18n="config.churchtools.password"></td><td><div class="input-group input-group-sm input-inline"><input id="churchtools-password" type="password" class="form-control" placeholder="Enter the new password here"></div></td></tr>`);
 
                 $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','Path to store exported data')
+                    .replace('##key##','config.storage.path')
                     .replace('##id##','storage-path')
                     .replace('##value##',data.config.storage.path));
 
                 $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','Filename for data of Groups (w/o extension)')
+                    .replace('##key##','config.storage.groupsData')
                     .replace('##id##','storage-groupsData')
                     .replace('##value##',data.config.storage.groupsData));
 
                 $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','Filename for data of Persons (w/o extension)')
+                    .replace('##key##','config.storage.contactPersonsData')
                     .replace('##id##','storage-contactPersonsData')
                     .replace('##value##',data.config.storage.contactPersonsData));
 
                 $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','Filename for data of Appointments (w/o extension)')
+                    .replace('##key##','config.storage.appointmentData')
                     .replace('##id##','storage-appointmentData')
                     .replace('##value##',data.config.storage.appointmentData));
 
@@ -304,38 +304,37 @@
                 if(data.config.storage.mimeTypes.includes('text/csv')) {
                     tmp = 'checked="checked"';
                 }
-                var rowTmp = `<tr><td>Output as CSV file ('text/csv')</td><td><input class="form-check-input" type="checkbox" id="outputCsvCheckBox" ${tmp}></td></tr>`;
+                var rowTmp = `<tr><td data-i18n="config.storage.csv"></td><td><input class="form-check-input" type="checkbox" id="outputCsvCheckBox" ${tmp}></td></tr>`;
                 $('#config-table-body').append(rowTmp);
                 
                 tmp = '';
                 if(data.config.storage.mimeTypes.includes('application/json')) {
                     tmp = 'checked="checked"';
                 }
-                rowTmp = `<tr><td>Output as JSON file ('application/json')</td><td><input class="form-check-input" type="checkbox" id="outputJsonCheckBox" ${tmp}></td></tr>`;
+                rowTmp = `<tr><td data-i18n="config.storage.json"></td><td><input class="form-check-input" type="checkbox" id="outputJsonCheckBox" ${tmp}></td></tr>`;
                 $('#config-table-body').append(rowTmp);
                 
                 allowedCalendarIds = data.config.calendar.allowedCalendarIds;
 
-                rowTmp = `<tr><td>Calendar IDs</td><td id="calendarIds"><span class="loader"></span></td></tr>`;
+                rowTmp = `<tr><td data-i18n="calendar_ids"></td><td id="calendarIds"><span class="loader"></span></td></tr>`;
                 $('#config-table-body').append(rowTmp);
 
                 groupExportTag = data.config.tags.groupsToExport;
-                $('#config-table-body').append('<tr><td>Tag for Groups to Export</td><td id="tags-groupsToExport"><span class="loader"></span></td></tr>');
+                $('#config-table-body').append('<tr><td data-i18n="config.tags.groupsToExport"></td><td id="tags-groupsToExport"><span class="loader"></span></td></tr>');
 
                 personExportTag = data.config.tags.personsToExport;
-                $('#config-table-body').append('<tr><td>Tag for Persons to Export</td><td id="tags-personsToExport"><span class="loader"></span></td></tr>');
+                $('#config-table-body').append('<tr><td data-i18n="config.tags.personsToExport"></td><td id="tags-personsToExport"><span class="loader"></span></td></tr>');
 
 
-                var rowTmp = '<tr><td>Log Level</td><td><select class="custom-select" id="logLevelSelect">'+
+                var rowTmp = '<tr><td data-i18n="config.logging.level"></td><td><select class="custom-select" id="logLevelSelect">'+
                     `<option value="debug" ${data.config.logging.level == 'debug' ? 'selected' : ''}>Debug</option>`+
                     `<option value="info" ${data.config.logging.level == 'info' ? 'selected' : ''}>Info</option>`+
                     `<option value="error" ${data.config.logging.level == 'error' ? 'selected' : ''}>Error</option>`+
                     `<option value="none" ${data.config.logging.level == 'none' ? 'selected' : ''}>None</option>`+
                     `</select></td></tr>`;
-                
                 $('#config-table-body').append(rowTmp);
 
-                $('#config-table-body').append(`<tr><td>Cron Job</td><td><div class="input-group input-group-sm input-inline">`+
+                $('#config-table-body').append(`<tr><td data-i18n="config.cronJob"></td><td><div class="input-group input-group-sm input-inline">`+
                     `<input id="cronJob-pattern" type="text" class="form-control" value="${data.config.cronJob.pattern}">`+
                     `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" >Help</a></div></div></td></tr>`);
 

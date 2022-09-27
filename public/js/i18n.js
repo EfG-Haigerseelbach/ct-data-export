@@ -24,12 +24,78 @@
         resources: {
             en: {
                 translation: {
-                  dashboard: 'Dashboard'
+                    navbar: {
+                        title: 'ChurchTools Data Export',
+                        logout: 'Logout'
+                    },
+                    dashboard: 'Dashboard',
+                    files: 'Files',
+                    configuration: 'Configuration',
+                    key: 'Key',
+                    value: 'Value',
+                    save: 'Save',
+                    config: {
+                        churchtools: {
+                            url: 'ChurchTools URL',
+                            username: 'ChurchTools API user',
+                            password: 'ChurchTools API password'
+                        },
+                        storage: {
+                            path: 'Path to store exported data',
+                            groupsData: 'Filename for data of Groups (w/o extension)',
+                            contactPersonsData: 'Filename for data of Persons (w/o extension)',
+                            appointmentData: 'Filename for data of Appointments (w/o extension)',
+                            csv: 'Output as CSV file (\'text/csv\')',
+                            json: 'Output as JSON file (\'application/json\')'
+                        },
+                        calendar_ids: 'Calendar IDs',
+                        tags: {
+                            groupsToExport: 'Tag for Groups to Export',
+                            personsToExport: 'Tag for Persons to Export'
+                        },
+                        logging: {
+                            level: 'Log Level'
+                        },
+                        cronJob: 'Cron Job'
+                    }
                 }
               },
               de: {
                 translation: {
-                    dashboard: 'Übersicht'
+                    navbar: {
+                        title: 'ChurchTools Datenexport',
+                        logout: 'Abmelden'
+                    },
+                    dashboard: 'Übersicht',
+                    files: 'Dateien',
+                    configuration: 'Konfiguration',
+                    key: 'Schlüssel',
+                    value: 'Wert',
+                    save: 'Speichern',
+                    config: {
+                        churchtools: {
+                            url: 'ChurchTools URL',
+                            username: 'ChurchTools API Benutzer',
+                            password: 'ChurchTools API Passwort'
+                        },
+                        storage: {
+                            path: 'Speicherpfad für exportierte Daten',
+                            groupsData: 'Dateiname für Gruppendaten (ohne Dateiendung)',
+                            contactPersonsData: 'Dateiname für Personendaten (ohne Dateiendung)',
+                            appointmentData: 'Dateiname für Termindaten (ohne Dateiendung)',
+                            csv: 'Ausgabe als CSV-Datei (\'text/csv\')',
+                            json: 'Ausgabe as JSON-Datei (\'application/json\')'
+                        },
+                        calendar_ids: 'Kalender IDs',
+                        tags: {
+                            groupsToExport: 'Tag für zu exportierende Gruppen',
+                            personsToExport: 'Tag für zu exportierende Personen'
+                        },
+                        logging: {
+                            level: 'Log Level'
+                        },
+                        cronJob: 'Cron Job'
+                    }
                 }
               }
         }
