@@ -130,10 +130,11 @@ dist
 .pnp.*
 
 # data export
+tmp/
 *.csv
 contactPersons.json
 groups.json
 appointments.json
 
 # config
-config/default.json
+config/default*.**
