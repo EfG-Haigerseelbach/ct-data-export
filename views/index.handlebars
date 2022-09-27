@@ -13,6 +13,8 @@
     </div>
 </nav>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <style>
     #refresh-files {
         transition: transform .7s ease-in-out;
@@ -49,17 +51,16 @@
 
     <h4 style="margin-top: 2rem;">Configuration</h4>
     <table class="table table-sm table-hover table-striped">
-      <thead>
-    <tr>
-      <th scope="col">Key</th>
-      <th scope="col">Value</th>
-    </tr>
-  </thead>
-  <tbody id="config-table-body">
-  </tbody>
-
-  </table>
-    </div>
+        <thead>
+            <tr>
+                <th scope="col">Key</th>
+                <th scope="col">Value</th>
+            </tr>
+        </thead>
+        <tbody id="config-table-body">
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-success" id="saveConfig"><i class="fa-regular fa-floppy-disk"></i> Save</button>
 </div>
 <script>
     function formatBytes(bytes, decimals = 2) {
@@ -92,16 +93,16 @@
         $.get("/getCalendars")
             .done(function (data) {
                 var calendarIdsAndNames = data;
-                var calendarCheckBoxTemplate = '<div class="form-group"><input class="form-check-input" type="checkbox" id="##ID##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL## <span style="color: #bbb;">(ID: ##ID##)</span></label></div>';
+                var calendarCheckBoxTemplate = '<div class="form-group"><input class="form-check-input calendarIdInput" type="checkbox" id="##ID##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL## <span style="color: #bbb;">(ID: ##ID##)</span></label></div>';
                 
                 var tmp = '';
                 calendarIdsAndNames.forEach(calendarIdAndName => {
                     var checkboxTmp = calendarCheckBoxTemplate
-                        .replace(/##ID##/g, calendarIdAndName.id)
+                        .replace(/##ID##/g, 'calendarId-'+calendarIdAndName.id)
                         .replace(/##LABEL##/g, calendarIdAndName.name);
                     var selected = false;
                     allowedCalendarIds.forEach(entry => {
-                        if(entry.id == calendarIdAndName.id) {
+                        if(entry == calendarIdAndName.id) {
                             selected = true;
                         }
                     });
@@ -127,17 +128,19 @@
         $.get("/getTags")
             .done(function (data) {
                 var tagIdsAndNames = data;
-                var tagRadioButtonTemplate = '<div class="form-group"><input class="form-check-input" type="radio" id="##ID##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL##</label></div>';
+                var tagRadioButtonTemplate = '<div class="form-group"><input class="form-check-input ##RADIO_GROUP##" type="radio" name="##RADIO_GROUP##" id="##ID##" data-name="##LABEL##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL##</label></div>';
                 
                 var tmpPersons = '';
                 var tmpGroups = '';
                 tagIdsAndNames.forEach(tagIdAndName => {
                     var radioButtonPersonsTmp = tagRadioButtonTemplate
-                        .replace(/##ID##/g, tagIdAndName.id)
-                        .replace(/##LABEL##/g, tagIdAndName.name);
+                        .replace(/##ID##/g, 'person-tag-'+tagIdAndName.id)
+                        .replace(/##LABEL##/g, tagIdAndName.name)
+                        .replace(/##RADIO_GROUP##/g, 'persons-to-export-tag-radio');
                     var radioButtonGroupsTmp = tagRadioButtonTemplate
-                        .replace(/##ID##/g, tagIdAndName.id)
-                        .replace(/##LABEL##/g, tagIdAndName.name);
+                        .replace(/##ID##/g, 'group-tag-'+tagIdAndName.id)
+                        .replace(/##LABEL##/g, tagIdAndName.name)
+                        .replace(/##RADIO_GROUP##/g, 'groups-to-export-tag-radio');
 
                     if(personExportTag == tagIdAndName.name) {
                         radioButtonPersonsTmp = radioButtonPersonsTmp.replace('##CHECKED##','checked="checked"');
@@ -153,27 +156,85 @@
                     tmpGroups += radioButtonGroupsTmp;
                 });
 
-                $('#tagForPersonsToExport').empty();
-                $('#tagForPersonsToExport').append(tmpPersons);
+                $('#tags-groupsToExport').empty();
+                $('#tags-groupsToExport').append(tmpGroups);
 
-                $('#tagForGroupsToExport').empty();
-                $('#tagForGroupsToExport').append(tmpGroups);
+                $('#tags-personsToExport').empty();
+                $('#tags-personsToExport').append(tmpPersons);
             })
             .fail(function (error) {
                 console.log(error);
             });
     }
 
+    function saveConfig() {
+        var newConfig = {
+            "churchtools": {
+                "url": $('#churchtools-url').val(),
+                "username": $('#churchtools-username').val(),
+                "password": $('#churchtools-password').val(),
+            },
+            "storage": {
+                "path": $('#storage-path').val(),
+                "groupsData": $('#storage-groupsData').val(),
+                "contactPersonsData": $('#storage-contactPersonsData').val(),
+                "appointmentData": $('#storage-appointmentData').val(),
+                "mimeTypes" : [ ]
+            }
+        };
+        if($('#outputCsvCheckBox').is(':checked')) {
+            newConfig.storage.mimeTypes.push('text/csv');
+        } 
+        if($('#outputJsonCheckBox').is(':checked')) {
+            newConfig.storage.mimeTypes.push('application/json');
+        } 
+
+        newConfig.calendar = {};
+        newConfig.calendar.allowedCalendarIds = [];
+        $('.calendarIdInput').each((index, element) => {
+            if($(element).is(':checked')) {
+                var id = $(element).attr('id').replace('calendarId-', '');
+                newConfig.calendar.allowedCalendarIds.push(id);
+            }
+        })
+
+        newConfig.tags = {};
+        newConfig.tags.groupsToExport = $( ".groups-to-export-tag-radio:checked" ).attr('data-name');
+        newConfig.tags.personsToExport = $( ".persons-to-export-tag-radio:checked" ).attr('data-name');
+
+        newConfig.logging = {};
+        newConfig.logging.level = $( "#logLevelSelect option:selected" ).attr('value');        
+
+        newConfig.cronJob = {};
+        newConfig.cronJob.pattern = "00 00 23 * * *";
+
+        $.ajax({
+            url: "/updateConfig", 
+            data: JSON.stringify(newConfig), 
+            contentType: 'application/json',
+            type: 'POST',
+            success: () => {
+                 location.reload();
+            },
+            error: (xhr, textStatus, errorThrown) =>{
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+            });
+    }
+
     $(document).ready(function () {
         $('#refresh-files').click(function() {
             $.get("/store")
-            .done(function () {
-                location.reload();
-            })
-            .fail(function (error) {
-                console.log(error);
-            });
+                .done(function () {
+                    location.reload();
+                })
+                .fail(function (error) {
+                    console.log(error);
+                });
         });
+
+        $('#saveConfig').click(saveConfig);
 
         getCalendarIdsAndNames();
         getTagIdsAndNames();
@@ -181,15 +242,17 @@
         $.get("/status")
             .done(function (data) {
                 data.files.forEach(file => {
-                    var entryTmp = `<a href="#" class="list-group-item list-group-item-action">`+
-                                   `    <div class="d-flex w-100 justify-content-between">`+
-                                   `        <h5 class="mb-1">${file.filename}</h5>`+
-                                   `        <small>${file.stats.mtime}</small>`+
-                                   `    </div>`+
-                                   `    <p class="mb-1">Some placeholder content in a paragraph.</p>`+
-                                   `    <small>${formatBytes(file.stats.size)}</small><small style="margin-left:1em;">${getIconForMimeType(file.mimeType)}</small>`+
-                                   `</a>`;
-                    $('#files-list').append(entryTmp);
+                    if(file.exists == true) { 
+                        var entryTmp = `<a href="#" class="list-group-item list-group-item-action">`+
+                                    `    <div class="d-flex w-100 justify-content-between">`+
+                                    `        <h5 class="mb-1">${file.filename}</h5>`+
+                                    `        <small>${file.stats.mtime}</small>`+
+                                    `    </div>`+
+                                    `    <p class="mb-1">Some placeholder content in a paragraph.</p>`+
+                                    `    <small>${formatBytes(file.stats.size)}</small><small style="margin-left:1em;">${getIconForMimeType(file.mimeType)}</small>`+
+                                    `</a>`;
+                        $('#files-list').append(entryTmp);
+                    }
                 });
 
                 var inputRowTemplate = `<tr><td>##key##</td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
@@ -246,17 +309,17 @@
                 $('#config-table-body').append(rowTmp);
 
                 groupExportTag = data.config.tags.groupsToExport;
-                $('#config-table-body').append('<tr><td>Tag for Groups to Export</td><td id="tagForGroupsToExport"><span class="loader"></span></td></tr>');
+                $('#config-table-body').append('<tr><td>Tag for Groups to Export</td><td id="tags-groupsToExport"><span class="loader"></span></td></tr>');
 
                 personExportTag = data.config.tags.personsToExport;
-                $('#config-table-body').append('<tr><td>Tag for Persons to Export</td><td id="tagForPersonsToExport"><span class="loader"></span></td></tr>');
+                $('#config-table-body').append('<tr><td>Tag for Persons to Export</td><td id="tags-personsToExport"><span class="loader"></span></td></tr>');
 
 
                 var rowTmp = '<tr><td>Log Level</td><td><select class="custom-select" id="logLevelSelect">'+
-                    `<option value="LOG_LEVEL_DEBUG" ${data.config.logging.level == 'LOG_LEVEL_DEBUG' ? 'selected' : ''}>Debug</option>`+
-                    `<option value="LOG_LEVEL_INFO" ${data.config.logging.level == 'LOG_LEVEL_INFO' ? 'selected' : ''}>Info</option>`+
-                    `<option value="LOG_LEVEL_ERROR" ${data.config.logging.level == 'LOG_LEVEL_ERROR' ? 'selected' : ''}>Error</option>`+
-                    `<option value="LOG_LEVEL_NONE" ${data.config.logging.level == 'LOG_LEVEL_NONE' ? 'selected' : ''}>None</option>`+
+                    `<option value="debug" ${data.config.logging.level == 'debug' ? 'selected' : ''}>Debug</option>`+
+                    `<option value="info" ${data.config.logging.level == 'info' ? 'selected' : ''}>Info</option>`+
+                    `<option value="error" ${data.config.logging.level == 'error' ? 'selected' : ''}>Error</option>`+
+                    `<option value="none" ${data.config.logging.level == 'none' ? 'selected' : ''}>None</option>`+
                     `</select></td></tr>`;
                 
                 $('#config-table-body').append(rowTmp);
