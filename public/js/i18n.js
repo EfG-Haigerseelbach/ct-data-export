@@ -108,19 +108,14 @@
   
         // fill language switcher
         Object.keys(lngs).map((lng) => {
-          const opt = new Option(lngs[lng].nativeName, lng);
-          if (lng === i18next.resolvedLanguage) {
-            opt.setAttribute("selected", "selected");
-          }
-          $('#languageSwitcher').append(opt);
+          $('#i18n-languages').append(`<li><a class="dropdown-item language-switch" href="#" data-language="${lng}">${lngs[lng].nativeName}</a></li>`);
         });
-        $('#languageSwitcher').change((a, b, c) => {
-          const chosenLng = $(this).find("option:selected").attr('value');
-          i18next.changeLanguage(chosenLng, () => {
-            rerender();
-          });
-        });
-  
+        $('.language-switch').click((event) => {
+            var chosenLng = $(event.currentTarget).attr('data-language')
+            i18next.changeLanguage(chosenLng, () => {
+                rerender();
+              });
+        });  
         rerender();
       });
   });

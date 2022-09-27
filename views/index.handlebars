@@ -12,6 +12,15 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="nav navbar-right" id="navbarSupportedContent" role="search">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-language"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="i18n-languages">
+                    </ul>
+                </li>
+            </ul>
             <form class="d-flex" action="/logout" method="POST">
                 <button class="btn btn-outline-success" type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-i18n="navbar.logout"></span></button>
             </form>
@@ -50,7 +59,6 @@
 </style>
 
 <div class="container">
-    <select name="language" id="languageSwitcher"></select>
     <h3 style="margin-top: 3rem;" data-i18n="dashboard"></h3>
     <h4 style="margin-top: 2rem;"><span data-i18n="files"></span> <i class="fa-solid fa-arrows-rotate" id="refresh-files"></i></h4>
     <div class="list-group" id="files-list">
