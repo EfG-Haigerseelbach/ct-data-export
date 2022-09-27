@@ -242,17 +242,21 @@
         $.get("/status")
             .done(function (data) {
                 data.files.forEach(file => {
-                    if(file.exists == true) { 
-                        var entryTmp = `<a href="#" class="list-group-item list-group-item-action">`+
-                                    `    <div class="d-flex w-100 justify-content-between">`+
-                                    `        <h5 class="mb-1">${file.filename}</h5>`+
-                                    `        <small>${file.stats.mtime}</small>`+
-                                    `    </div>`+
-                                    `    <p class="mb-1">Some placeholder content in a paragraph.</p>`+
-                                    `    <small>${formatBytes(file.stats.size)}</small><small style="margin-left:1em;">${getIconForMimeType(file.mimeType)}</small>`+
-                                    `</a>`;
-                        $('#files-list').append(entryTmp);
-                    }
+                    if(file.exists == false) {
+                        file.stats = {};
+                        file.stats.mtime = '-'
+                        file.stats.size = 0;
+                    } 
+                    var entryTmp = `<a href="#" class="list-group-item list-group-item-action">`+
+                                `    <div class="d-flex w-100 justify-content-between">`+
+                                `        <h5 class="mb-1">${file.filename}</h5>`+
+                                `        <small>${file.stats.mtime}</small>`+
+                                `    </div>`+
+                                `    <p class="mb-1">Some placeholder content in a paragraph.</p>`+
+                                `    <small>${formatBytes(file.stats.size)}</small><small style="margin-left:1em;">${getIconForMimeType(file.mimeType)}</small>`+
+                                `</a>`;
+                    $('#files-list').append(entryTmp);
+                    
                 });
 
                 var inputRowTemplate = `<tr><td>##key##</td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
