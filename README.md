@@ -13,8 +13,8 @@ Export data via ChurchTools API
 
 ### Configure
 
-5. Copy `template.json` to `default.json`.
-6. Edit `default.json` according to your needs. Refer to section **Configuration**.
+1. Copy `template.json` to `default.json`.
+2. Edit `default.json` according to your needs. Refer to section **Configuration**.
 
 ## Configuration
 
@@ -30,7 +30,7 @@ All configuration settings are located at `config/default.json`. Initially this 
 
 In addition to the configuration of the parameters above you need to ensure that the user (see `username`) has appropriate authorizations:
 
-```
+```text
 ...
 |
 +- Persons & Groups
@@ -46,7 +46,7 @@ In addition to the configuration of the parameters above you need to ensure that
 ...
 ```
 
-You can check the user's authorization in the ChurchTools webpage by going to _Persons & Groups_ > _Persons_ > the user in question > _Authorizations_ > _Edit Authorizations_.
+You can check the user's authorization in the ChurchTools webpage by going to *Persons & Groups* > *Persons* > the user in question > *Authorizations* > *Edit Authorizations*.
 
 ### Storage Paths
 
@@ -70,13 +70,13 @@ Parameter `allowedCalendarIds` is an array of objects where are each object has 
 
 | Parameter | Data Type | Default | Possible Values                 | Explanation                                                                              |
 |-----------|-----------|---------|---------------------------------|------------------------------------------------------------------------------------------|
-| `level`   | string    | `error` | `error`, `debug`, `info`, `off` | Refer to https://github.com/churchtools/churchtools-js-client/blob/master/src/logging.js |
+| `level`   | string    | `error` | `error`, `debug`, `info`, `off` | Refer to <https://github.com/churchtools/churchtools-js-client/blob/master/src/logging.js> |
 
 ### Cron Job
 
 | Parameter | Data Type | Default          | Possible Values                 | Explanation                                                              |
 |-----------|-----------|------------------|---------------------------------|--------------------------------------------------------------------------|
-| `pattern` | string    | `00 00 23 * * *` | `error`, `debug`, `info`, `off` | Refer to chapter *Cron Syntax* at https://github.com/node-cron/node-cron |
+| `pattern` | string    | `00 00 23 * * *` | `error`, `debug`, `info`, `off` | Refer to chapter *Cron Syntax* at <https://github.com/node-cron/node-cron> |
 
 ### Admin Token
 
@@ -86,4 +86,4 @@ Parameter `allowedCalendarIds` is an array of objects where are each object has 
 
 ## Usage
 
-tbd
+to be done
