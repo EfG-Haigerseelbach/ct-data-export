@@ -4,6 +4,9 @@
 
 <script src="public/js/i18n.js"></script>
 
+<script src="https://unpkg.com/cronstrue@2.11.0/dist/cronstrue.min.js" async></script>
+<script src="https://unpkg.com/cronstrue@2.11.0/dist/cronstrue-i18n.min.js" async></script>
+
 <nav class="navbar navbar-expand-lg bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="#" data-i18n="navbar.title"></a>
@@ -346,9 +349,13 @@
 
                 $('#config-table-body').append(`<tr><td data-i18n="config.cronJob"></td><td><div class="input-group input-group-sm input-inline">`+
                     `<input id="cronJob-pattern" type="text" class="form-control" value="${data.config.cronJob.pattern}">`+
-                    `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" >Help</a></div></div></td></tr>`);
+                    `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" >Help</a></div></div>`+
+                    `<div><span id="cronJob-pattern-explanation"></span></div></td></tr>`);
 
-                
+                $('#cronJob-pattern').change(()=> {
+                    $('#cronJob-pattern-explanation').empty();
+                    $('#cronJob-pattern-explanation').append(cronstrue.toString($('#cronJob-pattern').val(), { use24HourTimeFormat: true, locale: "de" }));
+                });
 
                 i18next.changeLanguage("de", () => {
                     rerender();
