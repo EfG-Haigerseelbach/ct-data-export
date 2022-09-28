@@ -467,7 +467,7 @@ function storeAllGroupsData() {
     getAllGroups()
       .then(allGroups => filterGroups(allGroups),
             reason => { reject(reason); })    
-      .then(filteredGroups => { resolve(storeData(filteredGroups, path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim()))); },
+      .then(filteredGroups => { resolve(storeData(filteredGroups, path.join('tmp',config.get('storage.groupsData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -477,7 +477,7 @@ function storeAllContactPersons() {
     getPersons([1,2,3,4,5,6,7])
       .then(allPersons => filterPersons(allPersons),
             reason => { reject(reason); })    
-      .then(filteredPersons => { resolve(storeData(filteredPersons,  path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim()))); },
+      .then(filteredPersons => { resolve(storeData(filteredPersons,  path.join('tmp',config.get('storage.contactPersonsData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -485,7 +485,7 @@ function storeAllContactPersons() {
 function storeNextAppointments() {
   return new Promise((resolve, reject) => {
     getNextAppointmentForCalendars()
-      .then(value => { resolve(storeData(value,  path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim()))); },
+      .then(value => { resolve(storeData(value,  path.join('tmp',config.get('storage.appointmentData').trim()))); },
             reason => { reject(reason); });
   });
 }
@@ -609,10 +609,6 @@ router.post('/updateConfig', checkAuthenticatedApi, function (req, res, next) {
   configTmp.churchtools.username = newConfig.churchtools.username;
   //configTmp.churchtools.password = newConfig.churchtools.password;
 
-  // TODO: Security risk, directory traversal possible!
-  // TODO: normalize path (e.g. no ending slash)
-  configTmp.storage.path = newConfig.storage.path;
-
   var allowedFilenameRegex = /^[\w\-.][\w\-. ]*$/;
   if(allowedFilenameRegex.test(newConfig.storage.groupsData)) {
     configTmp.storage.groupsData = newConfig.storage.groupsData;
@@ -676,25 +672,20 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
     var filesToCheck = [];
 
     config.get('storage.mimeTypes').forEach(mimeType => {
-      /*if(mimeType == 'application/json') {
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".json", "category": "groupsData"});
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".json", "category": "contactPersonsData"});
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".json", "category": "appointmentData"});
-      } else */
       if(mimeType == 'text/csv') {
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".csv", 
+        filesToCheck.push({ "path": path.join('tmp',config.get('storage.groupsData').trim())+".csv", 
           "category": "groupsData", "mimeType":"text/csv"});
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".csv", 
+        filesToCheck.push({ "path": path.join('tmp',config.get('storage.contactPersonsData').trim())+".csv", 
           "category": "contactPersonsData", "mimeType":"text/csv"});
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".csv", 
+        filesToCheck.push({ "path": path.join('tmp',config.get('storage.appointmentData').trim())+".csv", 
           "category": "appointmentData", "mimeType":"text/csv"});
       }
       if(mimeType == 'application/json') {
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.groupsData').trim())+".json", 
+        filesToCheck.push({ "path": path.join('tmp',config.get('storage.groupsData').trim())+".json", 
           "category": "groupsData", "mimeType":"application/json"});
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.contactPersonsData').trim())+".json", 
+        filesToCheck.push({ "path": path.join('tmp',config.get('storage.contactPersonsData').trim())+".json", 
           "category": "contactPersonsData", "mimeType":"application/json"});
-        filesToCheck.push({ "path": path.join(config.get('storage.path').trim(),config.get('storage.appointmentData').trim())+".json", 
+        filesToCheck.push({ "path": path.join('tmp',config.get('storage.appointmentData').trim())+".json", 
           "category": "appointmentData", "mimeType":"application/json"});
       }
     });
@@ -715,7 +706,6 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
       "username": config.get('churchtools.username'),
     };
     result.config.storage = {
-      "path": config.get('storage.path'),
       "groupsData": config.get('storage.groupsData'),
       "contactPersonsData": config.get('storage.contactPersonsData'),
       "appointmentData": config.get('storage.appointmentData'),

@@ -7,10 +7,13 @@
         "password": "password"
     },
     "storagePaths": {
-        "path": "absolute/or/relative/path",
         "groupsData": "path/and/filename.csv",
         "contactPersonsData": "path/and/filename.csv",
-        "appointmentData": "path/and/filename.csv"
+        "appointmentData": "path/and/filename.csv",
+        "mimeTypes": [
+            "text/csv",
+            "application/json"
+        ]
     },
     "calendar": {
         "allowedCalendarIds": [ 
