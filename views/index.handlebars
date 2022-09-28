@@ -108,12 +108,12 @@
         $.get("/getCalendars")
             .done(function (data) {
                 var calendarIdsAndNames = data;
-                var calendarCheckBoxTemplate = '<div class="form-group"><input class="form-check-input calendarIdInput" type="checkbox" id="##ID##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL## <span style="color: #bbb;">(ID: ##ID##)</span></label></div>';
+                var calendarCheckBoxTemplate = '<div class="form-group"><input class="form-check-input calendarIdInput" type="checkbox" id="calendarId-##ID##" ##CHECKED##> <label class="form-check-label" for="calendarId-##ID##">##LABEL## <span style="color: #bbb;">(ID: ##ID##)</span></label></div>';
                 
                 var tmp = '';
                 calendarIdsAndNames.forEach(calendarIdAndName => {
                     var checkboxTmp = calendarCheckBoxTemplate
-                        .replace(/##ID##/g, 'calendarId-'+calendarIdAndName.id)
+                        .replace(/##ID##/g, calendarIdAndName.id)
                         .replace(/##LABEL##/g, calendarIdAndName.name);
                     var selected = false;
                     allowedCalendarIds.forEach(entry => {
@@ -143,17 +143,19 @@
         $.get("/getTags")
             .done(function (data) {
                 var tagIdsAndNames = data;
-                var tagRadioButtonTemplate = '<div class="form-group"><input class="form-check-input ##RADIO_GROUP##" type="radio" name="##RADIO_GROUP##" id="##ID##" data-name="##LABEL##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL##</label></div>';
+                var tagRadioButtonTemplate = '<div class="form-group"><input class="form-check-input ##RADIO_GROUP##" type="radio" name="##RADIO_GROUP##" id="##ID##" data-name="##LABEL##" ##CHECKED##> <label class="form-check-label" for="##ID##">##LABEL## <span style="color: #bbb;">(ID: ##ID_ONLY##)</span></label></div>';
                 
                 var tmpPersons = '';
                 var tmpGroups = '';
                 tagIdsAndNames.forEach(tagIdAndName => {
                     var radioButtonPersonsTmp = tagRadioButtonTemplate
                         .replace(/##ID##/g, 'person-tag-'+tagIdAndName.id)
+                        .replace(/##ID_ONLY##/g, tagIdAndName.id)
                         .replace(/##LABEL##/g, tagIdAndName.name)
                         .replace(/##RADIO_GROUP##/g, 'persons-to-export-tag-radio');
                     var radioButtonGroupsTmp = tagRadioButtonTemplate
                         .replace(/##ID##/g, 'group-tag-'+tagIdAndName.id)
+                        .replace(/##ID_ONLY##/g, tagIdAndName.id)
                         .replace(/##LABEL##/g, tagIdAndName.name)
                         .replace(/##RADIO_GROUP##/g, 'groups-to-export-tag-radio');
 
@@ -324,7 +326,7 @@
                 
                 allowedCalendarIds = data.config.calendar.allowedCalendarIds;
 
-                rowTmp = `<tr><td data-i18n="calendar_ids"></td><td id="calendarIds"><span class="loader"></span></td></tr>`;
+                rowTmp = `<tr><td data-i18n="config.allowedCalendarIds"></td><td id="calendarIds"><span class="loader"></span></td></tr>`;
                 $('#config-table-body').append(rowTmp);
 
                 groupExportTag = data.config.tags.groupsToExport;
@@ -346,7 +348,7 @@
                     `<input id="cronJob-pattern" type="text" class="form-control" value="${data.config.cronJob.pattern}">`+
                     `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" >Help</a></div></div></td></tr>`);
 
-                console.log(data);
+                
 
                 i18next.changeLanguage("de", () => {
                     rerender();

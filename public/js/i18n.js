@@ -89,7 +89,7 @@
                             csv: 'Output as CSV file (\'text/csv\')',
                             json: 'Output as JSON file (\'application/json\')'
                         },
-                        calendar_ids: 'Calendar IDs',
+                        allowedCalendarIds: 'Calendar IDs',
                         tags: {
                             groupsToExport: 'Tag for Groups to Export',
                             personsToExport: 'Tag for Persons to Export'
@@ -127,7 +127,7 @@
                             csv: 'Ausgabe als CSV-Datei (\'text/csv\')',
                             json: 'Ausgabe as JSON-Datei (\'application/json\')'
                         },
-                        calendar_ids: 'Kalender IDs',
+                        allowedCalendarIds: 'Kalender IDs',
                         tags: {
                             groupsToExport: 'Tag für zu exportierende Gruppen',
                             personsToExport: 'Tag für zu exportierende Personen'

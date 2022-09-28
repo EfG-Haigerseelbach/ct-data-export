@@ -10,8 +10,6 @@ const path = require('path');
 const { group } = require('console');
 const { has } = require('config');
 
-
-
 var CronJob = require('cron').CronJob;
 
 checkAuthenticated = (req, res, next) => {

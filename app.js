@@ -13,6 +13,7 @@ const expressSession = require('express-session')({
 });
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+var config = require('config');
 
 
 var indexRouter = require('./routes/index');
@@ -26,7 +27,6 @@ var app = express();
 app.engine('handlebars', exphbs.engine({ extname: '.hbs', defaultLayout: "main"}));
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
-
 
 
 app.use(logger('dev'));
@@ -43,33 +43,19 @@ app.use(passport.session());
 app.use("/public", express.static(path.join(__dirname, 'public')));
 //app.use(favicon(__dirname + '/public/resources/favicon/favicon.ico'));
 
-
-
 app.use('/', indexRouter);
-
-
 
 // The "authUser" is a function that we will define later will contain the steps to authenticate a user, and will return the "authenticated user".
 passport.use(new LocalStrategy(authUser));
 
 function authUser(user, password, done) {
   console.log("authUser");
-  if(password == 'test') {
-  //Search the user, password in the DB to authenticate the user
-  //Let's assume that a search within your DB returned the username and password match for "Kyle".
-    let authenticated_user = { id: 123, name: "Kyle"}
+  if(password == config.get('adminToken')) {
+    let authenticated_user = { id: 1, name: "Admin"};
     return done(null, authenticated_user); //done(error, user);
   } else {
     return done(null, false, { message: 'Invalid admin token'});
   }
-  /*
-1. If the user not found in DB, 
-done (null, false)
-2. If the user found in DB, but password does not match, 
-done (null, false)
-3. If user found in DB and password match, 
-done (null, {authenticated_user})
-  */
 }
 
 passport.serializeUser( (userObj, done) => {
