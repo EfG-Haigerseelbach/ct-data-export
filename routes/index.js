@@ -1,7 +1,7 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
-const config = require('config');
+var config = require('config');
 const fs = require('fs');
 const { churchtoolsClient, activateLogging, LOG_LEVEL_DEBUG, LOG_LEVEL_INFO, LOG_LEVEL_ERROR, LOG_LEVEL_NONE, errorHelper } = require('@churchtools/churchtools-client');
 const axiosCookieJarSupport = require('axios-cookiejar-support');
@@ -30,13 +30,13 @@ function initChurchToolsClient() {
     churchtoolsClient.setCookieJar(axiosCookieJarSupport.default, new tough.CookieJar());
     churchtoolsClient.setBaseUrl(config.get('churchtools.url'));
     var logLevel = config.get('logging.level');
-    if(logLevel == "LOG_LEVEL_DEBUG") {
+    if(logLevel == "debug") {
       // LOG_LEVEL_DEBUG (outputs every request and response including request/response data)
       activateLogging(LOG_LEVEL_DEBUG);
-    } else if(logLevel == "LOG_LEVEL_INFO") {
+    } else if(logLevel == "info") {
       // LOG_LEVEL_INFO (outputs every request and response, but only method and URL)
       activateLogging(LOG_LEVEL_INFO);
-    } else if(logLevel == "LOG_LEVEL_ERROR") {
+    } else if(logLevel == "error") {
       // LOG_LEVEL_ERROR (outputs only errors)
       activateLogging(LOG_LEVEL_ERROR);
     } else {
@@ -222,9 +222,9 @@ function isCalendarIdAllowed(calendarId) {
   if(isNaN(calendarId)) {
     return false;
   }
-  var tmp = config.get('calendar.allowedCalendarIds');
-  for(var i = 0; i < tmp.length; i++) {
-    if(tmp[i].id == calendarId) {
+  var allowedCalendarIds = config.get('calendar.allowedCalendarIds');
+  for(var i = 0; i < allowedCalendarIds.length; i++) {
+    if(allowedCalendarIds[i] == calendarId) {
       return true;
     }
   }
@@ -250,10 +250,10 @@ function isCalendarIdsAllowed(calendarIds) {
  * @returns {array} calendar IDs as array of numbers
  */
 function getCalendarIds() {
-  var tmp = config.get('calendar.allowedCalendarIds');
+  var allowedCalendarIds = config.get('calendar.allowedCalendarIds');
   var result = [];
-  for(var i = 0; i < tmp.length; i++) {
-    result.push(tmp[i].id);
+  for(var i = 0; i < allowedCalendarIds.length; i++) {
+    result.push(allowedCalendarIds[i]);
   }
   return result;
 }
@@ -278,7 +278,9 @@ function buildQueryParametersForCalendarIds(calendarIds) {
  */
 function buildQueryParameterFromWithCurrentDate() {
   var now = new Date().toISOString().replace(/T.*/,'');
-  return 'from='+now;
+  var tmp = new Date();
+  var to = new Date(tmp.setMonth(tmp.getMonth()+3)).toISOString().replace(/T.*/,'');
+  return 'from='+now+'&to='+to;
 }
 
 function assertIsArray(toCheck, reject) {
@@ -505,8 +507,9 @@ router.get('/storeAllGroupsData', checkAuthenticatedApi, function (req, res, nex
     res.send(value);
   }, reason => {
     res.status(500);
-    res.send(reason);
-    console.log(reason);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
   });
 });
 
@@ -516,8 +519,9 @@ router.get('/storeAllContactPersons', checkAuthenticatedApi, function (req, res,
     res.send(value);
   }, reason => {
     res.status(500);
-    res.send(reason);
-    console.log(reason);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
   });
 });
 
@@ -527,7 +531,9 @@ router.get('/storeNextAppointments', checkAuthenticatedApi, function (req, res, 
     res.send(value);
   }, reason => {
     res.status(500);
-    res.send(reason);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
   });
 });
 
@@ -540,7 +546,9 @@ router.get('/store', checkAuthenticatedApi, function (req, res, next) {
     res.send("OK");
   }, reason => {
     res.status(500);
-    res.send(reason);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
   });
 });
 
@@ -550,7 +558,9 @@ router.get('/getAllGroups', checkAuthenticatedApi, function (req, res, next) {
     res.send(value);
   }, reason => {
     res.status(500);
-    res.send(reason);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
   });
 });
 
@@ -560,7 +570,9 @@ router.get('/getAllAppointments', checkAuthenticatedApi, function (req, res, nex
     res.send(value);
   }, reason => {
     res.status(500);
-    res.send(reason);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
   });
 });
 
@@ -570,7 +582,9 @@ router.get('/getCalendars', checkAuthenticatedApi, function (req, res, next) {
     res.send(calendarIdsAndNames);
   }, reason => {
     res.status(500);
-    res.send(reason);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
   });
 });
 
@@ -580,16 +594,83 @@ router.get('/getTags', checkAuthenticatedApi, function (req, res, next) {
     res.send(tagIdsAndNames);
   }, reason => {
     res.status(500);
-    res.send(reason);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
   });
 });
 
-router.get('/reloadConfig', checkAuthenticatedApi, function (req, res, next) {
-  delete require.cache[require.resolve('config')];
-  res.setHeader("Content-Type", "application/json");
-  res.send('OK');
-});
+router.post('/updateConfig', checkAuthenticatedApi, function (req, res, next) {
+  var result = {};
+  newConfig = req.body;
+  var configTmp = JSON.parse(fs.readFileSync('config/default.json'));
+  fs.writeFileSync('config/default.json.bak', JSON.stringify(configTmp));
 
+  // TODO: perform a connection test with the URL and user/password
+  configTmp.churchtools.url = newConfig.churchtools.url;
+  configTmp.churchtools.username = newConfig.churchtools.username;
+  //configTmp.churchtools.password = newConfig.churchtools.password;
+
+  // TODO: Security risk, directory traversal possible!
+  // TODO: normalize path (e.g. no ending slash)
+  configTmp.storage.path = newConfig.storage.path;
+
+  var allowedFilenameRegex = /^[\w\-.][\w\-. ]*$/;
+  if(allowedFilenameRegex.test(newConfig.storage.groupsData)) {
+    configTmp.storage.groupsData = newConfig.storage.groupsData;
+  } else {
+    result.storage.groupsData = 'The filename contains an invalid character';
+  }
+  if(allowedFilenameRegex.test(newConfig.storage.contactPersonsData)) {
+    configTmp.storage.contactPersonsData = newConfig.storage.contactPersonsData;
+  } else {
+    result.storage.contactPersonsData = 'The filename contains an invalid character';
+  }
+  if(allowedFilenameRegex.test(newConfig.storage.appointmentData)) {
+    configTmp.storage.appointmentData = newConfig.storage.appointmentData;
+  } else {
+    result.storage.appointmentData = 'The filename contains an invalid character';
+  }
+
+
+  configTmp.storage.mimeTypes = [];
+  if(newConfig.storage.mimeTypes.includes("text/csv")) {
+    configTmp.storage.mimeTypes.push("text/csv");
+  }
+  if(newConfig.storage.mimeTypes.includes("application/json")) {
+    configTmp.storage.mimeTypes.push("application/json");
+  }
+
+  // TODO: input validation for ID and name
+  configTmp.calendar.allowedCalendarIds = newConfig.calendar.allowedCalendarIds;
+
+  configTmp.tags.groupsToExport = newConfig.tags.groupsToExport; //JSON.stringify();
+  configTmp.tags.personsToExport = newConfig.tags.personsToExport;//JSON.stringify();
+
+  if(newConfig.logging.level == 'error' ||
+     newConfig.logging.level == 'debug' ||
+     newConfig.logging.level == 'info' ||
+     newConfig.logging.level == 'none') {
+    configTmp.logging.level = newConfig.logging.level;
+  } else {
+    configTmp.logging.level = 'error';
+    result.logging.level = 'The log level is invalid. Set the log level to "error"';
+  }
+
+  var cronPatternRegex = /((\d{1,2}|\*)\s){5}(\d{1,2}|\*)/;
+  if(cronPatternRegex.test(newConfig.cronJob.pattern)) {
+    configTmp.cronJob.pattern = newConfig.cronJob.pattern;
+  }
+
+  console.log(configTmp);
+
+  fs.writeFileSync('config/default.json', JSON.stringify(configTmp, null, 4));
+
+  delete require.cache[require.resolve('config')];
+  config = require('config');
+  res.setHeader("Content-Type", "application/json");
+  res.send({ "result" : "OK" });
+});
 
 router.get('/status', checkAuthenticatedApi, function (req, res, next) {
   try {
@@ -655,9 +736,10 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
     };
     res.send(result);
   } catch(err) {
-    console.log(err);
     res.status(500);
-    res.send("error");
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(err));
+    console.error(err);
   }
 });
 
@@ -691,7 +773,7 @@ router.post("/logout", (req,res) => {
     }
     res.redirect("/login")
   });
-})
+});
 
 var job = new CronJob(
 	config.get('cronJob.pattern'), 
