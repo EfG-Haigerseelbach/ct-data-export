@@ -354,6 +354,7 @@
 
                 $('#cronJob-pattern').change(()=> {
                     $('#cronJob-pattern-explanation').empty();
+                    // TODO: make locale dynamic
                     $('#cronJob-pattern-explanation').append(cronstrue.toString($('#cronJob-pattern').val(), { use24HourTimeFormat: true, locale: "de" }));
                 });
 
