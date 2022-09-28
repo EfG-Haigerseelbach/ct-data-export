@@ -274,7 +274,7 @@
                     
                 });
 
-                var inputRowTemplate = `<tr><td data-i18n="##key##"</td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
+                var inputRowTemplate = `<tr><td data-i18n="##key##"></td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
                 
                 $('#config-table-body').append(inputRowTemplate
                     .replace('##key##','config.churchtools.url')
@@ -347,6 +347,10 @@
                     `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" >Help</a></div></div></td></tr>`);
 
                 console.log(data);
+
+                i18next.changeLanguage("de", () => {
+                    rerender();
+                });
             })
             .fail(function (error) {
                 console.log(error);
