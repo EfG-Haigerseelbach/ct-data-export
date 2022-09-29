@@ -696,9 +696,9 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
     };
     filesToCheck.forEach(file => {
       if(fs.existsSync(file.path)) {
-        result.files.push({"filename": file.path, "exists": true, "stats": fs.statSync(file.path), "mimeType":file.mimeType});
+        result.files.push({"filename": file.path.replace('tmp\\',''), "exists": true, "stats": fs.statSync(file.path), "mimeType":file.mimeType});
       } else {
-        result.files.push({"filename": file.path, "exists": false});
+        result.files.push({"filename": file.path.replace('tmp\\',''), "exists": false});
       }
     });
     result.config.churchtools = {
