@@ -192,7 +192,7 @@
             "churchtools": {
                 "url": $('#churchtools-url').val(),
                 "username": $('#churchtools-username').val(),
-                "password": $('#churchtools-password').val(),
+                "password": $('#churchtools-password').val().trim().length > 0 ? $('#churchtools-password').val() : '',
             },
             "storage": {
                 "path": $('#storage-path').val(),

@@ -607,7 +607,7 @@ router.post('/updateConfig', checkAuthenticatedApi, function (req, res, next) {
   // TODO: perform a connection test with the URL and user/password
   configTmp.churchtools.url = newConfig.churchtools.url;
   configTmp.churchtools.username = newConfig.churchtools.username;
-  //configTmp.churchtools.password = newConfig.churchtools.password;
+  configTmp.churchtools.password = newConfig.churchtools.password.trim().length > 0 ? newConfig.churchtools.password : configTmp.churchtools.password;
 
   var allowedFilenameRegex = /^[\w\-.][\w\-. ]*$/;
   if(allowedFilenameRegex.test(newConfig.storage.groupsData)) {
