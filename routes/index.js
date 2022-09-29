@@ -701,6 +701,17 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
         result.files.push({"filename": file.path.replace('tmp\\',''), "exists": false});
       }
     });
+
+    result.files.sort(function compare(file_a, file_b) {
+      if (file_a.filename < file_b.filename ){
+        return -1;
+      }
+      if (file_a.filename > file_b.filename ){
+        return 1;
+      }
+      return 0;
+    });
+
     result.config.churchtools = {
       "url": config.get('churchtools.url'),
       "username": config.get('churchtools.username'),
