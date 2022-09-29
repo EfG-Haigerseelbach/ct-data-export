@@ -294,11 +294,6 @@
                 $('#config-table-body').append(`<tr><td data-i18n="config.churchtools.password"></td><td><div class="input-group input-group-sm input-inline"><input id="churchtools-password" type="password" class="form-control" placeholder="Enter the new password here"></div></td></tr>`);
 
                 $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','config.storage.path')
-                    .replace('##id##','storage-path')
-                    .replace('##value##',data.config.storage.path));
-
-                $('#config-table-body').append(inputRowTemplate
                     .replace('##key##','config.storage.groupsData')
                     .replace('##id##','storage-groupsData')
                     .replace('##value##',data.config.storage.groupsData));
