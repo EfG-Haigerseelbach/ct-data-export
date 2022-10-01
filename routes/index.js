@@ -9,6 +9,7 @@ const tough = require('tough-cookie');
 const path = require('path');
 const { group } = require('console');
 const { has } = require('config');
+var moment = require('moment');
 
 var CronJob = require('cron').CronJob;
 
@@ -334,48 +335,78 @@ function getNextAppointmentForCalendars() {
   });
 }
 
+var _calendars = {
+  timestamp : moment(),
+  calendars : []
+};
+
 /**
  * Get all calendars (ID and name).
  * @returns {object} promise
  */
  function getCalenders() {
-  var url = `/calendars`;
-  console.log(`Querying all calendars via URL: ${url}`);
-  return churchtoolsClient.get(url).then(calendars => {
+  // Check if the calendars have just been retrieved
+  if(_tags.timestamp <= moment().subtract(2, 'hours')) {
+    console.log('Using calendars from the cache');
     return new Promise((resolve, reject) => {
-      assertIsArray(calendars, reject);
-      var result = [];
-      
-      calendars.forEach(calendar => {
-        result.push({ id: calendar.id, name: calendar.name });
-      });
-      resolve(result);
+      resolve(_calendars.calendars);
     });
-  }, reason => {
-    console.error(reason); 
-  });
+  } else {
+    var url = `/calendars`;
+    console.log(`Querying all calendars via URL: ${url}`);
+    return churchtoolsClient.get(url).then(calendars => {
+      return new Promise((resolve, reject) => {
+        assertIsArray(calendars, reject);
+        var result = [];
+        
+        calendars.forEach(calendar => {
+          result.push({ id: calendar.id, name: calendar.name });
+        });
+        _calendars.timestamp = moment();
+        _calendars.calendars = result;
+        resolve(result);
+      });
+    }, reason => {
+      console.error(reason); 
+    });
+  }
 }
+
+var _tags = {
+  timestamp : moment(),
+  tags : []
+};
 
 /**
  * Get all tags (ID and name).
  * @returns {object} promise
  */
  function getTags() {
-  var url = `/tags?type=persons`;
-  console.log(`Querying all tags for type=persons via URL: ${url}`);
-  return churchtoolsClient.get(url).then(tags => {
+  // Check if the tags have just been retrieved
+  if(_tags.timestamp <= moment().subtract(2, 'hours')) {
+    console.log('Using tags from the cache');
     return new Promise((resolve, reject) => {
-      assertIsArray(tags, reject);
-      var result = [];
-      
-      tags.forEach(tag => {
-        result.push({ id: tag.id, name: tag.name });
-      });
-      resolve(result);
+      resolve(_tags.tags);
     });
-  }, reason => {
-    console.error(reason); 
-  });
+  } else {
+    var url = `/tags?type=persons`;
+    console.log(`Querying all tags for type=persons via URL: ${url}`);
+    return churchtoolsClient.get(url).then(tags => {
+      return new Promise((resolve, reject) => {
+        assertIsArray(tags, reject);
+        var result = [];
+        
+        tags.forEach(tag => {
+          result.push({ id: tag.id, name: tag.name });
+        });
+        _tags.timestamp = moment();
+        _tags.tags = result;
+        resolve(result);
+      });
+    }, reason => {
+      console.error(reason); 
+    });
+  }
 }
 
 /**
