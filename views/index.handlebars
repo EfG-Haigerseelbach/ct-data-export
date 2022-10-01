@@ -334,12 +334,12 @@
                 $('#config-table-body').append('<tr><td data-i18n="config.tags.personsToExport"></td><td id="tags-personsToExport"><span class="loader"></span></td></tr>');
 
 
-                var rowTmp = '<tr><td data-i18n="config.logging.level"></td><td><select class="custom-select" id="logLevelSelect">'+
+                var rowTmp = '<tr><td data-i18n="config.logging.level"></td><td><div class="input-group input-group-sm input-inline"><select class="from-select" id="logLevelSelect">'+
                     `<option value="debug" ${data.config.logging.level == 'debug' ? 'selected' : ''}>Debug</option>`+
                     `<option value="info" ${data.config.logging.level == 'info' ? 'selected' : ''}>Info</option>`+
                     `<option value="error" ${data.config.logging.level == 'error' ? 'selected' : ''}>Error</option>`+
                     `<option value="none" ${data.config.logging.level == 'none' ? 'selected' : ''}>None</option>`+
-                    `</select></td></tr>`;
+                    `</select></div></td></tr>`;
                 $('#config-table-body').append(rowTmp);
 
                 $('#config-table-body').append(`<tr><td data-i18n="config.cronJob"></td><td><div class="input-group input-group-sm input-inline">`+
