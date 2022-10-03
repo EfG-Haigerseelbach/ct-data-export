@@ -63,7 +63,7 @@
     } 
 </style>
 
-<div class="container">
+<div class="container" style="margin-bottom: 2em;">
     <h3 style="margin-top: 3rem;" data-i18n="dashboard"></h3>
     <h4 style="margin-top: 2rem;"><span data-i18n="files"></span> <i class="fa-solid fa-arrows-rotate" id="refresh-files"></i></h4>
     <div id="files">
@@ -264,16 +264,14 @@
         $.get("/status")
             .done(function (data) {
                 data.files.forEach(file => {
+                    var lastChangeDate;
                     if(file.exists == false) {
                         file.stats = {};
                         file.stats.mtime = '-'
                         file.stats.size = 0;
-                    } 
-                    var lastChangeDate = moment(file.stats.mtime, 'YYYY-MM-DDTHH:mm:ss.SSSZ');
-                    if(lastChangeDate.isValid()) {
-                        lastChangeDate = lastChangeDate.format('DD.MM.YYYY HH:mm:ss');
-                    } else {
                         lastChangeDate = '-';
+                    } else {
+                        lastChangeDate = moment(file.stats.mtime, 'YYYY-MM-DDTHH:mm:ss.SSSZ');
                     }
 
                     var entryTmp = 
@@ -283,7 +281,7 @@
                             `<!--<h5 class="card-title">${file.filename}</h5>-->`+
                             `<p class="card-text"><span data-i18n="lastChangeDate"></span>: ${lastChangeDate}</p>`+
                             `<p class="card-text">${formatBytes(file.stats.size)} ${getIconForMimeType(file.mimeType)}</p>`+
-                            `<a href="#" class="btn btn-primary">View</a>`+
+                            `<a href="#" class="btn ${file.exists == false ? 'btn-outline-secondary' : 'btn-primary'} ${file.exists == true ? '': 'disabled'}" data-i18n="view_file"></a>`+
                         `</div>`+
                     `</div>`;
                     $('#files').append(entryTmp);
