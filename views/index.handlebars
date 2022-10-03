@@ -66,7 +66,7 @@
 <div class="container">
     <h3 style="margin-top: 3rem;" data-i18n="dashboard"></h3>
     <h4 style="margin-top: 2rem;"><span data-i18n="files"></span> <i class="fa-solid fa-arrows-rotate" id="refresh-files"></i></h4>
-    <div class="list-group" id="files-list">
+    <div id="files">
     </div>
 
     <h4 style="margin-top: 2rem;" data-i18n="configuration"></h4>
@@ -276,14 +276,17 @@
                         lastChangeDate = '-';
                     }
 
-                    var entryTmp = `<a href="#" class="list-group-item list-group-item-action">`+
-                                `    <div class="d-flex w-100 justify-content-between">`+
-                                `        <h5 class="mb-1">${file.filename}</h5>`+
-                                `    </div>`+
-                                `    <p class="mb-1"><span data-i18n="lastChangeDate"></span>: ${lastChangeDate}</p>`+
-                                `    <small>${formatBytes(file.stats.size)}</small><small style="margin-left:1em;">${getIconForMimeType(file.mimeType)}</small>`+
-                                `</a>`;
-                    $('#files-list').append(entryTmp);
+                    var entryTmp = 
+                    `<div class="card" style="margin-bottom:1em;">`+
+                        `<h5 class="card-header">${file.filename}</h5>`+
+                        `<div class="card-body">`+
+                            `<!--<h5 class="card-title">${file.filename}</h5>-->`+
+                            `<p class="card-text"><span data-i18n="lastChangeDate"></span>: ${lastChangeDate}</p>`+
+                            `<p class="card-text">${formatBytes(file.stats.size)} ${getIconForMimeType(file.mimeType)}</p>`+
+                            `<a href="#" class="btn btn-primary">View</a>`+
+                        `</div>`+
+                    `</div>`;
+                    $('#files').append(entryTmp);
                     
                 });
 
@@ -370,11 +373,3 @@
             });
     });
 </script>
-<div class="card">
-  <h5 class="card-header">Featured</h5>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
-  </div>
-</div>
