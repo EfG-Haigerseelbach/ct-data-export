@@ -82,6 +82,23 @@
     </table>
     <button type="button" class="btn btn-success" id="saveConfig"><i class="fa-regular fa-floppy-disk"></i> <span data-i18n="save"></span></button>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="fileContentModal" tabindex="-1" aria-labelledby="fileContentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="fileContentModalLabel"></h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body font-monospace" id="fileContentModalBody">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close"></button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
     function formatBytes(bytes, decimals = 2) {
         if (bytes === 0) return '0 Bytes';
@@ -281,11 +298,30 @@
                             `<!--<h5 class="card-title">${file.filename}</h5>-->`+
                             `<p class="card-text"><span data-i18n="lastChangeDate"></span>: ${lastChangeDate}</p>`+
                             `<p class="card-text">${formatBytes(file.stats.size)} ${getIconForMimeType(file.mimeType)}</p>`+
-                            `<a href="#" class="btn ${file.exists == false ? 'btn-outline-secondary' : 'btn-primary'} ${file.exists == true ? '': 'disabled'}" data-i18n="view_file"></a>`+
+                            `<a href="#" class="btn ${file.exists == false ? 'btn-outline-secondary' : 'btn-primary'} ${file.exists == true ? '': 'disabled'} view-file-button" data-filename="${file.filename}" data-i18n="view_file"></a>`+
                         `</div>`+
                     `</div>`;
                     $('#files').append(entryTmp);
                     
+                });
+                $('.view-file-button').click(function(event) {
+                    var filename = $(this).data('filename');
+                     $.get("/getFile?filename="+filename)
+                        .done(function (file) {
+                            var content = file.content;
+                            if(filename.endsWith('json')) {
+                                content = JSON.stringify(JSON.parse(content), null, 4);
+                            }
+                            content = content.replace(/\n/g,'<br>');
+                            $('#fileContentModalLabel').empty();
+                            $('#fileContentModalLabel').append(filename);
+                            $('#fileContentModalBody').empty();
+                            $('#fileContentModalBody').append(content);
+                            $('#fileContentModal').modal('show');
+                        })
+                        .fail(function (error) {
+                            console.log(error);
+                        });
                 });
 
                 var inputRowTemplate = `<tr><td data-i18n="##key##"></td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;

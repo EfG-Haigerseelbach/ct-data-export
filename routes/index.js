@@ -409,6 +409,26 @@ var _tags = {
   }
 }
 
+function isFilenameInConfig(filename) {
+  filename = filename.replace(/\.csv/,'').replace(/\.json/,''); 
+  if(filename == config.get('storage.groupsData') ||
+     filename == config.get('storage.contactPersonsData') ||
+     filename == config.get('storage.appointmentData')) {
+    return true;
+  }
+  return false;
+}
+
+function getFile(filename) {
+  return new Promise((resolve, reject) => {
+    if(filename === undefined || filename == null || filename.length == 0 || !isFilenameInConfig(filename)) {
+      reject({ error: 'Invalid filename'});
+    }
+    var content = fs.readFileSync(path.join('tmp',filename), 'utf8');
+    resolve({ error: 'false', content: content});
+  });
+}
+
 /**
  * Build query parameters ids from the given array of person IDs
  * @param {Array} personIds array of person IDs as numbers
@@ -628,6 +648,19 @@ router.get('/getTags', checkAuthenticatedApi, function (req, res, next) {
     console.error(reason);
   });
 });
+
+router.get('/getFile', checkAuthenticatedApi, function (req, res, next) {
+  getFile(req.query.filename).then(file => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(file);
+  }, reason => {
+    res.status(500);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
+  });
+});
+
 
 router.post('/updateConfig', checkAuthenticatedApi, function (req, res, next) {
   var result = {};

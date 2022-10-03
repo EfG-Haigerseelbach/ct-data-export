@@ -77,6 +77,7 @@
                     save: 'Save',
                     lastChangeDate: 'Last cahge date',
                     view_file: 'View',
+                    close: 'Close',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
@@ -117,6 +118,7 @@
                     save: 'Speichern',
                     lastChangeDate: 'Letztes Änderungsdatum',
                     view_file: 'Anzeigen',
+                    close: 'Schließen',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
