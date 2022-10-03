@@ -336,7 +336,7 @@ function getNextAppointmentForCalendars() {
 }
 
 var _calendars = {
-  timestamp : moment(),
+  timestamp : moment().subtract(1, 'years'),
   calendars : []
 };
 
@@ -346,7 +346,7 @@ var _calendars = {
  */
  function getCalenders() {
   // Check if the calendars have just been retrieved
-  if(_tags.timestamp <= moment().subtract(2, 'hours')) {
+  if(_calendars.timestamp.isAfter(moment().subtract(20, 'seconds'))) {
     console.log('Using calendars from the cache');
     return new Promise((resolve, reject) => {
       resolve(_calendars.calendars);
@@ -373,7 +373,7 @@ var _calendars = {
 }
 
 var _tags = {
-  timestamp : moment(),
+  timestamp : moment().subtract(1, 'years'),
   tags : []
 };
 
@@ -383,7 +383,7 @@ var _tags = {
  */
  function getTags() {
   // Check if the tags have just been retrieved
-  if(_tags.timestamp <= moment().subtract(2, 'hours')) {
+  if(_tags.timestamp.isAfter(moment().subtract(20, 'seconds'))) {
     console.log('Using tags from the cache');
     return new Promise((resolve, reject) => {
       resolve(_tags.tags);

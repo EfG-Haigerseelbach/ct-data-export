@@ -7,6 +7,8 @@
 <script src="https://unpkg.com/cronstrue@2.11.0/dist/cronstrue.min.js" async></script>
 <script src="https://unpkg.com/cronstrue@2.11.0/dist/cronstrue-i18n.min.js" async></script>
 
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+
 <nav class="navbar navbar-expand-lg bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="#" data-i18n="navbar.title"></a>
@@ -267,12 +269,18 @@
                         file.stats.mtime = '-'
                         file.stats.size = 0;
                     } 
+                    var lastChangeDate = moment(file.stats.mtime, 'YYYY-MM-DDTHH:mm:ss.SSSZ');
+                    if(lastChangeDate.isValid()) {
+                        lastChangeDate = lastChangeDate.format('DD.MM.YYYY HH:mm:ss');
+                    } else {
+                        lastChangeDate = '-';
+                    }
+
                     var entryTmp = `<a href="#" class="list-group-item list-group-item-action">`+
                                 `    <div class="d-flex w-100 justify-content-between">`+
                                 `        <h5 class="mb-1">${file.filename}</h5>`+
-                                `        <small>${file.stats.mtime}</small>`+
                                 `    </div>`+
-                                `    <p class="mb-1">Some placeholder content in a paragraph.</p>`+
+                                `    <p class="mb-1"><span data-i18n="lastChangeDate"></span>: ${lastChangeDate}</p>`+
                                 `    <small>${formatBytes(file.stats.size)}</small><small style="margin-left:1em;">${getIconForMimeType(file.mimeType)}</small>`+
                                 `</a>`;
                     $('#files-list').append(entryTmp);
@@ -362,3 +370,11 @@
             });
     });
 </script>
+<div class="card">
+  <h5 class="card-header">Featured</h5>
+  <div class="card-body">
+    <h5 class="card-title">Special title treatment</h5>
+    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</div>

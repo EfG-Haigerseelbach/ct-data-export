@@ -75,6 +75,7 @@
                     key: 'Key',
                     value: 'Value',
                     save: 'Save',
+                    lastChangeDate: 'Last cahge date',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
@@ -113,6 +114,7 @@
                     key: 'Schlüssel',
                     value: 'Wert',
                     save: 'Speichern',
+                    lastChangeDate: 'Letztes Änderungsdatum',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
