@@ -78,6 +78,9 @@
                     lastChangeDate: 'Last cahge date',
                     view_file: 'View',
                     close: 'Close',
+                    login: 'Login',
+                    login_info: 'Access to the dashboard requires to login. Enter the <strong>admin token</strong> to proceed.',
+                    token_placeholder: 'Enter the token here',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
@@ -119,6 +122,9 @@
                     lastChangeDate: 'Letztes Änderungsdatum',
                     view_file: 'Anzeigen',
                     close: 'Schließen',
+                    login: 'Anmelden',
+                    login_info: 'Der Zugriff zum Dashboard benötigt eine Anmeldung. Bitte den <strong>Anmeldetoken</strong> eingeben, um fortzufahren.',
+                    token_placeholder: 'Den Anmeldetoken hier eingeben',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
@@ -160,8 +166,8 @@
         $('.language-switch').click((event) => {
             var chosenLng = $(event.currentTarget).attr('data-language')
             i18next.changeLanguage(chosenLng, () => {
-                rerender();
-              });
+              rerender();
+            });
         });  
         rerender();
       });
