@@ -81,6 +81,7 @@
                     login: 'Login',
                     login_info: 'Access to the dashboard requires to login. Enter the <strong>admin token</strong> to proceed.',
                     token_placeholder: 'Enter the token here',
+                    help: 'Help',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
@@ -125,6 +126,7 @@
                     login: 'Anmelden',
                     login_info: 'Der Zugriff zum Dashboard benötigt eine Anmeldung. Bitte den <strong>Anmeldetoken</strong> eingeben, um fortzufahren.',
                     token_placeholder: 'Den Anmeldetoken hier eingeben',
+                    help: 'Hilfe',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',

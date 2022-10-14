@@ -389,7 +389,7 @@
 
                 $('#config-table-body').append(`<tr><td data-i18n="config.cronJob"></td><td><div class="input-group input-group-sm input-inline">`+
                     `<input id="cronJob-pattern" type="text" class="form-control" value="${data.config.cronJob.pattern}">`+
-                    `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" >Help</a></div></div>`+
+                    `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" data-i18n="help"></a></div></div>`+
                     `<div><span id="cronJob-pattern-explanation"></span></div></td></tr>`);
 
                 $('#cronJob-pattern').change(()=> {
