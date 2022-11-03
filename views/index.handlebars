@@ -275,9 +275,6 @@
 
         $('#saveConfig').click(saveConfig);
 
-        getCalendarIdsAndNames();
-        getTagIdsAndNames();
-
         $.get("/status")
             .done(function (data) {
                 data.files.forEach(file => {
@@ -312,11 +309,10 @@
                             if(filename.endsWith('json')) {
                                 content = JSON.stringify(JSON.parse(content), null, 4);
                             }
-                            content = content.replace(/\n/g,'<br>');
                             $('#fileContentModalLabel').empty();
                             $('#fileContentModalLabel').append(filename);
                             $('#fileContentModalBody').empty();
-                            $('#fileContentModalBody').append(content);
+                            $('#fileContentModalBody').append("<pre>"+content+"</pre>");
                             $('#fileContentModal').modal('show');
                         })
                         .fail(function (error) {
@@ -401,6 +397,8 @@
                 i18next.changeLanguage("de", () => {
                     rerender();
                 });
+                getCalendarIdsAndNames();
+                getTagIdsAndNames();
             })
             .fail(function (error) {
                 console.log(error);

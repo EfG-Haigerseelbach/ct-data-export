@@ -71,6 +71,9 @@ function lineBreak2HtmlLineBreak(text) {
  * @returns {string} CSV-string
  */
 function json2csv(dataArray, separator, withHeader) {
+  if(dataArray.length == 0) {
+    return;
+  }
   var tmp = '';
   if(withHeader) {
     for (const [key, val] of Object.entries(dataArray[0])) {
@@ -94,6 +97,195 @@ function json2csv(dataArray, separator, withHeader) {
   return tmp;
 }
 
+function getProperty(path, obj) {
+  return path.split('.').reduce(function(prev, curr) {
+      return prev ? prev[curr] : null
+  }, obj || self)
+}
+
+function getWeekdayById(id) {
+  if(id == 0) {
+    return 'Sunday';
+  } else if(id == 0) {
+    return 'Monday';
+  } else if(id == 0) {
+    return 'Tuesday';
+  } else if(id == 0) {
+    return 'Wednesday';
+  } else if(id == 0) {
+    return 'Thursday';
+  } else if(id == 0) {
+    return 'Friday';
+  } else if(id == 0) {
+    return 'Saturday';
+  } else {
+    return '';
+  }
+}
+
+function buildGroupsExport(groupsDataFromChurchToolsApi) {
+  return new Promise((resolve, reject) => {
+    assertIsArray(groupsDataFromChurchToolsApi, reject);
+    var result = [];
+    var accessPathForExposureIndicator = config.get('export.accessPathForExposureIndicator');
+    var accessPathToCategoryData = config.get('export.accessPathToCategoryData');
+    groupsDataFromChurchToolsApi.forEach(group => {
+        var tmp = {};
+        tmp.id = group.id;
+        tmp.name = group.name;
+        tmp.startDate = group.information.dateOfFoundation != null ? group.information.dateOfFoundation : '';
+        tmp.endDate = group.information.endDate != null ? group.information.endDate : '';
+        tmp.weekday = group.information.weekday != null ? getWeekdayById(group.information.weekday) : 'undefined';
+
+        tmp.note = group.information.note;
+        tmp.imageUrl = group.information.imageUrl;
+        tmp.export = getProperty(accessPathForExposureIndicator, group);
+        if(tmp.export === undefined) {
+          tmp.export = false;
+        }
+        tmp.categories = [];
+        var categories = getProperty(accessPathToCategoryData, group);
+        if(categories != null) {
+          for(var [id, value] of Object.entries(categories)) {
+            var groupCategory = getMasterDataById("groupCategories", id);
+            if(groupCategory != undefined) {
+              tmp.categories.push(groupCategory.name);
+            } else {
+              console.error(`For group with ID ${group.id} (name: ${group.name}) the data field ${accessPathToCategoryData} contains value ${id} but there is no such master data for 'groupCategories'!`);
+            }
+          }
+        }
+        tmp.targetGroups = [];
+        var targetGroupsIdsTmp = getProperty(config.get('export.accessPath.targetGroupIds'), group);
+        if(targetGroupsIdsTmp != null) {
+          for(var [id, value] of Object.entries(targetGroupsIdsTmp)) {
+            tmp.targetGroups.push(getMasterDataById("targetGroups",id).name);
+          }
+        }
+        tmp.ageCategory = '';
+        var ageCategoryTmp = getProperty(config.get('export.accessPath.agecategory'), group);
+        if(ageCategoryTmp != null) {
+          tmp.ageCategory = ageCategoryTmp;
+        }
+        tmp.recurrenceDescription = '';
+        var recurrenceDescriptionTmp = getProperty(config.get('export.accessPath.recurrenceDescription'), group);
+        if(recurrenceDescriptionTmp != null) {
+          tmp.recurrenceDescription = recurrenceDescriptionTmp;
+        }
+        tmp.contactPersons = [];
+        var contactPersonIdsTmp = getProperty(config.get('export.accessPath.contactPersonIds'), group);
+        if(contactPersonIdsTmp != null && contactPersonIdsTmp.length > 0) {
+          tmp.contactPersons = contactPersonIdsTmp.split(/[\s,;]/);
+          /*for(var [id, value] of Object.entries(contactPersonIdsTmp)) {
+            tmp.contactPersons.push(id />>> getPerson(id).name/);
+          }*/
+        }
+        //console.log(tmp);
+        result.push(tmp);
+    });
+    result.sort(function compare(group_a, group_b) {
+      if (group_a.id < group_b.id ){
+        return -1;
+      }
+      if (group_a.id > group_b.id ){
+        return 1;
+      }
+      return 0;
+    });
+    //return result;
+    resolve(result);
+  });
+}
+
+function removeDuplicates(a) {
+  var seen = {};
+  var out = [];
+  var len = a.length;
+  var j = 0;
+  for(var i = 0; i < len; i++) {
+       var item = a[i];
+       if(seen[item] !== 1) {
+             seen[item] = 1;
+             out[j++] = item;
+       }
+  }
+  return out;
+}
+
+function expandGroupContactPerson(groups, person) {
+  for(var i = 0; i < groups.length; i++) {
+    for(var j = 0; j < groups[i].contactPersons.length; j++) {
+      if(!Number.isNaN(Number.parseInt(groups[i].contactPersons[j])) && groups[i].contactPersons[j] == person.id) {
+        // not expanded yet
+        groups[i].contactPersons.splice(j,1,person);
+      }
+    }
+  }
+  return groups;
+}
+
+function expandGroupContactPersons(groups) {
+  return new Promise((resolve, reject) => {
+    assertIsArray(groups, reject);
+    var idsOfPersonsToExpand = [];
+    groups.forEach(group => {
+      idsOfPersonsToExpand = idsOfPersonsToExpand.concat(group.contactPersons);
+    });
+    idsOfPersonsToExpand = removeDuplicates(idsOfPersonsToExpand);
+    getPersons(idsOfPersonsToExpand)
+      .then(persons => {
+        for(var i = 0; i < persons.length; i++) {
+          groups = expandGroupContactPerson(groups, persons[i]);
+        }
+        resolve(groups);
+      })
+      .catch(reason => reject(reason));
+  });
+}
+
+function replaceGroupImage(groups) {
+  return new Promise((resolve, reject) => {
+    assertIsArray(groups, reject);
+    Promise.allSettled(groups.map(group => {
+      return new Promise((resolveGroupImage, rejectGroupImage) => {
+        getGroupImageUrl(group.id).then(url => {
+          resolveGroupImage({id: group.id, imageUrl: url});
+        });
+        /*for(var i = 0; i < groups.length; i++) {
+          if(groups[i].id == group.id) {
+            groups[i].imageUrlNew = url;
+            break;
+          }
+        }*/
+      });
+    })).then(data => {
+      for(var i = 0; i < groups.length; i++) {
+        for(var j = 0; j < data.length; j++) {
+          if(groups[i].id == data[j].value.id) {
+            groups[i].imageUrl = data[j].value.imageUrl;
+            break;
+          }
+        }
+      }
+      resolve(groups);
+    });
+  });
+}
+
+function filterForToBeExportedGroups(groups) {
+  return new Promise((resolve, reject) => {
+    assertIsArray(groups, reject);
+    var result = [];
+    for(var i = 0; i < groups.length; i++) {
+      if(groups[i].export) {
+        result.push(groups[i]);
+      }
+    }
+    resolve(result);
+  });
+}
+
+
 /**
  * Get data of all groups from ChurchTools.
  * 
@@ -104,22 +296,30 @@ function getAllGroups() {
   // TODO: This approach does not work for scenarios where there are more than 100 groups.
   var url = `/groups?page=1&limit=100`;
   console.log(`Querying all groups URL: ${url}`);
-  return churchtoolsClient.get(url).then(groups => {
+  return churchtoolsClient.get(url)
+    .then(groups => buildGroupsExport(groups))
+    .then(groups => filterForToBeExportedGroups(groups))
+    .then(groups => expandGroupContactPersons(groups))
+    .then(groups => replaceGroupImage(groups))
+    .catch(reason => console.error(reason));
+}
+
+/**
+ * Query the group image
+ * @param {Number} groupId ID of the group
+ * @returns {object} promise
+ */
+ function getGroupImageUrl(groupId) {
+  var url = `/files/groupimage/${groupId}`; // needs authorization 'administer groups'
+  console.log(`Querying the groupimage of group ${groupId} via URL: ${url}`);
+  return churchtoolsClient.get(url).then(groupImage => {
     return new Promise((resolve, reject) => {
-      assertIsArray(groups, reject);
-      var result = [];
-      groups.forEach(group => {
-          var tmp = {};
-          tmp.id = group.id;
-          tmp.name = group.name;
-          tmp.startDate = 'TODO'; // does not exist so far
-          tmp.endDate = group.information.endDate;
-          tmp.note = group.information.note;
-          tmp.imageUrl = group.information.imageUrl;
-          //console.log(tmp);
-          result.push(tmp);
-      });
-      resolve(result);
+      assertIsArray(groupImage, reject);
+      if(groupImage.length > 0) {
+        resolve(groupImage[0].fileUrl);
+      } else {
+        resolve('');
+      }
     });
   }, reason => {
     console.error(reason); 
@@ -154,8 +354,7 @@ function getAllGroups() {
 async function filterGroups(groups) {
   var result = [];
   for(let i = 0; i < groups.length; i++) {
-    var hasTag = await hasGroupExportTag(groups[i].id);
-    if(hasTag) {
+    if(groups[i].export) {
       result.push(groups[i]);
     }
   }
@@ -346,7 +545,7 @@ var _calendars = {
  */
  function getCalenders() {
   // Check if the calendars have just been retrieved
-  if(_calendars.timestamp.isAfter(moment().subtract(20, 'seconds'))) {
+  if(_calendars.timestamp.isAfter(moment().subtract(60, 'seconds'))) {
     console.log('Using calendars from the cache');
     return new Promise((resolve, reject) => {
       resolve(_calendars.calendars);
@@ -383,7 +582,7 @@ var _tags = {
  */
  function getTags() {
   // Check if the tags have just been retrieved
-  if(_tags.timestamp.isAfter(moment().subtract(20, 'seconds'))) {
+  if(_tags.timestamp.isAfter(moment().subtract(60, 'seconds'))) {
     console.log('Using tags from the cache');
     return new Promise((resolve, reject) => {
       resolve(_tags.tags);
@@ -406,6 +605,45 @@ var _tags = {
     }, reason => {
       console.error(reason); 
     });
+  }
+}
+
+var _masterData = {
+  timestamp : moment().subtract(1, 'years'),
+  masterData : []
+};
+
+/**
+ * Get all master data.
+ * @returns {object} promise
+ */
+ function getMasterData() {
+  // Check if the master data have just been retrieved
+  if(_masterData.timestamp.isAfter(moment().subtract(20, 'seconds'))) {
+    console.log('Using master data from the cache');
+    return new Promise((resolve, reject) => {
+      resolve(_masterData.masterData);
+    });
+  } else {
+    var url = `/person/masterdata`;
+    console.log(`Querying all master data via URL: ${url}`);
+    return churchtoolsClient.get(url).then(masterData => {
+      return new Promise((resolve, reject) => {
+        _masterData.timestamp = moment();
+        _masterData.masterData = masterData;
+        resolve(masterData);
+      });
+    }, reason => {
+      console.error(reason); 
+    });
+  }
+}
+
+function getMasterDataById(section, id) {
+  for(var i = 0; i < _masterData.masterData[section].length; i++) {
+    if(_masterData.masterData[section][i].id == id) {
+      return _masterData.masterData[section][i];
+    }
   }
 }
 
@@ -443,55 +681,112 @@ function getFile(filename) {
   return tmp;
 }
 
+var _persons = {
+  timestamp : moment().subtract(1, 'years'),
+  persons : []
+};
+
+function addOrUpdatePerson(person) {
+  var personsTmp = [];
+  var found = false;
+  for(var i = 0; i < _persons.persons.length; i++) {
+    if(_persons.persons[i].id == person.id) {
+      found = true;
+      personsTmp.push(person);
+    } else {
+      personsTmp.push(_persons.persons[i]);
+    }
+  }
+  if(!found) {
+    person.timestamp = moment();
+    personsTmp.push(person);
+  }
+  _persons.persons = personsTmp;
+};
+
+function getPerson(id) {
+  var found = false;
+  for(var i = 0; i < _persons.persons.length; i++) {
+    if(_persons.persons[i].id == id) {
+      if(_persons.persons[i].timestamp.isAfter(moment().subtract(120, 'seconds'))) {
+        found = true;
+        console.log(`Using person with id ${id} from the cache`);
+        return new Promise((resolve, reject) => {
+          resolve(_persons.persons[i]);
+        });
+      }
+    }
+  }
+  if(!found) {
+    var personIdsTmp = [];
+    personIdsTmp.push(id);
+    return new Promise((resolve, reject) => {
+      getPersons(personIdsTmp)
+        .then(allPersons => { allPersons.forEach(addOrUpdatePerson) },
+        reason => { reject(reason); });
+      });
+  }
+}
+
 /**
  * 
  * @param {Array} personIds array of person IDs as numbers
  * @returns 
  */
 function getPersons(personIds) {
-  var url = `/persons?${buildQueryParametersForPersonIds(personIds)}`;
-  url += '&page=1&limit=100';
-  console.log(`Querying persons using URL: ${url}`);
-  return churchtoolsClient.get(url).then(persons => {
+  // Check if the tags have just been retrieved
+  if(_persons.timestamp.isAfter(moment().subtract(60, 'seconds'))) {
+    console.log('Using persons from the cache');
     return new Promise((resolve, reject) => {
-      assertIsArray(persons, reject);
-      var result = [];
-      persons.forEach(person => {
-          var tmp = {};
-          tmp.id = person.id;
-          tmp.firstName = person.firstName;
-          tmp.lastName = person.lastName;
-          tmp.email = null;
-          if(person.emails != null && person.emails.length > 0) {
-            for(var i = 0; i < person.emails.length; i++) {
-              if(person.emails[i].isDefault) {
-                tmp.email = person.emails[i].email;
-                break;
+      resolve(_persons.persons);
+    });
+  } else {
+    var url = `/persons?${buildQueryParametersForPersonIds(personIds)}`;
+    url += '&page=1&limit=100';
+    console.log(`Querying persons using URL: ${url}`);
+    return churchtoolsClient.get(url).then(persons => {
+      return new Promise((resolve, reject) => {
+        assertIsArray(persons, reject);
+        var result = [];
+        persons.forEach(person => {
+            var tmp = {};
+            tmp.id = person.id;
+            tmp.firstName = person.firstName;
+            tmp.lastName = person.lastName;
+            tmp.email = null;
+            if(person.emails != null && person.emails.length > 0) {
+              for(var i = 0; i < person.emails.length; i++) {
+                if(person.emails[i].isDefault) {
+                  tmp.email = person.emails[i].email;
+                  break;
+                }
+              }
+              // No email is flagged as default. Take the first one.
+              if(tmp.email == null) {
+                tmp.email = person.emails[0].email;
               }
             }
-            // No email is flagged as default. Take the first one.
-            if(tmp.email == null) {
-              tmp.email = person.emails[0].email;
+            tmp.imageUrl = person.imageUrl;
+            if(person.mobile.length > 0) {
+              tmp.phone = person.mobile;
+            } else if(person.phonePrivate.length > 0) {
+              tmp.phone = person.phonePrivate;
+            } else if(person.phoneWork.length > 0) {
+              tmp.phone = person.phoneWork;
+            } else {
+              tmp.phone = null;
             }
-          }
-          tmp.imageUrl = person.imageUrl;
-          if(person.mobile.length > 0) {
-            tmp.phone = person.mobile;
-          } else if(person.phonePrivate.length > 0) {
-            tmp.phone = person.phonePrivate;
-          } else if(person.phoneWork.length > 0) {
-            tmp.phone = person.phoneWork;
-          } else {
-            tmp.phone = null;
-          }
-          //console.log(tmp);
-          result.push(tmp);
+            //console.log(tmp);
+            result.push(tmp);
+        });
+        _persons.timestamp = moment();
+        _persons.persons = result;
+        resolve(result);
       });
-      resolve(result);
+    }, reason => {
+      console.error(reason); 
     });
-  }, reason => {
-    console.error(reason); 
-  });
+  }
 }
 
 /**
@@ -543,8 +838,10 @@ function storeNextAppointments() {
 
 initChurchToolsClient();
 login(config.get('churchtools.username'), config.get('churchtools.password')).then(() => {
-    //getNextAppointmentForCalendar(nn);
+  getMasterData();
+  getTags();
 }).catch(error => {
+    console.error(error.stack);
     // getTranslatedErrorMessage returns a human readable translated error message
     // from either a full response object, response data or Exception or Error instances.
     console.error(errorHelper.getTranslatedErrorMessage(error));
