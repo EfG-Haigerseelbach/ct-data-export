@@ -21,6 +21,20 @@
             { "id": 2, "name": "Some Other Name" }
         ]
     },
+    "tags": {
+        "groupsToExport": "tagA",
+        "personsToExport": "tagB"
+    },
+    "export": {
+        "accessPathForExposureIndicator": "information.website_expose",
+        "accessPathToCategoryData": "information.website_groupcategory_ids",
+        "accessPath": {
+            "targetGroupIds": "information.website_targetgroup_ids",
+            "agecategory": "information.website_agecategory",
+            "recurrenceDescription": "information.website_recurrence_description",
+            "contactPersonIds": "information.website_contact_person_ids"
+        }
+    },
     "logging": {
         "level":"error"
     },
