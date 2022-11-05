@@ -351,16 +351,6 @@ function getAllGroups() {
   });
 }
 
-async function filterGroups(groups) {
-  var result = [];
-  for(let i = 0; i < groups.length; i++) {
-    if(groups[i].export) {
-      result.push(groups[i]);
-    }
-  }
-  return result;
-}
-
 /**
  * Check if the person with the specified ID has the tag used to mark for export.
  * @param {Number} personId ID of the person
@@ -774,7 +764,7 @@ function getPersons(personIds) {
             } else if(person.phoneWork.length > 0) {
               tmp.phone = person.phoneWork;
             } else {
-              tmp.phone = null;
+              tmp.phone = '';
             }
             //console.log(tmp);
             result.push(tmp);
@@ -808,12 +798,66 @@ function storeData(data, path) {
   });
 }
 
+function groups2Csv(groups) {
+  var tmp = 'id;name;startDate;endDate;weekday;note;imageUrl;categories;targetGroups;ageCategory;recurrenceDescription;'+
+    'contactPersons-1-id;contactPersons-1-firstName;contactPersons-1-lastName;contactPersons-1-email;contactPersons-1-imageUrl;contactPersons-1-phone;'+
+    'contactPersons-2-id;contactPersons-2-firstName;contactPersons-2-lastName;contactPersons-2-email;contactPersons-2-imageUrl;contactPersons-2-phone\n';
+  for(var i = 0; i < groups.length; i++) {
+    tmp += groups[i].id + ';';
+    tmp += groups[i].name + ';';
+    tmp += groups[i].startDate + ';';
+    tmp += groups[i].endDate + ';';
+    tmp += groups[i].weekday + ';';
+    tmp += groups[i].note + ';';
+    tmp += groups[i].imageUrl + ';';
+    tmp += groups[i].ageCategory + ';';
+    tmp += groups[i].recurrenceDescription + ';';
+    if(groups[i].contactPersons.length == 0) {
+      tmp += ';;;;;;;;;;;;';
+    } else if(groups[i].contactPersons.length == 1) {
+      tmp += groups[i].contactPersons[0].id + ';';
+      tmp += groups[i].contactPersons[0].firstName + ';';
+      tmp += groups[i].contactPersons[0].lastName + ';';
+      tmp += groups[i].contactPersons[0].email + ';';
+      tmp += groups[i].contactPersons[0].imageUrl + ';';
+      tmp += groups[i].contactPersons[0].phone + ';';
+      tmp += ';;;;;;';
+    } else {
+      tmp += groups[i].contactPersons[0].id + ';';
+      tmp += groups[i].contactPersons[0].firstName + ';';
+      tmp += groups[i].contactPersons[0].lastName + ';';
+      tmp += groups[i].contactPersons[0].email + ';';
+      tmp += groups[i].contactPersons[0].imageUrl + ';';
+      tmp += groups[i].contactPersons[0].phone + ';';
+      tmp += groups[i].contactPersons[1].id + ';';
+      tmp += groups[i].contactPersons[1].firstName + ';';
+      tmp += groups[i].contactPersons[1].lastName + ';';
+      tmp += groups[i].contactPersons[1].email + ';';
+      tmp += groups[i].contactPersons[1].imageUrl + ';';
+      tmp += groups[i].contactPersons[1].phone + ';';
+    }
+    tmp += '\n';
+  }
+  return tmp;
+}
+
+function storeGroups(data, path) {
+  return new Promise((resolve, reject) => {
+    config.get('storage.mimeTypes').forEach(mimeType => {
+      if(mimeType == 'application/json') {
+        fs.writeFileSync(path+".json", JSON.stringify(data,null,4));
+      } else if(mimeType == 'text/csv') {
+        fs.writeFileSync(path+".csv", groups2Csv(data));
+      }
+    });
+    resolve("Data gathered and stored ");
+  });
+}
+
 function storeAllGroupsData() {
   return new Promise((resolve, reject) => {
-    getAllGroups()
-      .then(allGroups => filterGroups(allGroups),
-            reason => { reject(reason); })    
-      .then(filteredGroups => { resolve(storeData(filteredGroups, path.join('tmp',config.get('storage.groupsData').trim()))); },
+    getAllGroups()  
+      .then(groups => { resolve(storeGroups(groups, path.join('tmp',config.get('storage.groupsData').trim()))); },
             reason => { reject(reason); });
   });
 }
