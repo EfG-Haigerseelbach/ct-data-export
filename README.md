@@ -245,50 +245,52 @@ The exported groups data has the following schema:
 ]
 ```
 
+Overview:
+
 | Property              | Data Type       | Description                                    | API-path at /groups                        | Example                                                                      |
 |-----------------------|-----------------|------------------------------------------------|--------------------------------------------|------------------------------------------------------------------------------|
-| id                    | `number`          | group's ID                                     | `information.id`                             | `42`                                                                           |
-| name                  | `string`          | group's name                                   | `information.name`                           | `"Biking"`                                                                     |
-| startDate             | `string`          | group's date of creation/ foundation           | `information.dateOfFoundation`               | `"2020-10-27"`                                                                 |
-| endDate               | `string`          | group's date of completion                     | `information.endDate`                        | `"2021-10-28"`                                                                 |
-| weekday               | `string`          | group's day of meeting                         | `information.weekday`                        | `"Wednesday"`                                                                  |
-| note                  | `string`          | group's description                            | `information.note`                            | `"Some description"`                                                           |
-| imageUrl              | `string`          | group's image                                  | API `/files/groupimage/{groupid}`            | `"https://test.church.tools/?q=public/filedownload&id=1234&filename=abcd...."` |
-| categories            | array of `string` | custom field for group: categories for website | `information.website_groupcategory_ids`      | `[ "small groups", "regular" ]`                                                |
-| targetGroups          | array of `string` | custom field for group: target groups          | `information.website_target_group_ids`       | `[ "youth", "families" ]`                                                      |
-| ageCategory           | `string`          | custom field for group: age category           | `information.website_agecategory`            | `"30-50"`                                                                      |
-| recurrence Description | `string`          | custom field for group: recurrence description | `information.website_recurrence_description` | `"every two weeks"`                                                            |
-| contactPersons        | `string`          | custom field for group: separated person IDs   | `information.website_contact_person_ids`     | `"17 49"`                                                                      |
+| [id](#id)             | `number`          | group's ID                                     | `information.id`                             | `42`                                                                           |
+| [name](#name)         | `string`          | group's name                                   | `information.name`                           | `"Biking"`                                                                     |
+| [startDate](#startdate)| `string`          | group's date of creation/ foundation           | `information.dateOfFoundation`               | `"2020-10-27"`                                                                 |
+| [endDate](#enddate)   | `string`          | group's date of completion                     | `information.endDate`                        | `"2021-10-28"`                                                                 |
+| [weekday](#weekday)   | `string`          | group's day of meeting                         | `information.weekday`                        | `"Wednesday"`                                                                  |
+| [note](#note)         | `string`          | group's description                            | `information.note`                            | `"Some description"`                                                           |
+| [imageUrl](#imageurl) | `string`          | group's image                                  | API `/files/groupimage/{groupid}`            | `"https://test.church.tools/?q=public/filedownload&id=1234&filename=abcd...."` |
+| [categories](#categories)| array of `string` | custom field for group: categories for website | `information.website_groupcategory_ids`      | `[ "small groups", "regular" ]`                                                |
+| [targetGroups](#targetgroups)| array of `string` | custom field for group: target groups          | `information.website_target_group_ids`       | `[ "youth", "families" ]`                                                      |
+| [ageCategory](#agecategory)| `string`          | custom field for group: age category           | `information.website_agecategory`            | `"30-50"`                                                                      |
+| [recurrence Description](#recurrencedescription)| `string`          | custom field for group: recurrence description | `information.website_recurrence_description` | `"every two weeks"`                                                            |
+| [contactPersons](#contactpersons)| `string`          | custom field for group: separated person IDs   | `information.website_contact_person_ids`     | `"17 49"`                                                                      |
 
-##### id
+### id
 
 This is the group's ID given by ChurchTools backend. In the (JSON) export it is represented as number. In the (standard) API `/groups/{groupId}` it is exposed at path `information.id`. Example values are `42`, `17`, `35`.
 
-##### name
+### name
 
 This is the group's name given by the creator/ maintainer of the group. In the (JSON) export it is represented as string. In the (standard) API `/groups/{groupId}` it is exposed at path `information.name`. Example values are `"Biking"`, `"Youth"`, `"Young Adults"`.
 
-##### startDate
+### startDate
 
 This is the group's start date given by the creator/ maintainer of the group. In the (JSON) export it is represented as string. In the (standard) API `/groups/{groupId}` it is exposed at path `information.dateOfFoundation`. The value exposed by the ChurchTools API is of type string and has format `YYYY-MM-DD`. This format is kept. Example values are `"2020-10-27"`, `"2020-05-21"`, `"2020-01-01"`.
 
-##### endDate
+### endDate
 
 This is the group's date of completion given by the creator/ maintainer of the group. In the (JSON) export it is represented as string. In the (standard) API `/groups/{groupId}` it is exposed at path `information.endDate`. The value exposed by the ChurchTools API is of type string and has format `YYYY-MM-DD`. This format is kept. Example values are `"2021-12-31"`, `"2021-04-17"`, `"2021-06-06"`.
 
-##### weekday
+### weekday
 
 This is the group's day of meeting given by the creator/ maintainer of the group. In the (JSON) export it is represented as string. In the (standard) API `/groups/{groupId}` it is exposed at path `information.weekday`. The value exposed by the ChurchTools API is of type number and has value range `''`, `0` (=Sunday), `1` (= Monday), ..., `6` (= Saturday). This value is transformed into day names in English language plus and empty value. Example values are `""`, `"Wednesday"`, `"Friday"`.
 
-##### note
+### note
 
 This is the group's description given by the creator/ maintainer of the group. In the (JSON) export it is represented as string. In the (standard) API `/groups/{groupId}` it is exposed at path `information.note`. The string is UTF-8 encoded. Hence it can contain arbitrary characters, inc. emojis, line feeds and new lines. Example values are `"Some description"`, `"This is a test"`, `"Lorem ipsum"`.
 
-##### imageUrl
+### imageUrl
 
 This is the group's image given by the creator/ maintainer of the group. In the (JSON) export it is represented as URL in form of a string. To get the group image in high resolution in stead of (standard) API `/groups/{groupId}` the API `/files/groupimage/{groupid}` is used. Here, the URL at path `fileUrl` is used. An example values is `""https://test.church.tools/?q=public/filedownload&id=1234&filename=abcd...."`.
 
-##### categories
+### categories
 
 This is a custom field which does *not* exist in standard. In ChurchTools backend's master data > DB-Fields it needs to be defined as follows:
 
@@ -320,7 +322,7 @@ Since database table `cdb_groupcategory` is used the (standard) mechanism for gr
 
 The properties' names are the corresponding group category IDs (master data > group category). These IDs are replaced for the data export. Therefore the master data of group categories are read via API `/person/masterdata`. In the response the data from property `groupCategories` is used the get the titles (master data > group category > title). In the export an array of string (the titles) is used. An example values is `[ "small groups", "regular" ]`.
 
-##### targetGroups
+### targetGroups
 
 This is a custom field which does *not* exist in standard. In ChurchTools backend's master data > DB-Fields it needs to be defined as follows:
 
@@ -353,7 +355,7 @@ Since database table `cdb_targetgroup` is used the (standard) mechanism for targ
 
 The properties' names are the corresponding target group IDs (master data > target group). These IDs are replaced for the data export. Therefore the master data of group categories are read via API `/person/masterdata`. In the response the data from property `targetGroups` is used the get the titles (master data > target group > title). In the export an array of string (the titles) is used. An example values is `[ "youth", "families" ]`.
 
-##### ageCategory
+### ageCategory
 
 This is a custom field which does *not* exist in standard. In ChurchTools backend's master data > DB-Fields it needs to be defined as follows:
 
@@ -382,7 +384,7 @@ There is no reference to another database table used. In a group's details scree
 
 The value is kept for the data export.
 
-##### recurrenceDescription
+### recurrenceDescription
 
 This is a custom field which does *not* exist in standard. In ChurchTools backend's master data > DB-Fields it needs to be defined as follows:
 
@@ -413,7 +415,7 @@ The value is kept for the data export.
 
 This is the group's name given by the creator/ maintainer of the group. In the (JSON) export it is represented as string. In the (standard) API `/groups/{groupId}` it is exposed at path `information.name`. Example values are `"Biking"`, `"Youth"`, `"Young Adults"`.
 
-##### contactPersons
+### contactPersons
 
 This is a custom field which does *not* exist in standard. In ChurchTools backend's master data > DB-Fields it needs to be defined as follows:
 
