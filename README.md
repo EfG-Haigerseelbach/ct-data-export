@@ -168,7 +168,7 @@ The data export is executed recurrently. The frequency can be configured via par
 
 Excerpt from the node-cron documentation:
 
-````
+```text
 ┌────────────── second (optional)
 │ ┌──────────── minute
 │ │ ┌────────── hour
@@ -218,7 +218,7 @@ Excerpt from the template configuration:
 
 The exported groups data has the following schema:
 
-```
+```text
 [
     {
         "id": integer,
