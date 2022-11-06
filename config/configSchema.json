@@ -1,0 +1,147 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "Product",
+    "description": "A product in the catalog",
+    "type": "object",
+    "properties": {
+        "info": {
+            "type": "string"
+        },
+        "production": {
+            "type": "boolean"
+        },
+        "churchtools": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "description": "The URL of your ChurchTools instance. If hosted, the pattern is https://<church-name>.church.tools"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "Name of the user to authenticate against the ChurchTools API"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Password of this user"
+                }
+            },
+            "required": ["url", "username", "password"],
+            "additionalProperties": true
+        },
+        "storage": {
+            "type": "object",
+            "properties": {
+                "groupsData": {
+                    "type": "string",
+                    "description": "Path (optional) and filename for data of groups without file type extension (e.g. .csv)"
+                },
+                "contactPersonsData": {
+                    "type": "string",
+                    "description": "Path (optional) and filename for data of contact persons without file type extension (e.g. .csv)"
+                },
+                "appointmentData": {
+                    "type": "string",
+                    "description": "Path (optional) and filename for data of appointments without file type extension (e.g. .csv)"
+                },
+                "mimeTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "This parameter is expected to be an array of strings. It can contain any combination of the following values: text/csv, application/json."
+                }
+            },
+            "required": ["groupsData", "contactPersonsData", "appointmentData", "mimeTypes"],
+            "additionalProperties": true
+        },
+        "calendar": {
+            "type": "object",
+            "properties": {
+                "allowedCalendarIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "to be done"
+                }
+            },
+            "required": ["allowedCalendarIds"],
+            "additionalProperties": true
+        },
+        "tags": {
+            "type": "object",
+            "properties": {
+                "groupsToExport": {
+                    "type": "string",
+                    "description": "to be done"
+                },
+                "personsToExport": {
+                    "type": "string",
+                    "description": "to be done"
+                }
+            },
+            "required": ["groupsToExport", "personsToExport"],
+            "additionalProperties": true
+        },
+        "export": {
+            "type": "object",
+            "properties": {
+                "accessPath": {
+                    "type": "object",
+                    "properties": {
+                        "exposureIndicator": {
+                            "type": "string"
+                        },
+                        "categoryData": {
+                            "type": "string"
+                        },
+                        "targetGroupIds": {
+                            "type": "string"
+                        },
+                        "agecategory": {
+                            "type": "string"
+                        },
+                        "recurrenceDescription": {
+                            "type": "string"
+                        },
+                        "contactPersonIds": {
+                            "type": "string"
+                        }
+                    },
+                    "description": "to be done",
+                    "required": ["exposureIndicator", "categoryData", "targetGroupIds", "agecategory", "recurrenceDescription", "contactPersonIds"],
+                    "additionalProperties": true
+                }
+            },
+            "required": ["accessPath"],
+            "additionalProperties": true
+        },
+        "logging": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type":"string"
+                }
+            },
+            "required": ["level"],
+            "additionalProperties": true
+        },
+        "cronJob": {
+            "type": "object",
+            "properties": {
+                "pattern": {
+                    "type": "string"
+                }
+            },
+            "required": ["pattern"],
+            "additionalProperties": true
+        },
+        "adminToken": {
+            "type": "string"
+        }
+    },
+    "required": ["info", "production", "churchtools", "storage", "calendar", "tags", "logging", "cronJob", "adminToken"],
+    "additionalProperties": false
+  }

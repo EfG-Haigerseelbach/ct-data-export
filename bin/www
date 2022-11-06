@@ -4,7 +4,6 @@
  * Module dependencies.
  */
 var fs = require('fs');
-var app = require('../app');
 var debug = require('debug')('new-folder:server');
 var http = require('http');
 const config = require('config');
@@ -13,27 +12,54 @@ const configInfo = config.get('info');
 console.log(configInfo);
 
 /**
- * Get port from environment and store in Express.
+ * Check if the configuration is valid.
  */
+var { JSONError, Draft07 } = require ('json-schema-library');
+var configSchema = require('../config/configSchema.json');
 
-var port = normalizePort(process.env.PORT || '20228');
-app.set('port', port);
+const configJsonSchema = new Draft07(configSchema);
+var errors = configJsonSchema.validate(config);
+
+function keepLogging() {
+  setTimeout(() => {
+      console.log('The configuration is erroneous. Please correct it and restart the application.');
+      console.error(errors);
+      keepLogging();
+  }, 360000)
+}
+
+if(errors != undefined && errors.length > 0) {
+  // The configuration is not valid.
+  console.log('The configuration is erroneous. Please correct it and restart the application.');
+  console.error(errors);
+  // Start an endless loop. This is required for monitoring tools like pm2 to prevent a restart with (the same)
+  // erroneous configuration.
+  keepLogging();
+
+} else {
+  /**
+   * Get port from environment and store in Express.
+   */
+  var app = require('../app');
+  var port = normalizePort(process.env.PORT || '20228');
+  app.set('port', port);
 
 
-/**
- * Create HTTP server.
- */
+  /**
+   * Create HTTP server.
+   */
 
-var server = http.createServer(app);
+  var server = http.createServer(app);
 
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+  /**
+   * Listen on provided port, on all network interfaces.
+   */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+}
 
 /**
  * Normalize a port into a number, string, or false.
