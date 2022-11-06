@@ -14,8 +14,11 @@ var moment = require('moment');
 var CronJob = require('cron').CronJob;
 
 checkAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) { return next() }
-  res.redirect("/login")
+  if(req.isAuthenticated()) { 
+    return next();
+  } else {
+    res.redirect("/login");
+  }
 }
 
 checkAuthenticatedApi = (req, res, next) => {
@@ -100,7 +103,7 @@ function json2csv(dataArray, separator, withHeader) {
 function getProperty(path, obj) {
   return path.split('.').reduce(function(prev, curr) {
       return prev ? prev[curr] : null
-  }, obj || self)
+  }, obj || self);
 }
 
 function getWeekdayById(id) {
@@ -127,8 +130,6 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
   return new Promise((resolve, reject) => {
     assertIsArray(groupsDataFromChurchToolsApi, reject);
     var result = [];
-    var accessPathForExposureIndicator = config.get('export.accessPathForExposureIndicator');
-    var accessPathToCategoryData = config.get('export.accessPathToCategoryData');
     groupsDataFromChurchToolsApi.forEach(group => {
         var tmp = {};
         tmp.id = group.id;
@@ -136,15 +137,13 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         tmp.startDate = group.information.dateOfFoundation != null ? group.information.dateOfFoundation : '';
         tmp.endDate = group.information.endDate != null ? group.information.endDate : '';
         tmp.weekday = group.information.weekday != null ? getWeekdayById(group.information.weekday) : 'undefined';
-
         tmp.note = group.information.note;
         tmp.imageUrl = group.information.imageUrl;
-        tmp.export = getProperty(accessPathForExposureIndicator, group);
-        if(tmp.export === undefined) {
-          tmp.export = false;
-        }
+        tmp.export = getProperty(config.get('export.accessPath.exposureIndicator'), group);
+        tmp.export = tmp.export === undefined ? false : tmp.export;
+
         tmp.categories = [];
-        var categories = getProperty(accessPathToCategoryData, group);
+        var categories = getProperty(config.get('export.accessPath.categoryData'), group);
         if(categories != null) {
           for(var [id, value] of Object.entries(categories)) {
             var groupCategory = getMasterDataById("groupCategories", id);
@@ -176,11 +175,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         var contactPersonIdsTmp = getProperty(config.get('export.accessPath.contactPersonIds'), group);
         if(contactPersonIdsTmp != null && contactPersonIdsTmp.length > 0) {
           tmp.contactPersons = contactPersonIdsTmp.split(/[\s,;]/);
-          /*for(var [id, value] of Object.entries(contactPersonIdsTmp)) {
-            tmp.contactPersons.push(id />>> getPerson(id).name/);
-          }*/
         }
-        //console.log(tmp);
         result.push(tmp);
     });
     result.sort(function compare(group_a, group_b) {
