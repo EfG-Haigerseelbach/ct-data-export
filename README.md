@@ -10,7 +10,7 @@ Export data via ChurchTools API
 2.2 [ChurchTools API](#churchtools-api)  
 2.3 [Storage Paths](#storage-paths)  
 2.4 [Calendar](#calendar)  
-2.5 [Logging](#logging)  
+2.5 [ChurchTools Client Logging](#churchtools-client-logging)  
 2.6 [Cron Job](#cron-job)  
 2.7 [Admin Token](#admin-token)  
 3. [Data Structure](#data-structure)  
@@ -30,7 +30,7 @@ Export data via ChurchTools API
 All configuration settings are located at `config/default.json`. Initially this file *does not exist*. You need to copy `config/template.json` and adjust it according to your needs.
 
 1. Copy `template.json` to `default.json`.
-2. Edit `default.json` according to your needs. Refer to section **Configuration**.
+2. Edit `default.json` according to your needs. Refer to section [Configuration](#configuration).
 
 ## Configuration
 
@@ -142,23 +142,77 @@ Parameter `allowedCalendarIds` is an array of objects whereas each object has th
 | `id`      | number    | n/a     | integer         | ID of the calendar given by ChurchTools                                                         |
 | `name`    | string    | n/a     | n/a             | An descriptive text for the calendar ID o get a better readability of the config (not consumed) |
 
-### Logging
+### ChurchTools Client Logging
+
+The [ChurchTools client](https://github.com/churchtools/churchtools-js-client) supports different levels of logging. The log level can be set via the configuration.
 
 | Parameter | Data Type | Default | Possible Values                 | Explanation                                                                                |
 |-----------|-----------|---------|---------------------------------|--------------------------------------------------------------------------------------------|
 | `level`   | string    | `error` | `error`, `debug`, `info`, `off` | Refer to <https://github.com/churchtools/churchtools-js-client/blob/master/src/logging.js> |
 
+Excerpt from the template configuration:
+
+````JSON
+"logging": {
+    "level":"error"
+}
+````
+
 ### Cron Job
 
-| Parameter | Data Type | Default          | Possible Values   | Explanation                                                                |
-|-----------|-----------|------------------|-------------------|----------------------------------------------------------------------------|
-| `pattern` | string    | `00 00 23 * * *` | n/a               | Refer to chapter *Cron Syntax* at <https://github.com/node-cron/node-cron> |
+The data export is executed recurrently. The frequency can be configured via parameter `cronJob.pattern`.
+
+| Parameter | Data Type | Default          | Explanation                                                                |
+|-----------|-----------|------------------|----------------------------------------------------------------------------|
+| `pattern` | string    | `00 00 23 * * *` | Refer to chapter *Cron Syntax* at <https://github.com/node-cron/node-cron> |
+
+Excerpt from the node-cron documentation:
+
+````
+┌────────────── second (optional)
+│ ┌──────────── minute
+│ │ ┌────────── hour
+│ │ │ ┌──────── day of month
+│ │ │ │ ┌────── month
+│ │ │ │ │ ┌──── day of week
+│ │ │ │ │ │
+│ │ │ │ │ │
+* * * * * *
+````
+
+| Field        | Value                             |
+|--------------|-----------------------------------|
+| second       | 0-59                              |
+| minute       | 0-59                              |
+| hour         | 0-23                              |
+| hour         | 0-23                              |
+| day of month | 1-31                              |
+| month        | 1-12 (or names)                   |
+| day of week  | 0-7 (or names, 0 or 7 are sunday) |
+
+Multiple values separated by comma and ranges of values are also possible. Refer to <https://github.com/node-cron/node-cron>.
+
+The excerpt from the template configuration shows a data export which is executed every day at 23:00:00:
+
+````JSON
+"cronJob": {
+    "pattern": "00 00 23 * * *",
+}
+````
 
 ### Admin Token
 
-| Parameter    | Data Type | Default       | Possible Values | Explanation                         |
-|--------------|-----------|---------------|-----------------|-------------------------------------|
-| `adminToken` | string    | `toBeChanged` | n/a             | Token to access the admin dashboard |
+Access to the dashboard is secured by a token. The token should be changed during initial configuration! **DO NOT USE THE DEFAULT VALUE!** This application processes personal data. Securing this processing is essential to comply with data privacy and additional legislation.
+
+| Parameter    | Data Type | Default       | Explanation                         |
+|--------------|-----------|---------------|-------------------------------------|
+| `adminToken` | string    | `toBeChanged` | Token to access the admin dashboard |
+
+Excerpt from the template configuration:
+
+````JSON
+"adminToken" : "toBeChanged"
+````
 
 ## Data Structure
 
