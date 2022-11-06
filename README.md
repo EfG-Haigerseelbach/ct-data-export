@@ -104,19 +104,38 @@ In addition to the configuration of the parameters above you need to ensure that
 ...
 ```
 
-You can check the user's authorization in the ChurchTools webpage by going to *Persons & Groups* > *Persons* > the user in question > *Authorizations* > *Edit Authorizations*.
+You can check the user's authorization in the ChurchTools webpage by going to *Persons & Groups* > *Persons* > **the user in question** > *Authorizations* > *Edit Authorizations*.
 
 ### Storage Paths
 
-| Parameter            | Data Type | Default                     | Possible Values | Explanation                                                                    |
-|----------------------|-----------|-----------------------------|-----------------|--------------------------------------------------------------------------------|
-| `groupsData`         | string    | `path/and/filename.csv`     | n/a             | Filename for data of groups without file type extension (e.g. `.csv`)          |
-| `contactPersonsData` | string    | `path/and/filename.csv`     | n/a             | Filename for data of contact persons without file type extension (e.g. `.csv`) |
-| `appointmentData`    | string    | `path/and/filename.csv`     | n/a             | Filename for data of appointments without file type extension (e.g. `.csv`)    |
+There are three sorts of data exported: groups, (contact) persons and appointments. For each a dedicated storage path for data to export **has to be** configured. These string values could either refer to a relative (e.g. `../../groups`) or absolute (e.g. `/tmp/data/groups`) path. Please note that the nodeJS-application requires corresponding authorizations to access
+this path.
+
+| Parameter            | Data Type | Default                 | Explanation                                                                                        |
+|----------------------|-----------|-------------------------|----------------------------------------------------------------------------------------------------|
+| `groupsData`         | string    | `path/and/filename`     | Path (optional) and filename for data of groups without file type extension (e.g. `.csv`)          |
+| `contactPersonsData` | string    | `path/and/filename`     | Path (optional) and filename for data of contact persons without file type extension (e.g. `.csv`) |
+| `appointmentData`    | string    | `path/and/filename`     | Path (optional) and filename for data of appointments without file type extension (e.g. `.csv`)    |
+
+Data can be exported as comma separated values (CSV) or JSON. This is controlled by parameter `mimeTypes`. This parameter is expected to be an array of strings. It can contain any combination of the following values: `text/csv`, `application/json`. It can also be empty which would result in *no* data is exported.
+
+Excerpt from the template configuration:
+
+````JSON
+"storagePaths": {
+        "groupsData": "path/and/filename",
+        "contactPersonsData": "path/and/filename",
+        "appointmentData": "path/and/filename",
+        "mimeTypes": [
+            "text/csv",
+            "application/json"
+        ]
+    }
+````
 
 ### Calendar
 
-Parameter `allowedCalendarIds` is an array of objects where are each object has the following semantics:
+Parameter `allowedCalendarIds` is an array of objects whereas each object has the following semantics:
 
 | Parameter | Data Type | Default | Possible Values | Explanation                                                                                     |
 |-----------|-----------|---------|-----------------|-------------------------------------------------------------------------------------------------|
