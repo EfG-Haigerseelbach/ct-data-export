@@ -7,13 +7,12 @@ Export data via ChurchTools API
 1.2 [Configure](#configure)  
 2. [Configuration](#configuration)  
 2.1 [ChurchTools Master Data](#churchtools-master-data)  
-2.2 [Data Export](#data-export)  
-2.2.1 [ChurchTools API](#churchtools-api)  
-2.2.2 [Storage Paths](#storage-paths)  
-2.2.3 [Calendar](#calendar)  
-2.2.4 [Logging](#logging)  
-2.2.5 [Cron Job](#cron-job)  
-2.2.6 [Admin Token](#admin-token)  
+2.2 [ChurchTools API](#churchtools-api)  
+2.3 [Storage Paths](#storage-paths)  
+2.4 [Calendar](#calendar)  
+2.5 [Logging](#logging)  
+2.6 [Cron Job](#cron-job)  
+2.7 [Admin Token](#admin-token)  
 3. [Data Structure](#data-structure)  
 4. [Usage](#usage)  
 
@@ -28,6 +27,8 @@ Export data via ChurchTools API
 
 ### Configure
 
+All configuration settings are located at `config/default.json`. Initially this file *does not exist*. You need to copy `config/template.json` and adjust it according to your needs.
+
 1. Copy `template.json` to `default.json`.
 2. Edit `default.json` according to your needs. Refer to section **Configuration**.
 
@@ -40,6 +41,23 @@ This application expects certain additional data fields to exist. Hence, the sta
 1) Go to tab `Persons & Groups` and press `Master data`.
 2) Click on `DB-Fields` and add the following new fields by pressing the plus-icon at the end of the table (see steps 3ff).
 3) Categories
+
+| Property                             | DB-field category       | DB-field target groups     |
+|--------------------------------------|-------------------------|----------------------------|
+| DB-Field-Category                    | Group                   | Group                      |
+| DB-Field-Type                        | Multiple selection      | Multiple selection         |
+| Table column                         | `website_category_ids`  | `website_targetgroup_ids`  |
+| Database table                       | `cdb_groupcategory`     | `cdb_targetgroup`          |
+| Appears when people are entered      | No                      | No                         |
+| Description                          | Website - Categories    | Website - Target Groups    |
+| Short description                    | (on purpose)            | (on purpose)               |
+| HTML-View end of line                | `<br/>`                 | `<br/>`                    |
+| Security level                       | *1                      | *1                         |
+| Length                               | 255                     | 255                        |
+| Sort Order                           | 90                      | 91                         |
+| Delete when user is moved to archive | No                      | No                         |
+| Null value is allowed                | Yes                     | Yes                        |
+| Hide in surface                      | No                      | No                         |
 
 | Name                                 | Value                                                                          |
 |--------------------------------------|--------------------------------------------------------------------------------|
@@ -134,11 +152,8 @@ This application expects certain additional data fields to exist. Hence, the sta
 | Null value is allowed                | Yes                                                                            |
 | Hide in surface                      | No                                                                             |
 
-### Data Export
 
-All configuration settings are located at `config/default.json`. Initially this file *does not exist*. You need to copy `config/template.json` and adjust it according to your needs.
-
-#### ChurchTools API
+### ChurchTools API
 
 | Parameter   | Data Type | Default | Possible Values | Explanation                                                                                                  |
 |-------------|-----------|---------|-----------------|--------------------------------------------------------------------------------------------------------------|
@@ -167,7 +182,7 @@ In addition to the configuration of the parameters above you need to ensure that
 
 You can check the user's authorization in the ChurchTools webpage by going to *Persons & Groups* > *Persons* > the user in question > *Authorizations* > *Edit Authorizations*.
 
-#### Storage Paths
+### Storage Paths
 
 | Parameter            | Data Type | Default                     | Possible Values | Explanation                                                                    |
 |----------------------|-----------|-----------------------------|-----------------|--------------------------------------------------------------------------------|
@@ -175,7 +190,7 @@ You can check the user's authorization in the ChurchTools webpage by going to *P
 | `contactPersonsData` | string    | `path/and/filename.csv`     | n/a             | Filename for data of contact persons without file type extension (e.g. `.csv`) |
 | `appointmentData`    | string    | `path/and/filename.csv`     | n/a             | Filename for data of appointments without file type extension (e.g. `.csv`)    |
 
-#### Calendar
+### Calendar
 
 Parameter `allowedCalendarIds` is an array of objects where are each object has the following semantics:
 
@@ -184,19 +199,19 @@ Parameter `allowedCalendarIds` is an array of objects where are each object has 
 | `id`      | number    | n/a     | integer         | ID of the calendar given by ChurchTools                                                         |
 | `name`    | string    | n/a     | n/a             | An descriptive text for the calendar ID o get a better readability of the config (not consumed) |
 
-#### Logging
+### Logging
 
 | Parameter | Data Type | Default | Possible Values                 | Explanation                                                                                |
 |-----------|-----------|---------|---------------------------------|--------------------------------------------------------------------------------------------|
 | `level`   | string    | `error` | `error`, `debug`, `info`, `off` | Refer to <https://github.com/churchtools/churchtools-js-client/blob/master/src/logging.js> |
 
-#### Cron Job
+### Cron Job
 
 | Parameter | Data Type | Default          | Possible Values   | Explanation                                                                |
 |-----------|-----------|------------------|-------------------|----------------------------------------------------------------------------|
 | `pattern` | string    | `00 00 23 * * *` | n/a               | Refer to chapter *Cron Syntax* at <https://github.com/node-cron/node-cron> |
 
-#### Admin Token
+### Admin Token
 
 | Parameter    | Data Type | Default       | Possible Values | Explanation                         |
 |--------------|-----------|---------------|-----------------|-------------------------------------|
