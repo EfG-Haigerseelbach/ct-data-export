@@ -8,7 +8,7 @@ Export data via ChurchTools API
 2. [Configuration](#configuration)  
 2.1 [ChurchTools Master Data](#churchtools-master-data)  
 2.2 [Data Export](#data-export)  
-2.2.1 [ChurchTools API)(#churchtools-api)  
+2.2.1 [ChurchTools API](#churchtools-api)  
 2.2.2 [Storage Paths](#storage-paths)  
 2.2.3 [Calendar](#calendar)  
 2.2.4 [Logging](#logging)  
@@ -45,12 +45,12 @@ This application expects certain additional data fields to exist. Hence, the sta
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Multiple selection                                                             |
-| Table column                         | website_category_ids                                                           |
-| Database table                       | cdb_groupcategory                                                              |
+| Table column                         | `website_category_ids`                                                         |
+| Database table                       | `cdb_groupcategory`                                                            |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Categories                                                           |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 90                                                                             |
@@ -64,12 +64,12 @@ This application expects certain additional data fields to exist. Hence, the sta
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Multiple selection                                                             |
-| Table column                         | website_targetgroup_ids                                                        |
-| Database table                       | cdb_targetgroup                                                                |
+| Table column                         | `website_targetgroup_ids`                                                      |
+| Database table                       | `cdb_targetgroup`                                                              |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Target Groups                                                        |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 91                                                                             |
@@ -83,12 +83,12 @@ This application expects certain additional data fields to exist. Hence, the sta
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Text field                                                                     |
-| Table column                         | website_agecategory                                                            |
+| Table column                         | `website_agecategory`                                                          |
 | Database table                       | (empty)                                                                        |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Age Category                                                         |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 92                                                                             |
@@ -102,12 +102,12 @@ This application expects certain additional data fields to exist. Hence, the sta
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Text field                                                                     |
-| Table column                         | website_recurrence_description                                                 |
+| Table column                         | `website_recurrence_description`                                               |
 | Database table                       | (empty)                                                                        |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Recurrence Description                                               |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 93                                                                             |
@@ -121,12 +121,12 @@ This application expects certain additional data fields to exist. Hence, the sta
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Text field                                                                     |
-| Table column                         | website_contact_person_ids                                                     |
+| Table column                         | `website_contact_person_ids`                                                   |
 | Database table                       | (empty)                                                                        |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Contact Person IDs                                                   |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 94                                                                             |
@@ -284,12 +284,12 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Multiple selection                                                             |
-| Table column                         | website_category_ids                                                           |
-| Database table                       | cdb_groupcategory                                                              |
+| Table column                         | `website_category_ids`                                                         |
+| Database table                       | `cdb_groupcategory`                                                            |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Categories                                                           |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 90                                                                             |
@@ -316,12 +316,12 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Multiple selection                                                             |
-| Table column                         | website_targetgroup_ids                                                        |
-| Database table                       | cdb_targetgroup                                                                |
+| Table column                         | `website_targetgroup_ids`                                                      |
+| Database table                       | `cdb_targetgroup`                                                              |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Target Groups                                                        |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 91                                                                             |
@@ -349,12 +349,12 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Text field                                                                     |
-| Table column                         | website_agecategory                                                            |
+| Table column                         | `website_agecategory`                                                          |
 | Database table                       | (empty)                                                                        |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Age Category                                                         |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 92                                                                             |
@@ -378,12 +378,12 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Text field                                                                     |
-| Table column                         | website_recurrence_description                                                 |
+| Table column                         | `website_recurrence_description`                                               |
 | Database table                       | (empty)                                                                        |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Recurrence Description                                               |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 93                                                                             |
@@ -409,12 +409,12 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 |--------------------------------------|--------------------------------------------------------------------------------|
 | DB-Field-Category                    | Group                                                                          |
 | DB-Field-Type                        | Text field                                                                     |
-| Table column                         | website_contact_person_ids                                                     |
+| Table column                         | `website_contact_person_ids`                                                   |
 | Database table                       | (empty)                                                                        |
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Contact Person IDs                                                   |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| HTML-View end of line                | `<br/>`                                                                        |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 94                                                                             |
