@@ -41,22 +41,41 @@ This application expects certain additional data fields to exist. Hence, the sta
 1) Go to tab `Persons & Groups` and press `Master data`.
 2) Click on `DB-Fields` and add the following new fields by pressing the plus-icon at the end of the table:
 
-| Property                             | Category               | Target Groups             | Age Category           | Recurrence Description           | Contact Person IDs           |
-|--------------------------------------|------------------------|---------------------------|------------------------|----------------------------------|------------------------------|
-| DB-Field-Category                    | Group                  | Group                     | Group                  | Group                            | Group                        |
-| DB-Field-Type                        | Multiple selection     | Multiple selection        | Text field             | Text field                       | Text field                   |
-| Table column                         | `website_category_ids` | `website_targetgroup_ids` | `website_agecategory`  | `website_recurrence_description` | `website_contact_person_ids` |
-| Database table                       | `cdb_groupcategory`    | `cdb_targetgroup`         | (empty)                | (empty)                          | (empty)                      |
-| Appears when people are entered      | No                     | No                        | No                     | No                               | No                           |
-| Description                          | Website - Categories   | Website - Target Groups   | Website - Age Category | Website - Recurrence Description | Website - Contact Person IDs |
-| Short description                    | (on purpose)           | (on purpose)              | (on purpose)           | (on purpose)                     | (on purpose)                 |
-| HTML-View end of line                | `<br/>`                | `<br/>`                   | `<br/>`                | `<br/>`                          | `<br/>`                      |
-| Security level                       | *1                     | *1                        | *1                     | *1                               | *1                           |
-| Length                               | 255                    | 255                       | 255                    | 255                              | 255                          |
-| Sort Order                           | 90                     | 91                        | 92                     | 93                               | 94                           |
-| Delete when user is moved to archive | No                     | No                        | No                     | No                               | No                           |
-| Null value is allowed                | Yes                    | Yes                       | Yes                    | Yes                              | Yes                          |
-| Hide in surface                      | No                     | No                        | No                     | No                               | No                           |
+| Property                             | Expose                 | Category               | Target Groups             |
+|--------------------------------------|------------------------|------------------------|---------------------------|
+| DB-Field-Category                    | Group                  | Group                  | Group                     |
+| DB-Field-Type                        | Yes-No field           | Multiple selection     | Multiple selection        |
+| Table column                         | `website_expose`       | `website_category_ids` | `website_targetgroup_ids` |
+| Database table                       | (empty)                | `cdb_groupcategory`    | `cdb_targetgroup`         |
+| Appears when people are entered      | No                     | No                     | No                        |
+| Description                          | Show in Website        | Website - Categories   | Website - Target Groups   |
+| Short description                    | (on purpose)           | (on purpose)           | (on purpose)              |
+| HTML-View end of line                | `<br/>`                | `<br/>`                | `<br/>`                   |
+| Security level                       | *1                     | *1                     | *1                        |
+| Length                               | 1                      | 255                    | 255                       |
+| Sort Order                           | 90                     | 91                     | 92                        |
+| Delete when user is moved to archive | No                     | No                     | No                        |
+| Null value is allowed                | Yes                    | Yes                    | Yes                       |
+| Hide in surface                      | No                     | No                     | No                        |
+
+| Property                             | Age Category           | Recurrence Description           | Contact Person IDs           |
+|--------------------------------------|------------------------|----------------------------------|------------------------------|
+| DB-Field-Category                    | Group                  | Group                            | Group                        |
+| DB-Field-Type                        | Text field             | Text field                       | Text field                   |
+| Table column                         | `website_agecategory`  | `website_recurrence_description` | `website_contact_person_ids` |
+| Database table                       | (empty)                | (empty)                          | (empty)                      |
+| Appears when people are entered      | No                     | No                               | No                           |
+| Description                          | Website - Age Category | Website - Recurrence Description | Website - Contact Person IDs |
+| Short description                    | (on purpose)           | (on purpose)                     | (on purpose)                 |
+| HTML-View end of line                | `<br/>`                | `<br/>`                          | `<br/>`                      |
+| Security level                       | *1                     | *1                               | *1                           |
+| Length                               | 255                    | 255                              | 255                          |
+| Sort Order                           | 93                     | 94                               | 95                           |
+| Delete when user is moved to archive | No                     | No                               | No                           |
+| Null value is allowed                | Yes                    | Yes                              | Yes                          |
+| Hide in surface                      | No                     | No                               | No                           |
+
+*1) depending on who should be able to display and edit these fields an appropriate security level should be selected. If you don't have any clue use level 4 in the beginning.
 
 ### ChurchTools API
 
