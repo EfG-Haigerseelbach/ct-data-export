@@ -66,7 +66,7 @@
 <div class="container" style="margin-bottom: 2em;">
     <h3 style="margin-top: 3rem;" data-i18n="dashboard"></h3>
     <h4 style="margin-top: 2rem;"><span data-i18n="files"></span> <i class="fa-solid fa-arrows-rotate" id="refresh-files"></i></h4>
-    <div id="files">
+    <div id="files" class="d-flex flex-wrap">
     </div>
 
     <h4 style="margin-top: 2rem;" data-i18n="configuration"></h4>
@@ -289,7 +289,7 @@
                     }
 
                     var entryTmp = 
-                    `<div class="card" style="margin-bottom:1em;">`+
+                    `<div class="card" style="margin-bottom:1em; margin-right: 1em;">`+
                         `<h5 class="card-header">${file.filename}</h5>`+
                         `<div class="card-body">`+
                             `<!--<h5 class="card-title">${file.filename}</h5>-->`+
