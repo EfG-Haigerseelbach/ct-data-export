@@ -247,18 +247,18 @@ The exported groups data has the following schema:
 
 | Property              | Data Type       | Description                                    | API-path at /groups                        | Example                                                                      |
 |-----------------------|-----------------|------------------------------------------------|--------------------------------------------|------------------------------------------------------------------------------|
-| id                    | number          | group's ID                                     | information.id                             | 42                                                                           |
-| name                  | string          | group's name                                   | information.name                           | "Biking"                                                                     |
-| startDate             | string          | group's date of creation/ foundation           | information.dateOfFoundation               | "2020-10-27"                                                                 |
-| endDate               | string          | group's date of completion                     | information.endDate                        | "2021-10-28"                                                                 |
-| weekday               | string          | group's day of meeting                         | information.weekday                        | "Wednesday"                                                                  |
-| note                  | string          | group's description                            | informtion.note                            | "Some description"                                                           |
-| imageUrl              | string          | group's image                                  | API /files/groupimage/{groupid}            | "https://test.church.tools/?q=public/filedownload&id=1234&filename=abcd...." |
-| categories            | array of string | custom field for group: categories for website | information.website_groupcategory_ids      | [ "small groups", "regular" ]                                                |
-| targetGroups          | array of string | custom field for group: target groups          | information.website_target_group_ids       | [ "youth", "families" ]                                                      |
-| ageCategory           | string          | custom field for group: age category           | information.website_agecategory            | "30-50"                                                                      |
-| recurrenceDescription | string          | custom field for group: recurrence description | information.website_recurrence_description | "every two weeks"                                                            |
-| contactPersons        | string          | custom field for group: separated person IDs   | information.website_contact_person_ids     | "17 49"                                                                      |
+| id                    | `number`          | group's ID                                     | `information.id`                             | `42`                                                                           |
+| name                  | `string`          | group's name                                   | `information.name`                           | `"Biking"`                                                                     |
+| startDate             | `string`          | group's date of creation/ foundation           | `information.dateOfFoundation`               | `"2020-10-27"`                                                                 |
+| endDate               | `string`          | group's date of completion                     | `information.endDate`                        | `"2021-10-28"`                                                                 |
+| weekday               | `string`          | group's day of meeting                         | `information.weekday`                        | `"Wednesday"`                                                                  |
+| note                  | `string`          | group's description                            | `information.note`                            | `"Some description"`                                                           |
+| imageUrl              | `string`          | group's image                                  | API `/files/groupimage/{groupid}`            | `"https://test.church.tools/?q=public/filedownload&id=1234&filename=abcd...."` |
+| categories            | array of `string` | custom field for group: categories for website | `information.website_groupcategory_ids`      | `[ "small groups", "regular" ]`                                                |
+| targetGroups          | array of `string` | custom field for group: target groups          | `information.website_target_group_ids`       | `[ "youth", "families" ]`                                                      |
+| ageCategory           | `string`          | custom field for group: age category           | `information.website_agecategory`            | `"30-50"`                                                                      |
+| recurrence Description | `string`          | custom field for group: recurrence description | `information.website_recurrence_description` | `"every two weeks"`                                                            |
+| contactPersons        | `string`          | custom field for group: separated person IDs   | `information.website_contact_person_ids`     | `"17 49"`                                                                      |
 
 ##### id
 
