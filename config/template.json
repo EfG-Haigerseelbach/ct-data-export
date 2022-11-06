@@ -7,9 +7,9 @@
         "password": "password"
     },
     "storagePaths": {
-        "groupsData": "path/and/filename.csv",
-        "contactPersonsData": "path/and/filename.csv",
-        "appointmentData": "path/and/filename.csv",
+        "groupsData": "path/and/filename",
+        "contactPersonsData": "path/and/filename",
+        "appointmentData": "path/and/filename",
         "mimeTypes": [
             "text/csv",
             "application/json"
