@@ -2,6 +2,22 @@
 
 Export data via ChurchTools API
 
+1. [Installation](#installation)
+1.1 [Download](#download)
+1.2 [Configure](#configure)
+2. [Configuration](#configuration)
+2.1 [ChurchTools Master Data](#churchtools-master-data)
+2.2 [Data Export](#data-export)
+2.2.1 [ChurchTools API)[#churchtools-api]
+2.2.2 [Storage Paths](#storage-paths)
+2.2.3 [Calendar](#calendar)
+2.2.4 [Logging](#logging)
+2.2.5 [Cron Job](#cron-job)
+2.2.6 [Admin Token](#admin-token)
+3. [Data Structure](#data-structure)
+4. [Usage](#usage)
+
+
 ## Installation
 
 ### Download
@@ -20,10 +36,104 @@ Export data via ChurchTools API
 
 ### ChurchTools Master Data
 
-This application expects certain additional data fields to exist. Hence, the pre-delivered master data of ChurchTools need to be extended:
+This application expects certain additional data fields to exist. Hence, the standard master data of ChurchTools needs to be extended:
 
 1) Go to tab `Persons & Groups` and press `Master data`.
-2) Click on `DB-Fields` and add the following fields (by pressing the plus-icon at the end of the table):
+2) Click on `DB-Fields` and add the following new fields by pressing the plus-icon at the end of the table (see steps 3ff).
+3) Categories
+
+| Name                                 | Value                                                                          |
+|--------------------------------------|--------------------------------------------------------------------------------|
+| DB-Field-Category                    | Group                                                                          |
+| DB-Field-Type                        | Multiple selection                                                             |
+| Table column                         | website_category_ids                                                           |
+| Database table                       | cdb_groupcategory                                                              |
+| Appears when people are entered      | No                                                                             |
+| Description                          | Website - Categories                                                           |
+| Short description                    | (on purpose)                                                                   |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| Security level                       | dependens, use level 4 in case only very selected people should see this field |
+| Length                               | 255                                                                            |
+| Sort Order                           | 90                                                                             |
+| Delete when user is moved to archive | No                                                                             |
+| Null value is allowed                | Yes                                                                            |
+| Hide in surface                      | No                                                                             |
+
+4) Target groups
+
+| Name                                 | Value                                                                          |
+|--------------------------------------|--------------------------------------------------------------------------------|
+| DB-Field-Category                    | Group                                                                          |
+| DB-Field-Type                        | Multiple selection                                                             |
+| Table column                         | website_targetgroup_ids                                                        |
+| Database table                       | cdb_targetgroup                                                                |
+| Appears when people are entered      | No                                                                             |
+| Description                          | Website - Target Groups                                                        |
+| Short description                    | (on purpose)                                                                   |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| Security level                       | dependens, use level 4 in case only very selected people should see this field |
+| Length                               | 255                                                                            |
+| Sort Order                           | 91                                                                             |
+| Delete when user is moved to archive | No                                                                             |
+| Null value is allowed                | Yes                                                                            |
+| Hide in surface                      | No                                                                             |
+
+5) Age category
+
+| Name                                 | Value                                                                          |
+|--------------------------------------|--------------------------------------------------------------------------------|
+| DB-Field-Category                    | Group                                                                          |
+| DB-Field-Type                        | Text field                                                                     |
+| Table column                         | website_agecategory                                                            |
+| Database table                       | (empty)                                                                        |
+| Appears when people are entered      | No                                                                             |
+| Description                          | Website - Age Category                                                         |
+| Short description                    | (on purpose)                                                                   |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| Security level                       | dependens, use level 4 in case only very selected people should see this field |
+| Length                               | 255                                                                            |
+| Sort Order                           | 92                                                                             |
+| Delete when user is moved to archive | No                                                                             |
+| Null value is allowed                | Yes                                                                            |
+| Hide in surface                      | No                                                                             |
+
+6) Recurrence Description
+
+| Name                                 | Value                                                                          |
+|--------------------------------------|--------------------------------------------------------------------------------|
+| DB-Field-Category                    | Group                                                                          |
+| DB-Field-Type                        | Text field                                                                     |
+| Table column                         | website_recurrence_description                                                 |
+| Database table                       | (empty)                                                                        |
+| Appears when people are entered      | No                                                                             |
+| Description                          | Website - Recurrence Description                                               |
+| Short description                    | (on purpose)                                                                   |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| Security level                       | dependens, use level 4 in case only very selected people should see this field |
+| Length                               | 255                                                                            |
+| Sort Order                           | 93                                                                             |
+| Delete when user is moved to archive | No                                                                             |
+| Null value is allowed                | Yes                                                                            |
+| Hide in surface                      | No                                                                             |
+
+7) Contact Person IDs
+
+| Name                                 | Value                                                                          |
+|--------------------------------------|--------------------------------------------------------------------------------|
+| DB-Field-Category                    | Group                                                                          |
+| DB-Field-Type                        | Text field                                                                     |
+| Table column                         | website_contact_person_ids                                                     |
+| Database table                       | (empty)                                                                        |
+| Appears when people are entered      | No                                                                             |
+| Description                          | Website - Contact Person IDs                                                   |
+| Short description                    | (on purpose)                                                                   |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
+| Security level                       | dependens, use level 4 in case only very selected people should see this field |
+| Length                               | 255                                                                            |
+| Sort Order                           | 94                                                                             |
+| Delete when user is moved to archive | No                                                                             |
+| Null value is allowed                | Yes                                                                            |
+| Hide in surface                      | No                                                                             |
 
 ### Data Export
 
@@ -93,7 +203,7 @@ Parameter `allowedCalendarIds` is an array of objects where are each object has 
 |--------------|-----------|---------------|-----------------|-------------------------------------|
 | `adminToken` | string    | `toBeChanged` | n/a             | Token to access the admin dashboard |
 
-#### Data Structure
+## Data Structure
 
 The exported groups data has the following schema:
 
@@ -180,7 +290,7 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Categories                                                           |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | <br/>                                                                          |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 90                                                                             |
@@ -212,7 +322,7 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Target Groups                                                        |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | <br/>                                                                          |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 91                                                                             |
@@ -245,7 +355,7 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Age Category                                                         |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | <br/>                                                                          |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 92                                                                             |
@@ -274,7 +384,7 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Recurrence Description                                               |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | <br/>                                                                          |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 93                                                                             |
@@ -292,7 +402,6 @@ The value is kept for the data export.
 
 This is the group's name given by the creator/ maintainer of the group. In the (JSON) export it is represented as string. In the (standard) API `/groups/{groupId}` it is exposed at path `information.name`. Example values are `"Biking"`, `"Youth"`, `"Young Adults"`.
 
-| contactPersons        | string          | custom field for group: separated person IDs   | information.website_contact_person_ids     | "17 49"                                                                      |
 ##### contactPersons
 
 This is a custom field which does *not* exist in standard. In ChurchTools backend's master data > DB-Fields it needs to be defined as follows:
@@ -306,7 +415,7 @@ This is a custom field which does *not* exist in standard. In ChurchTools backen
 | Appears when people are entered      | No                                                                             |
 | Description                          | Website - Contact Person IDs                                                   |
 | Short description                    | (on purpose)                                                                   |
-| HTML-View end of line                | <br/>                                                                          |
+| HTML-View end of line                | &lt;br/&gt;                                                                          |
 | Security level                       | dependens, use level 4 in case only very selected people should see this field |
 | Length                               | 255                                                                            |
 | Sort Order                           | 94                                                                             |
