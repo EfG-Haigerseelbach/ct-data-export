@@ -2,21 +2,20 @@
 
 Export data via ChurchTools API
 
-1. [Installation](#installation)
-1.1 [Download](#download)
-1.2 [Configure](#configure)
-2. [Configuration](#configuration)
-2.1 [ChurchTools Master Data](#churchtools-master-data)
-2.2 [Data Export](#data-export)
-2.2.1 [ChurchTools API)[#churchtools-api]
-2.2.2 [Storage Paths](#storage-paths)
-2.2.3 [Calendar](#calendar)
-2.2.4 [Logging](#logging)
-2.2.5 [Cron Job](#cron-job)
-2.2.6 [Admin Token](#admin-token)
-3. [Data Structure](#data-structure)
-4. [Usage](#usage)
-
+1. [Installation](#installation)  
+1.1 [Download](#download)  
+1.2 [Configure](#configure)  
+2. [Configuration](#configuration)  
+2.1 [ChurchTools Master Data](#churchtools-master-data)  
+2.2 [Data Export](#data-export)  
+2.2.1 [ChurchTools API)(#churchtools-api)  
+2.2.2 [Storage Paths](#storage-paths)  
+2.2.3 [Calendar](#calendar)  
+2.2.4 [Logging](#logging)  
+2.2.5 [Cron Job](#cron-job)  
+2.2.6 [Admin Token](#admin-token)  
+3. [Data Structure](#data-structure)  
+4. [Usage](#usage)  
 
 ## Installation
 
