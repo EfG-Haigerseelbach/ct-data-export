@@ -15,9 +15,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 var config = require('config');
 
-
 var indexRouter = require('./routes/index');
-
 
 var app = express();
 
