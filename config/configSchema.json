@@ -56,20 +56,6 @@
             "required": ["groupsData", "contactPersonsData", "appointmentData", "mimeTypes"],
             "additionalProperties": true
         },
-        "calendar": {
-            "type": "object",
-            "properties": {
-                "allowedCalendarIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "to be done"
-                }
-            },
-            "required": ["allowedCalendarIds"],
-            "additionalProperties": true
-        },
         "tags": {
             "type": "object",
             "properties": {
@@ -142,6 +128,6 @@
             "type": "string"
         }
     },
-    "required": ["info", "production", "churchtools", "storage", "calendar", "tags", "logging", "cronJob", "adminToken"],
+    "required": ["info", "production", "churchtools", "storage", "tags", "logging", "cronJob", "adminToken"],
     "additionalProperties": false
   }

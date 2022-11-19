@@ -112,50 +112,11 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
     function getIconForMimeType(mimeType) {
-        if(mimeType == "text/csv") {
-            return '<i class="fa-solid fa-file-csv"></i>';
-        } else {
-            return '<i class="fa-solid fa-file"></i>';
-        }
+        return '<i class="fa-solid fa-file"></i>';
     }
 
     function cronJobPatternToString(pattern) {
 
-    }
-
-
-    var allowedCalendarIds = [];
-
-    function getCalendarIdsAndNames() {
-        $.get("/getCalendars")
-            .done(function (data) {
-                var calendarIdsAndNames = data;
-                var calendarCheckBoxTemplate = '<div class="form-group"><input class="form-check-input calendarIdInput" type="checkbox" id="calendarId-##ID##" ##CHECKED##> <label class="form-check-label" for="calendarId-##ID##">##LABEL## <span style="color: #bbb;">(ID: ##ID##)</span></label></div>';
-                
-                var tmp = '';
-                calendarIdsAndNames.forEach(calendarIdAndName => {
-                    var checkboxTmp = calendarCheckBoxTemplate
-                        .replace(/##ID##/g, calendarIdAndName.id)
-                        .replace(/##LABEL##/g, calendarIdAndName.name);
-                    var selected = false;
-                    allowedCalendarIds.forEach(entry => {
-                        if(entry == calendarIdAndName.id) {
-                            selected = true;
-                        }
-                    });
-                    if(selected) {
-                        checkboxTmp = checkboxTmp.replace('##CHECKED##','checked="checked"');
-                    } else {
-                        checkboxTmp = checkboxTmp.replace('##CHECKED##','');
-                    }
-                    tmp += checkboxTmp;
-                });
-                $('#calendarIds').empty();
-                $('#calendarIds').append(tmp);
-            })
-            .fail(function (error) {
-                console.log(error);
-            });
     }
 
     var groupExportTag;
@@ -221,21 +182,9 @@
                 "mimeTypes" : [ ]
             }
         };
-        if($('#outputCsvCheckBox').is(':checked')) {
-            newConfig.storage.mimeTypes.push('text/csv');
-        } 
         if($('#outputJsonCheckBox').is(':checked')) {
             newConfig.storage.mimeTypes.push('application/json');
         } 
-
-        newConfig.calendar = {};
-        newConfig.calendar.allowedCalendarIds = [];
-        $('.calendarIdInput').each((index, element) => {
-            if($(element).is(':checked')) {
-                var id = $(element).attr('id').replace('calendarId-', '');
-                newConfig.calendar.allowedCalendarIds.push(id);
-            }
-        })
 
         newConfig.tags = {};
         newConfig.tags.groupsToExport = $( ".groups-to-export-tag-radio:checked" ).attr('data-name');
@@ -265,6 +214,7 @@
     $(document).ready(function () {
         $('#refresh-files').click(function() {
             $.get("/store")
+            //$.get("/storeAllPersonsTest")
                 .done(function () {
                     location.reload();
                 })
@@ -350,22 +300,10 @@
                     .replace('##value##',data.config.storage.appointmentData));
 
                 var tmp = '';
-                if(data.config.storage.mimeTypes.includes('text/csv')) {
-                    tmp = 'checked="checked"';
-                }
-                var rowTmp = `<tr><td data-i18n="config.storage.csv"></td><td><input class="form-check-input" type="checkbox" id="outputCsvCheckBox" ${tmp}></td></tr>`;
-                $('#config-table-body').append(rowTmp);
-                
-                tmp = '';
                 if(data.config.storage.mimeTypes.includes('application/json')) {
                     tmp = 'checked="checked"';
                 }
                 rowTmp = `<tr><td data-i18n="config.storage.json"></td><td><input class="form-check-input" type="checkbox" id="outputJsonCheckBox" ${tmp}></td></tr>`;
-                $('#config-table-body').append(rowTmp);
-                
-                allowedCalendarIds = data.config.calendar.allowedCalendarIds;
-
-                rowTmp = `<tr><td data-i18n="config.allowedCalendarIds"></td><td id="calendarIds"><span class="loader"></span></td></tr>`;
                 $('#config-table-body').append(rowTmp);
 
                 groupExportTag = data.config.tags.groupsToExport;
@@ -397,7 +335,6 @@
                 i18next.changeLanguage("de", () => {
                     rerender();
                 });
-                getCalendarIdsAndNames();
                 getTagIdsAndNames();
             })
             .fail(function (error) {

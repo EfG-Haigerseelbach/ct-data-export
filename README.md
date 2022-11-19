@@ -9,10 +9,9 @@ Export data via ChurchTools API
 2.1 [ChurchTools Master Data](#churchtools-master-data)  
 2.2 [ChurchTools API](#churchtools-api)  
 2.3 [Storage Paths](#storage-paths)  
-2.4 [Calendar](#calendar)  
-2.5 [ChurchTools Client Logging](#churchtools-client-logging)  
-2.6 [Cron Job](#cron-job)  
-2.7 [Admin Token](#admin-token)  
+2.4 [ChurchTools Client Logging](#churchtools-client-logging)  
+2.5 [Cron Job](#cron-job)  
+2.6 [Admin Token](#admin-token)  
 3. [Data Structure](#data-structure)  
 4. [Usage](#usage)  
 
@@ -100,6 +99,8 @@ In addition to the configuration of the parameters above you need to ensure that
 |  ...
 |  +- view tags (dt. Tags einsehen)
 |  ...
+|  +- write access to all visible persons (write access)
+|  ...
 |  +- administer groups (dt. Gruppen administrieren)
 ...
 ```
@@ -113,11 +114,11 @@ this path.
 
 | Parameter            | Data Type | Default                 | Explanation                                                                                        |
 |----------------------|-----------|-------------------------|----------------------------------------------------------------------------------------------------|
-| `groupsData`         | string    | `path/and/filename`     | Path (optional) and filename for data of groups without file type extension (e.g. `.csv`)          |
-| `contactPersonsData` | string    | `path/and/filename`     | Path (optional) and filename for data of contact persons without file type extension (e.g. `.csv`) |
-| `appointmentData`    | string    | `path/and/filename`     | Path (optional) and filename for data of appointments without file type extension (e.g. `.csv`)    |
+| `groupsData`         | string    | `path/and/filename`     | Path (optional) and filename for data of groups without file type extension (e.g. `.json`)          |
+| `contactPersonsData` | string    | `path/and/filename`     | Path (optional) and filename for data of contact persons without file type extension (e.g. `.json`) |
+| `appointmentData`    | string    | `path/and/filename`     | Path (optional) and filename for data of appointments without file type extension (e.g. `.json`)    |
 
-Data can be exported as comma separated values (CSV) or JSON. This is controlled by parameter `mimeTypes`. This parameter is expected to be an array of strings. It can contain any combination of the following values: `text/csv`, `application/json`. It can also be empty which would result in *no* data is exported.
+As of now data can be exported as JSON. This is controlled by parameter `mimeTypes`. This parameter is expected to be an array of strings. It can contain any combination of the following values: `application/json`. It can also be empty which would result in *no* data is exported.
 
 Excerpt from the template configuration:
 
@@ -127,20 +128,10 @@ Excerpt from the template configuration:
         "contactPersonsData": "path/and/filename",
         "appointmentData": "path/and/filename",
         "mimeTypes": [
-            "text/csv",
             "application/json"
         ]
     }
 ````
-
-### Calendar
-
-Parameter `allowedCalendarIds` is an array of objects whereas each object has the following semantics:
-
-| Parameter | Data Type | Default | Possible Values | Explanation                                                                                     |
-|-----------|-----------|---------|-----------------|-------------------------------------------------------------------------------------------------|
-| `id`      | number    | n/a     | integer         | ID of the calendar given by ChurchTools                                                         |
-| `name`    | string    | n/a     | n/a             | An descriptive text for the calendar ID o get a better readability of the config (not consumed) |
 
 ### ChurchTools Client Logging
 

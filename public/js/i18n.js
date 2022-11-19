@@ -93,7 +93,6 @@
                             groupsData: 'Filename for data of Groups (w/o extension)',
                             contactPersonsData: 'Filename for data of Persons (w/o extension)',
                             appointmentData: 'Filename for data of Appointments (w/o extension)',
-                            csv: 'Output as CSV file (\'text/csv\')',
                             json: 'Output as JSON file (\'application/json\')'
                         },
                         allowedCalendarIds: 'Calendar IDs',
@@ -138,7 +137,6 @@
                             groupsData: 'Dateiname für Gruppendaten (ohne Dateiendung)',
                             contactPersonsData: 'Dateiname für Personendaten (ohne Dateiendung)',
                             appointmentData: 'Dateiname für Termindaten (ohne Dateiendung)',
-                            csv: 'Ausgabe als CSV-Datei (\'text/csv\')',
                             json: 'Ausgabe as JSON-Datei (\'application/json\')'
                         },
                         allowedCalendarIds: 'Kalender IDs',

@@ -15,12 +15,6 @@
             "application/json"
         ]
     },
-    "calendar": {
-        "allowedCalendarIds": [ 
-            { "id": 1, "name": "Some Name" },
-            { "id": 2, "name": "Some Other Name" }
-        ]
-    },
     "tags": {
         "groupsToExport": "tagA",
         "personsToExport": "tagB"
