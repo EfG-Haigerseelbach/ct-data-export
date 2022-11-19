@@ -178,7 +178,6 @@
                 "path": $('#storage-path').val(),
                 "groupsData": $('#storage-groupsData').val(),
                 "contactPersonsData": $('#storage-contactPersonsData').val(),
-                "appointmentData": $('#storage-appointmentData').val(),
                 "mimeTypes" : [ ]
             }
         };
@@ -294,11 +293,6 @@
                     .replace('##id##','storage-contactPersonsData')
                     .replace('##value##',data.config.storage.contactPersonsData));
 
-                $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','config.storage.appointmentData')
-                    .replace('##id##','storage-appointmentData')
-                    .replace('##value##',data.config.storage.appointmentData));
-
                 var tmp = '';
                 if(data.config.storage.mimeTypes.includes('application/json')) {
                     tmp = 'checked="checked"';
@@ -325,7 +319,9 @@
                     `<input id="cronJob-pattern" type="text" class="form-control" value="${data.config.cronJob.pattern}">`+
                     `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" data-i18n="help"></a></div></div>`+
                     `<div><span id="cronJob-pattern-explanation"></span></div></td></tr>`);
-
+                // Display a cron pattern explanation
+                $('#cronJob-pattern-explanation').append(cronstrue.toString($('#cronJob-pattern').val(), { use24HourTimeFormat: true, locale: "de" }));
+                // Update the cron pattern explanation on change
                 $('#cronJob-pattern').change(()=> {
                     $('#cronJob-pattern-explanation').empty();
                     // TODO: make locale dynamic

@@ -505,8 +505,7 @@ function getMasterDataById(section, id) {
 function isFilenameInConfig(filename) {
   filename = filename.replace(/\.json/,''); 
   if(filename == config.get('storage.groupsData') ||
-     filename == config.get('storage.contactPersonsData') ||
-     filename == config.get('storage.appointmentData')) {
+     filename == config.get('storage.contactPersonsData')) {
     return true;
   }
   return false;
@@ -997,12 +996,6 @@ router.post('/updateConfig', checkAuthenticatedApi, function (req, res, next) {
   } else {
     result.storage.contactPersonsData = 'The filename contains an invalid character';
   }
-  if(allowedFilenameRegex.test(newConfig.storage.appointmentData)) {
-    configTmp.storage.appointmentData = newConfig.storage.appointmentData;
-  } else {
-    result.storage.appointmentData = 'The filename contains an invalid character';
-  }
-
 
   configTmp.storage.mimeTypes = [];
   if(newConfig.storage.mimeTypes.includes("application/json")) {
@@ -1048,8 +1041,6 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
           "category": "groupsData", "mimeType":"application/json"});
         filesToCheck.push({ "path": path.join('tmp',config.get('storage.contactPersonsData').trim())+".json", 
           "category": "contactPersonsData", "mimeType":"application/json"});
-        filesToCheck.push({ "path": path.join('tmp',config.get('storage.appointmentData').trim())+".json", 
-          "category": "appointmentData", "mimeType":"application/json"});
       }
     });
 
@@ -1082,7 +1073,6 @@ router.get('/status', checkAuthenticatedApi, function (req, res, next) {
     result.config.storage = {
       "groupsData": config.get('storage.groupsData'),
       "contactPersonsData": config.get('storage.contactPersonsData'),
-      "appointmentData": config.get('storage.appointmentData'),
       "mimeTypes": config.get('storage.mimeTypes'),
     };
     result.config.tags = config.get('tags');
