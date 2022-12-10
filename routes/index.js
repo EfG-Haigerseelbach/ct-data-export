@@ -610,7 +610,7 @@ function buildPersonsExport(personsDataFromChurchToolsApi) {
           }
         }
         tmp.imageUrl = person.imageUrl;
-        tmp.responsibilities = 'ToBeDone'; // TODO
+        tmp.responsibilities = person.website_responsibilities;
 
         tmp.export = getProperty(exportIndicator, person);
         tmp.export = tmp.export === undefined ? false : tmp.export;
@@ -709,50 +709,6 @@ function getAllContactPersons() {
     .then(persons => filterForToBeExportedPersons(persons))
     .then(persons => replacePersonsImages(persons))
     .catch(reason => console.error(reason));
-}
-
-function getAllToBeExportedPersons() {
-  const exportIndicator = config.get('export.person.attributeThatIndicatesToExport');
-  var url = `/persons`;
-  console.log(`Querying persons using URL #######: ${url}`);
-  return churchtoolsClient.getAllPages(url).then(persons => {
-    return new Promise((resolve, reject) => {
-      assertIsArray(persons, reject);
-      var result = [];
-      persons.forEach(person => {
-          // Check if this person is to be exported
-          if(getProperty(exportIndicator, person) == true) {
-            var tmp = {};
-            tmp.id = person.id;
-            tmp.firstName = person.firstName;
-            tmp.lastName = person.lastName;
-            tmp.email = null;
-            if(person.emails != null && person.emails.length > 0) {
-              for(var i = 0; i < person.emails.length; i++) {
-                if(person.emails[i].isDefault) {
-                  tmp.email = person.emails[i].email;
-                  break;
-                }
-              }
-              // No email is flagged as default. Take the first one.
-              if(tmp.email == null) {
-                if(person.emails.length > 0) {
-                  tmp.email = person.emails[0].email;
-                } else {
-                  tmp.email = '';
-                }
-              }
-            }
-            tmp.imageUrl = person.imageUrl;
-            tmp.responsibilities = 'ToBeDone'; // TODO
-            result.push(tmp);
-          }
-      });
-      resolve(result);
-    });
-  }, reason => {
-    console.error(reason); 
-  });
 }
 
 /**
@@ -868,14 +824,6 @@ function storeAllContactPersons() {
   });
 }
 
-function storeAllPersonsTest() {
-  return new Promise((resolve, reject) => {
-    getAllToBeExportedPersons()
-      .then(allPersons => { allPersons.forEach(person => { console.log(person); })},
-            reason => { reject(reason); });
-  });
-}
-
 initChurchToolsClient();
 login(config.get('churchtools.username'), config.get('churchtools.password')).then(() => {
   getMasterData();
@@ -901,18 +849,6 @@ router.get('/storeAllGroupsData', checkAuthenticatedApi, function (req, res, nex
 
 router.get('/storeAllContactPersons', checkAuthenticatedApi, function (req, res, next) {
   storeAllContactPersons().then(value => {
-    res.setHeader("Content-Type", "text/plain");
-    res.send(value);
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
-});
-
-router.get('/storeAllPersonsTest', checkAuthenticatedApi, function (req, res, next) {
-  storeAllPersonsTest().then(value => {
     res.setHeader("Content-Type", "text/plain");
     res.send(value);
   }, reason => {
