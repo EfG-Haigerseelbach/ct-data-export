@@ -1064,8 +1064,14 @@ var job = new CronJob(
 	config.get('cronJob.pattern'), 
 	function() {
 		console.log('Gather all data');
-    storeAllGroupsData();
-    storeAllContactPersons();
+    storeAllGroupsData()
+    .then(storeAllContactPersons)
+    .then(value => {
+      console.log(`Job completed. Updated the groups' and contact persons' data.`)
+    }, reason => {
+      console.error(`Job ended with error. See below.`)
+      console.error(reason);
+    });
 	},
 	null,
 	true,
