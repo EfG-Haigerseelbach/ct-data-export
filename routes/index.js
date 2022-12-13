@@ -1060,6 +1060,7 @@ router.post("/logout", (req,res) => {
   });
 });
 
+console.log(`Cron job pattern: ${config.get('cronJob.pattern')}`);
 var job = new CronJob(
 	config.get('cronJob.pattern'), 
 	function() {
