@@ -626,17 +626,31 @@ function buildPersonsExport(personsDataFromChurchToolsApi) {
         tmp.export = getProperty(exportIndicator, person);
         tmp.export = tmp.export === undefined ? false : tmp.export;
 
+        tmp.sortOrder = getProperty(config.get('export.person.sortOrder'), person);
+        tmp.sortOrder = tmp.sortOrder === undefined ? 99 : tmp.sortOrder;
+
         result.push(tmp);
     });
+    // Sort using the sort order
     result.sort(function compare(person_a, person_b) {
-      if (person_a.id < person_b.id ){
+      if(person_a.sortOrder < person_b.sortOrder ){
         return -1;
-      }
-      if (person_a.id > person_b.id ){
+      } else if(person_a.sortOrder > person_b.sortOrder ){
         return 1;
-      }
-      return 0;
+      } else {
+        if(person_a.firstName < person_b.firstName){
+          return -1;
+        } else if(person_a.firstName > person_b.firstName){
+          return 1;
+        } else {
+          return 0;
+        }
+      }      
     });
+    // Overwrite the sort order with uniq integer values.
+    for(var i = 0; i < result.length; i++) {
+      result[i].sortOrder = i+1;
+    }
     resolve(result);
   });
 }
