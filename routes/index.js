@@ -628,29 +628,19 @@ function buildPersonsExport(personsDataFromChurchToolsApi) {
 
         tmp.sortOrder = getProperty(config.get('export.person.sortOrder'), person);
         tmp.sortOrder = tmp.sortOrder === undefined ? 99 : tmp.sortOrder;
-
+        
         result.push(tmp);
     });
-    // Sort using the sort order
+    // Sort using the ID
     result.sort(function compare(person_a, person_b) {
-      if(person_a.sortOrder < person_b.sortOrder ){
+      if(person_a.id < person_b.id ){
         return -1;
-      } else if(person_a.sortOrder > person_b.sortOrder ){
+      } else if(person_a.id > person_b.id ){
         return 1;
       } else {
-        if(person_a.firstName < person_b.firstName){
-          return -1;
-        } else if(person_a.firstName > person_b.firstName){
-          return 1;
-        } else {
-          return 0;
-        }
+        return 0;
       }      
     });
-    // Overwrite the sort order with uniq integer values.
-    for(var i = 0; i < result.length; i++) {
-      result[i].sortOrder = i+1;
-    }
     resolve(result);
   });
 }
@@ -665,6 +655,26 @@ function filterForToBeExportedPersons(persons) {
         delete persons[i].export;
         result.push(persons[i]);
       }
+    }
+    // Sort using the sort order
+    result.sort(function compare(person_a, person_b) {
+      if(person_a.sortOrder < person_b.sortOrder ){
+        return 1;
+      } else if(person_a.sortOrder > person_b.sortOrder ){
+        return -1;
+      } else {
+        if(person_a.firstName < person_b.firstName){
+          return -1;
+        } else if(person_a.firstName > person_b.firstName){
+          return 1;
+        } else {
+          return 0;
+        }
+      }      
+    });
+    // Overwrite the sort order with uniq integer values.
+    for(var i = 0; i < result.length; i++) {
+      result[i].sortOrder = i+1;
     }
     resolve(result);
   });
