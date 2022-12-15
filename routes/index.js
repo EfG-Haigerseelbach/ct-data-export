@@ -628,6 +628,9 @@ function buildPersonsExport(personsDataFromChurchToolsApi) {
 
         tmp.sortOrder = getProperty(config.get('export.person.sortOrder'), person);
         tmp.sortOrder = tmp.sortOrder === undefined ? 99 : tmp.sortOrder;
+        if(!Number.isInteger(tmp.sortOrder)) {
+          tmp.sortOrder = 99;
+        }
         
         result.push(tmp);
     });
