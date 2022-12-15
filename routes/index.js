@@ -105,7 +105,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
           for(var [id, value] of Object.entries(categories)) {
             var groupCategory = getMasterDataById("groupCategories", id);
             if(groupCategory != undefined) {
-              tmp.categories.push(groupCategory.name);
+              tmp.categories.push(groupCategory.nameTranslated);
             } else {
               console.error(`For group with ID ${group.id} (name: ${group.name}) the data field ${accessPathToCategoryData} contains value ${id} but there is no such master data for 'groupCategories'!`);
             }
@@ -115,7 +115,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         var targetGroupsIdsTmp = getProperty(config.get('export.accessPath.targetGroupIds'), group);
         if(targetGroupsIdsTmp != null) {
           for(var [id, value] of Object.entries(targetGroupsIdsTmp)) {
-            tmp.targetGroups.push(getMasterDataById("targetGroups",id).name);
+            tmp.targetGroups.push(getMasterDataById("targetGroups",id).nameTranslated);
           }
         }
         tmp.ageCategory = '';
