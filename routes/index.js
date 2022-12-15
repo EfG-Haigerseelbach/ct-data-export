@@ -92,7 +92,9 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         tmp.id = group.id;
         tmp.name = group.name;
         tmp.startDate = group.information.dateOfFoundation != null ? group.information.dateOfFoundation : '';
+        tmp.startDate = moment(tmp.startDate, "YYYY-MM-DD").format("DD.MM.YYYY");
         tmp.endDate = group.information.endDate != null ? group.information.endDate : '';
+        tmp.endDate = moment(tmp.endDate, "YYYY-MM-DD").format("DD.MM.YYYY");
         tmp.weekday = group.information.weekday != null ? getWeekdayById(group.information.weekday) : 'undefined';
         tmp.note = group.information.note;
         tmp.imageUrl = group.information.imageUrl;
