@@ -97,6 +97,7 @@ res.render("dashboard.ejs", {name: req.user.name})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
+  console.error(req);
   next(createError(404));
 });
 
