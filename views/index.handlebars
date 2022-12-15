@@ -300,11 +300,11 @@
                 rowTmp = `<tr><td data-i18n="config.storage.json"></td><td><input class="form-check-input" type="checkbox" id="outputJsonCheckBox" ${tmp}></td></tr>`;
                 $('#config-table-body').append(rowTmp);
 
-                groupExportTag = data.config.tags.groupsToExport;
-                $('#config-table-body').append('<tr><td data-i18n="config.tags.groupsToExport"></td><td id="tags-groupsToExport"><span class="loader"></span></td></tr>');
+                //groupExportTag = data.config.tags.groupsToExport;
+                //$('#config-table-body').append('<tr><td data-i18n="config.tags.groupsToExport"></td><td id="tags-groupsToExport"><span class="loader"></span></td></tr>');
 
-                personExportTag = data.config.tags.personsToExport;
-                $('#config-table-body').append('<tr><td data-i18n="config.tags.personsToExport"></td><td id="tags-personsToExport"><span class="loader"></span></td></tr>');
+                //personExportTag = data.config.tags.personsToExport;
+                //$('#config-table-body').append('<tr><td data-i18n="config.tags.personsToExport"></td><td id="tags-personsToExport"><span class="loader"></span></td></tr>');
 
 
                 var rowTmp = '<tr><td data-i18n="config.logging.level"></td><td><div class="input-group input-group-sm input-inline"><select class="from-select" id="logLevelSelect">'+
@@ -331,7 +331,7 @@
                 i18next.changeLanguage("de", () => {
                     rerender();
                 });
-                getTagIdsAndNames();
+                //getTagIdsAndNames();
             })
             .fail(function (error) {
                 console.log(error);
