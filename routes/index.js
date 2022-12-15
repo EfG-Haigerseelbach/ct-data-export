@@ -249,7 +249,10 @@ function replacePersonsImagesForGroups(groups) {
           // Cross-check the promises' result data.
           for(var k = 0; k < data.length; k++) {
             if(groups[i].contactPersons[j].id == data[k].value.id) {
-              groups[i].contactPersons[j].imageUrl = data[k].value.imageUrl;
+              // Only change the person's image URL in case the new URL is not empty.
+              if(data[k].value.imageUrl.length > 0) {
+                groups[i].contactPersons[j].imageUrl = data[k].value.imageUrl;
+              }
               break;
             }
           }
@@ -346,7 +349,11 @@ function getAllGroups() {
     return new Promise((resolve, reject) => {
       assertIsArray(personImage, reject);
       if(personImage.length > 0) {
-        resolve(personImage[0].fileUrl);
+        if(personImage[0].fileUrl !== undefined) {
+          resolve(personImage[0].fileUrl);
+        } else {
+          resolve('');
+        }
       } else {
         resolve('');
       }
@@ -754,6 +761,10 @@ function getPersons(personIds) {
               }
             }
             tmp.imageUrl = person.imageUrl;
+            if(tmp.imageUrl.length == 0) {
+              // Person has no avatar image. Use the default image.
+              tmp.imageUrl = config.get('churchtools.url') + '/system/assets/img/nobody-new.jpg';
+            }
             if(person.mobile.length > 0) {
               tmp.phone = person.mobile;
             } else if(person.phonePrivate.length > 0) {
