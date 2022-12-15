@@ -100,6 +100,8 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         tmp.imageUrl = group.information.imageUrl;
         tmp.export = getProperty(config.get('export.accessPath.exposureIndicator'), group);
         tmp.export = tmp.export === undefined ? false : tmp.export;
+        tmp.showOnLandingPage = getProperty(config.get('export.accessPath.showOnLandingPage'), group);
+        tmp.showOnLandingPage = tmp.showOnLandingPage === undefined ? false : tmp.showOnLandingPage;
 
         tmp.categories = [];
         var categories = getProperty(config.get('export.accessPath.categoryData'), group);
