@@ -662,9 +662,9 @@ function filterForToBeExportedPersons(persons) {
     // Sort using the sort order
     result.sort(function compare(person_a, person_b) {
       if(person_a.sortOrder < person_b.sortOrder ){
-        return 1;
-      } else if(person_a.sortOrder > person_b.sortOrder ){
         return -1;
+      } else if(person_a.sortOrder > person_b.sortOrder ){
+        return 1;
       } else {
         if(person_a.firstName < person_b.firstName){
           return -1;
