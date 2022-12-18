@@ -356,10 +356,10 @@ function getAllGroups() {
         if(personImage[0].fileUrl !== undefined) {
           resolve(personImage[0].fileUrl);
         } else {
-          resolve('');
+          resolve(config.get('churchtools.url') + '/system/assets/img/nobody-new.jpg');
         }
       } else {
-        resolve('');
+        resolve(config.get('churchtools.url') + '/system/assets/img/nobody-new.jpg');
       }
     });
   }, reason => {
