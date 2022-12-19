@@ -461,3 +461,10 @@ Please note that there are at maximum *two* persons exported. Although further I
 ## Usage
 
 to be done
+
+## To Be Done
+
+* Change translations for time.of.meeting
+* Change translations for date.of.foundation
+* Change translations for date.of.completion
+* Change translations for day.of.meeting

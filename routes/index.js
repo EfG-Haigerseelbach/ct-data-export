@@ -93,9 +93,14 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         tmp.name = group.name;
         tmp.startDate = group.information.dateOfFoundation != null ? group.information.dateOfFoundation : '';
         tmp.startDate = tmp.startDate.length == 0 ? '' : moment(tmp.startDate, "YYYY-MM-DD").format("DD.MM.YYYY");
+        
         tmp.endDate = group.information.endDate != null ? group.information.endDate : '';
         tmp.endDate = tmp.endDate.length == 0 ? '' : moment(tmp.endDate, "YYYY-MM-DD").format("DD.MM.YYYY");
+        
         tmp.weekday = group.information.weekday != null ? getWeekdayById(group.information.weekday) : '';
+        
+        tmp.startTime = group.information.meetingTime != null ? group.information.meetingTime : '';
+
         tmp.note = group.information.note;
         tmp.imageUrl = group.information.imageUrl;
         tmp.export = getProperty(config.get('export.accessPath.exposureIndicator'), group);
