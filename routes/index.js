@@ -915,6 +915,19 @@ router.get('/store', checkAuthenticatedApi, function (req, res, next) {
   });
 });
 
+router.get('/triggerHooks', checkAuthenticatedApi, function(req, res, next) {
+  triggerHooks('cron')
+  .then(() => {
+    res.setHeader("Content-Type", "text/plain");
+    res.send("OK");
+  }, reason => {
+    res.status(500);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
+  });
+}); 
+
 router.get('/getAllGroups', checkAuthenticatedApi, function (req, res, next) {
   getAllGroups().then(value => {
     res.setHeader("Content-Type", "application/json");
@@ -1102,6 +1115,90 @@ router.post("/logout", (req,res) => {
   });
 });
 
+function callHookUrl(url) {
+  if(url.startsWith('https')) {
+    const https = require('https');
+  
+    https.get(url, res => {
+      let data = [];  
+      res.on('data', chunk => {
+        data.push(chunk);
+      });
+      res.on('end', () => {
+        var tmp = JSON.parse(Buffer.concat(data).toString());
+        console.log(moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message);
+      });
+    }).on('error', err => {
+      console.log('Error: ', err.message);
+    });
+        
+  } else {
+    const http = require('http');
+    var urlTmp = new URL(url);
+
+    var options = {
+      host: urlTmp.hostname,
+      path: urlTmp.pathname + urlTmp.search + urlTmp.hash
+    };
+    
+    callback = function(response) {
+      var str = '';
+      //another chunk of data has been received, so append it to `str`
+      response.on('data', function (chunk) {
+        str += chunk;
+      });
+      //the whole response has been received, so we just print it out here
+      response.on('end', function () {
+        console.log(str);
+      });
+    }
+    
+    http.request(options, callback).end();
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function triggerHooksInternal(hook) {
+  if(!hook.hasOwnProperty('delay')) {
+    // Create a fake delay of 0 seconds.
+    hook.delay = 0;
+  } else {
+    hook.delay = hook.delay * 1000;
+  }
+  sleep(hook.delay).then(() => {
+    console.log(`Executing hook: ${hook.description}`);
+    callHookUrl(hook.url);
+    if(hook.hasOwnProperty('followedBy')) {
+      for(var i = 0; i < hook.followedBy.length; i++) {
+        triggerHooksInternal(hook.followedBy[i]);
+      }
+    }
+  });
+}
+
+function triggerHooks(task) {
+  return new Promise((resolve, reject) => {
+    var pathToHooks = './config/hooks.json';
+    if(!fs.existsSync(pathToHooks)) {
+      console.log('No hooks defined.');
+      return;
+    }
+    var hooks = fs.readFileSync(pathToHooks, 'utf-8');
+    hooks = JSON.parse(hooks);
+    for(var i = 0; i < hooks.length; i++) {
+      if(hooks[i].task == task) {
+        triggerHooksInternal(hooks[i]);
+      }
+    }
+    resolve();
+  });
+}
+
 console.log(`Cron job pattern: ${config.get('cronJob.pattern')}`);
 var job = new CronJob(
 	config.get('cronJob.pattern'), 
@@ -1114,7 +1211,8 @@ var job = new CronJob(
     }, reason => {
       console.error(`Job ended with error. See below.`)
       console.error(reason);
-    });
+    })
+    .then(triggerHooks('cron'));
 	},
 	null,
 	true,
