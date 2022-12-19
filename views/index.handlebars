@@ -77,7 +77,8 @@
 
     <h4 style="margin-top: 2rem;"><span data-i18n="trigger_hooks"></span> <i class="fa-solid fa-play" id="trigger-hooks"></i></h4>
     <div class="accordion" id="hooks">
-
+    </div>
+    <div id="hooksResults">
     </div>
 
     <h4 style="margin-top: 2rem;" data-i18n="configuration"></h4>
@@ -221,29 +222,29 @@
             });
     }
 
-    function displayHooks(hooks, counter = 0) {
+    function displayHooks(hooks) {
         for(var i = 0; i < hooks.length; i++) {
-            counter++;
+            var hook = hooks[i];
             var hookTemp = `<div class="accordion-item">`+
-                `<h2 class="accordion-header" id="heading-${counter}">`+
+                `<h2 class="accordion-header" id="heading-${hook.internalId}">`+
                     `<button `+
                         `class="accordion-button collapsed" `+
                         `type="button" `+
                         `data-bs-toggle="collapse" `+
-                        `data-bs-target="#collapse-${counter}" `+
+                        `data-bs-target="#collapse-${hook.internalId}" `+
                         `aria-expanded="false" `+
-                        `aria-controls="collapse-${counter}">`+
+                        `aria-controls="collapse-${hook.internalId}">`+
                         `Hook&nbsp; <span style="font-style: italic; color: #888">${hooks[i].description}</span>`+
                     `</button>`+
                 `</h2>`+
                 `<div `+
-                    `id="collapse-${counter}" `+
+                    `id="collapse-${hook.internalId}" `+
                     `class="accordion-collapse collapse" `+
-                    `aria-labelledby="heading-${counter}" `+
+                    `aria-labelledby="heading-${hook.internalId}" `+
                     `data-bs-parent="#hooks">`+
                 `<div class="accordion-body">`+
                     `<label `+
-                        `for="hook-description-${counter}" `+
+                        `for="hook-description-${hook.internalId}" `+
                         `class="form-label" `+
                         `style="font-weight: bold;">`+
                         `Description`+
@@ -251,11 +252,11 @@
                     `<input `+
                         `type="text" `+
                         `class="form-control form-control-sm" `+
-                        `id="hook-description-${counter}" `+
+                        `id="hook-description-${hook.internalId}" `+
                         `placeholder="Description" `+
                         `value="${hooks[i].description}">`+
                     `<label `+
-                        `for="hook-url-${counter}" `+
+                        `for="hook-url-${hook.internalId}" `+
                         `class="form-label" `+
                         `style="margin-top: 1em; font-weight: bold;">`+
                         `URL`+
@@ -263,13 +264,13 @@
                     `<input `+
                         `type="text" `+
                         `class="form-control form-control-sm" `+
-                        `id="hook-url-${counter}" `+
+                        `id="hook-url-${hook.internalId}" `+
                         `placeholder="URL" `+
                         `value="${hooks[i].url}">`;
             if(hooks[i].hasOwnProperty('delay')) {
                 hookTemp += 
                     `<label `+
-                        `for="hook-delay-${counter}" `+
+                        `for="hook-delay-${hook.internalId}" `+
                         `class="form-label" `+
                         `style="margin-top: 1em; font-weight: bold;">`+
                         `Delay [seconds]`+
@@ -277,17 +278,27 @@
                     `<input `+
                         `type="text" `+
                         `class="form-control form-control-sm" `+
-                        `id="hook-delay-${counter}" `+
+                        `id="hook-delay-${hook.internalId}" `+
                         `placeholder="Delay in seconds" `+
                         `value="${hooks[i].delay}">`;
             }
+             hookTemp += 
+                    `<label `+
+                        `for="hook-last-result-${hook.internalId}" `+
+                        `class="form-label" `+
+                        `style="margin-top: 1em; font-weight: bold;">`+
+                        `Last Result`+
+                    `</label>`+
+                    `<input `+
+                        `type="text" `+
+                        `class="form-control form-control-sm" `+
+                        `id="hook-last-result-${hook.internalId}" `+
+                        `data-internalid="${hook.internalId}" `+
+                        `placeholder="no result yet" readonly>`;
             hookTemp += `</div>`+
                 `</div>`+
             `</div>`;
             $('#hooks').append(hookTemp);
-            if(hooks[i].hasOwnProperty('followedBy')) {
-                displayHooks(hooks[i].followedBy, counter++);
-            }
         }
     }
 
@@ -298,6 +309,12 @@
             success: (data) => { displayHooks(data); },
             error: (xhr, textStatus, errorThrown) =>{ console.log(textStatus); console.log(errorThrown); }
         });
+    }
+
+    function displayHooksResults(data) {
+        for(var i = 0; i < data.length; i++) {
+            $(`input[data-internalid="${data[i].internalId}"]`).val(data[i].result);
+        }
     }
 
     $(document).ready(function () {
@@ -317,7 +334,7 @@
             $.ajax({
                 url: "/hooks", 
                 type: 'POST',
-                success: () => { console.log('Hooks triggered'); },
+                success: (data) => { displayHooksResults(data); },
                 error: (xhr, textStatus, errorThrown) =>{ console.log(textStatus); console.log(errorThrown); }
             });
         });

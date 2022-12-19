@@ -116,7 +116,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
             if(groupCategory != undefined) {
               tmp.categories.push(groupCategory.nameTranslated);
             } else {
-              console.error(`For group with ID ${group.id} (name: ${group.name}) the data field ${accessPathToCategoryData} contains value ${id} but there is no such master data for 'groupCategories'!`);
+              console.error(`For group with ID ${group.id} (name: ${group.name}) the data field ${config.get('export.accessPath.categoryData')} contains value ${id} but there is no such master data for 'groupCategories'!`);
             }
           }
         }
@@ -935,9 +935,9 @@ router.get('/hooks', checkAuthenticatedApi, function(req, res, next) {
 
 router.post('/hooks', checkAuthenticatedApi, function(req, res, next) {
   triggerHooks('cron')
-  .then(() => {
-    res.setHeader("Content-Type", "text/plain");
-    res.send("OK");
+  .then((result) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(result));
   }, reason => {
     res.status(500);
     res.setHeader("Content-Type", "application/json");
@@ -1134,70 +1134,79 @@ router.post("/logout", (req,res) => {
   });
 });
 
-function callHookUrl(url) {
-  if(url.startsWith('https')) {
-    const https = require('https');
-  
-    https.get(url, res => {
-      let data = [];  
-      res.on('data', chunk => {
-        data.push(chunk);
-      });
-      res.on('end', () => {
-        var tmp = JSON.parse(Buffer.concat(data).toString());
-        console.log(moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message);
-      });
-    }).on('error', err => {
-      console.log('Error: ', err.message);
-    });
-        
-  } else {
-    const http = require('http');
-    var urlTmp = new URL(url);
-
-    var options = {
-      host: urlTmp.hostname,
-      path: urlTmp.pathname + urlTmp.search + urlTmp.hash
-    };
+function callHookUrl(hook) {
+  return new Promise((resolve, reject) => {
+    if(hook.url.startsWith('https')) {
+      const https = require('https');
     
-    callback = function(response) {
-      var str = '';
-      //another chunk of data has been received, so append it to `str`
-      response.on('data', function (chunk) {
-        str += chunk;
+      https.get(hook.url, res => {
+        let data = [];  
+        res.on('data', chunk => {
+          data.push(chunk);
+        });
+        res.on('end', () => {
+          var tmp = JSON.parse(Buffer.concat(data).toString());
+          tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
+          hook.result = tmp;
+          resolve(hook);
+        });
+      }).on('error', err => {
+        console.log(`An error occurred when calling the hook URL ${hook.url}: `, err.message);
+        hook.result = err.message;
+        reject(hook);
       });
-      //the whole response has been received, so we just print it out here
-      response.on('end', function () {
-        console.log(str);
-      });
+          
+    } else {
+      const http = require('http');
+      var urlTmp = new URL(hook.url);
+
+      var options = {
+        host: urlTmp.hostname,
+        path: urlTmp.pathname + urlTmp.search + urlTmp.hash
+      };
+      
+      callback = function(response) {
+        var str = '';
+        //another chunk of data has been received, so append it to `str`
+        response.on('data', function (chunk) {
+          str += chunk;
+        });
+        //the whole response has been received, so we just print it out here
+        response.on('end', function () {
+          hook.result = str;
+          resolve(hook);
+        });
+      }
+      
+      http.request(options, callback).end();
     }
-    
-    http.request(options, callback).end();
-  }
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
   });
 }
 
-function triggerHooksInternal(hook) {
-  if(!hook.hasOwnProperty('delay')) {
-    // Create a fake delay of 0 seconds.
-    hook.delay = 0;
-  } else {
-    hook.delay = hook.delay * 1000;
-  }
-  sleep(hook.delay).then(() => {
-    console.log(`Executing hook: ${hook.description}`);
-    callHookUrl(hook.url);
-    if(hook.hasOwnProperty('followedBy')) {
-      for(var i = 0; i < hook.followedBy.length; i++) {
-        triggerHooksInternal(hook.followedBy[i]);
+function linearizeHooks(hooks, task, delay, internalId) {
+  var linearizedHooks = [];
+  for(var i = 0; i < hooks.length; i++) {
+    if(!hooks[i].hasOwnProperty('task') || ( hooks[i].task == task || task == null ) ) {
+      var hookTmp = {
+        internalId: internalId,
+        description: hooks[i].description,
+        url: hooks[i].url
+      };
+      internalId++;
+      if(hooks[i].hasOwnProperty('delay')) {
+        hookTmp.delay = delay + hooks[i].delay;
+      } else {
+        hookTmp.delay = delay;
+      }
+      linearizedHooks.push(hookTmp);
+      // Check for child hooks.
+      if(hooks[i].hasOwnProperty('followedBy')) {
+        // There are child hooks.
+        linearizedHooks = linearizedHooks.concat(linearizeHooks(hooks[i].followedBy, task, hookTmp.delay, internalId++));
       }
     }
-  });
+  }
+  return linearizedHooks;
 }
 
 function triggerHooks(task) {
@@ -1209,12 +1218,24 @@ function triggerHooks(task) {
     }
     var hooks = fs.readFileSync(pathToHooks, 'utf-8');
     hooks = JSON.parse(hooks);
-    for(var i = 0; i < hooks.length; i++) {
-      if(hooks[i].task == task) {
-        triggerHooksInternal(hooks[i]);
+
+    linearizedHooks = linearizeHooks(hooks, task, 0, 0);
+
+    Promise.allSettled(linearizedHooks.map(hook => {
+      return new Promise((resolveHook, rejectHook) => {
+        setTimeout(() => {
+          callHookUrl(hook)
+            .then((hookResult) => { resolveHook(hookResult)})
+            .catch((hookRejectionReason) => { rejectHook(hookRejectionReason)});
+        }, hook.delay * 1000);
+      });
+    })).then(data => {
+      var result = [];
+      for(var i = 0; i < data.length; i++) {
+        result.push(data[i].value);
       }
-    }
-    resolve();
+      resolve(result);
+    });
   });
 }
 
@@ -1227,7 +1248,8 @@ function getHooks() {
     }
     var hooks = fs.readFileSync(pathToHooks, 'utf-8');
     hooks = JSON.parse(hooks);
-    resolve(hooks);
+    linearizedHooks = linearizeHooks(hooks, null, 0, 0);
+    resolve(linearizedHooks);
   });
 }
 
