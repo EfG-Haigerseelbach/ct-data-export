@@ -833,7 +833,11 @@ function storeData(data, path) {
   return new Promise((resolve, reject) => {
     config.get('storage.mimeTypes').forEach(mimeType => {
       if(mimeType == 'application/json') {
-        fs.writeFileSync(path+".json", JSON.stringify(data,null,4));
+        try {
+          fs.writeFileSync(path+".json", JSON.stringify(data,null,4));
+        } catch(error) {
+          reject(error.message);
+        }
       } else {
         reject(`Unsupported mime-type: ${mimeType}`);
       }
@@ -846,7 +850,11 @@ function storeGroups(data, path) {
   return new Promise((resolve, reject) => {
     config.get('storage.mimeTypes').forEach(mimeType => {
       if(mimeType == 'application/json') {
-        fs.writeFileSync(path+".json", JSON.stringify(data,null,4));
+        try {
+          fs.writeFileSync(path+".json", JSON.stringify(data,null,4));
+        } catch(error) {
+          reject(error.message);
+        }
       } else {
         reject(`Unsupported mime-type: ${mimeType}`);
       }
