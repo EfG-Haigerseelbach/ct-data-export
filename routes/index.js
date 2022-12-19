@@ -915,7 +915,20 @@ router.get('/store', checkAuthenticatedApi, function (req, res, next) {
   });
 });
 
-router.get('/triggerHooks', checkAuthenticatedApi, function(req, res, next) {
+router.get('/hooks', checkAuthenticatedApi, function(req, res, next) {
+  getHooks()
+  .then(hooks => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(hooks));
+  }, reason => {
+    res.status(500);
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(reason));
+    console.error(reason);
+  });
+}); 
+
+router.post('/hooks', checkAuthenticatedApi, function(req, res, next) {
   triggerHooks('cron')
   .then(() => {
     res.setHeader("Content-Type", "text/plain");
@@ -927,6 +940,7 @@ router.get('/triggerHooks', checkAuthenticatedApi, function(req, res, next) {
     console.error(reason);
   });
 }); 
+
 
 router.get('/getAllGroups', checkAuthenticatedApi, function (req, res, next) {
   getAllGroups().then(value => {
@@ -1196,6 +1210,19 @@ function triggerHooks(task) {
       }
     }
     resolve();
+  });
+}
+
+function getHooks() {
+  return new Promise((resolve, reject) => {
+    var pathToHooks = './config/hooks.json';
+    if(!fs.existsSync(pathToHooks)) {
+      console.log('No hooks defined.');
+      return;
+    }
+    var hooks = fs.readFileSync(pathToHooks, 'utf-8');
+    hooks = JSON.parse(hooks);
+    resolve(hooks);
   });
 }
 
