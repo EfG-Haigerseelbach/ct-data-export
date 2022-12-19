@@ -1153,7 +1153,7 @@ function callHookUrl(hook) {
           data.push(chunk);
         });
         res.on('end', () => {
-          var tmp = JSON.parse(Buffer.concat(data).toString());
+          var tmp = Buffer.concat(data).toString();
           tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
           hook.result = tmp;
           resolve(hook);
