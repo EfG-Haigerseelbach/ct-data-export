@@ -332,8 +332,8 @@
 
         $('#trigger-hooks').click(function() {
             $.ajax({
-                url: "/hooks", 
-                type: 'POST',
+                url: "/triggerhooks", 
+                type: 'GET',
                 success: (data) => { displayHooksResults(data); },
                 error: (xhr, textStatus, errorThrown) =>{ console.log(textStatus); console.log(errorThrown); }
             });

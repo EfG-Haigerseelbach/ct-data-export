@@ -10,6 +10,7 @@ const path = require('path');
 const { group } = require('console');
 const { has } = require('config');
 var moment = require('moment');
+const { getSystemErrorMap } = require('util');
 
 var CronJob = require('cron').CronJob;
 
@@ -941,7 +942,7 @@ router.get('/hooks', checkAuthenticatedApi, function(req, res, next) {
   });
 }); 
 
-router.post('/hooks', checkAuthenticatedApi, function(req, res, next) {
+router.get('/triggerhooks', checkAuthenticatedApi, function(req, res, next) {
   triggerHooks('cron')
   .then((result) => {
     res.setHeader("Content-Type", "application/json");
