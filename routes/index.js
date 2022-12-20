@@ -943,6 +943,7 @@ router.get('/hooks', checkAuthenticatedApi, function(req, res, next) {
 }); 
 
 router.get('/triggerhooks', checkAuthenticatedApi, function(req, res, next) {
+  console.log('Triggering hooks...');
   triggerHooks('cron')
   .then((result) => {
     res.setHeader("Content-Type", "application/json");
@@ -1145,6 +1146,7 @@ router.post("/logout", (req,res) => {
 
 function callHookUrl(hook) {
   return new Promise((resolve, reject) => {
+    console.log('Calling hook URL: '+hook.url);
     if(hook.url.startsWith('https')) {
       const https = require('https');
     
@@ -1154,6 +1156,7 @@ function callHookUrl(hook) {
           data.push(chunk);
         });
         res.on('end', () => {
+          console.log('Received result for hook URL: '+hook.url);
           var tmp = JSON.parse(Buffer.concat(data).toString());
           tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
           hook.result = tmp;
