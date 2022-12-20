@@ -1146,7 +1146,7 @@ router.post("/logout", (req,res) => {
 
 function callHookUrl(hook) {
   return new Promise((resolve, reject) => {
-    console.log('Calling hook URL: '+hook.url);
+    console.log(moment().format('YYYY.MM.DD HH:mm:ss')+' - Calling hook URL: '+hook.url);
     if(hook.url.startsWith('https')) {
       const https = require('https');
     
@@ -1156,10 +1156,15 @@ function callHookUrl(hook) {
           data.push(chunk);
         });
         res.on('end', () => {
-          console.log('Received result for hook URL: '+hook.url);
-          var tmp = JSON.parse(Buffer.concat(data).toString());
-          tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
-          hook.result = tmp;
+          console.log(moment().format('YYYY.MM.DD HH:mm:ss')+' - Received result for hook URL: '+hook.url);
+          try{
+            var tmp = JSON.parse(Buffer.concat(data).toString());
+            tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
+            hook.result = tmp;
+          } catch(error) {
+            // Seems to be no JSON, use the result as plain text
+            hook.result = Buffer.concat(data).toString();
+          }
           resolve(hook);
         });
       }).on('error', err => {
