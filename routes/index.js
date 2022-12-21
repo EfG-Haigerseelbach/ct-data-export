@@ -104,8 +104,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         
         tmp.startTime = group.information.meetingTime != null ? group.information.meetingTime : '';
 
-        tmp.note = group.information.note;
-        tmp.note = marked.parse(tmp.note).replace(/"/g,"\"");
+        tmp.note = marked.parse(group.information.note).replace(/"/g,"\"");
 
         tmp.imageUrl = group.information.imageUrl;
         tmp.export = getProperty(config.get('export.accessPath.exposureIndicator'), group);
