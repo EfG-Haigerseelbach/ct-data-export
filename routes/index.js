@@ -11,6 +11,8 @@ const { group } = require('console');
 const { has } = require('config');
 var moment = require('moment');
 const { getSystemErrorMap } = require('util');
+const marked = require('marked');
+
 
 var CronJob = require('cron').CronJob;
 
@@ -103,6 +105,8 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         tmp.startTime = group.information.meetingTime != null ? group.information.meetingTime : '';
 
         tmp.note = group.information.note;
+        tmp.note = marked.parse(tmp.note).replace(/"/g,"\"");
+
         tmp.imageUrl = group.information.imageUrl;
         tmp.export = getProperty(config.get('export.accessPath.exposureIndicator'), group);
         tmp.export = tmp.export === undefined ? false : tmp.export;
