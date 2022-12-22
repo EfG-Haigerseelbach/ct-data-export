@@ -353,6 +353,7 @@
 
     $(document).ready(function () {
         $('#refresh-files-button').click(function() {
+            $('#refresh-files-button').prop("disabled", true);
             $('#refresh-files-spinner').show();
             $.get("/store")
                 .done(function () {
@@ -363,12 +364,14 @@
                 })
                 .always(function() {
                     $('#refresh-files-spinner').hide();
+                    $('#refresh-files-button').prop("disabled",false);
                 });
         });
 
         getHooks();
 
         $('#trigger-hooks-button').click(function() {
+            $('#trigger-hooks-button').prop("disabled", true);
             $('#trigger-hooks-spinner').show();
             $.ajax({
                 url: "/triggerhooks", 
@@ -378,6 +381,7 @@
             })
             .always(function() {
                 $('#trigger-hooks-spinner').hide();
+                $('#trigger-hooks-button').prop("disabled", false);
             });
         });
 
