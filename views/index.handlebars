@@ -275,13 +275,12 @@
                 `<div `+
                     `id="collapse-${hook.internalId}" `+
                     `class="accordion-collapse collapse" `+
-                    `aria-labelledby="heading-${hook.internalId}" `+
-                    `data-bs-parent="#hooks">`+
+                    `aria-labelledby="heading-${hook.internalId}">`+
                 `<div class="accordion-body">`+
                     `<label `+
                         `for="hook-description-${hook.internalId}" `+
                         `class="form-label" `+
-                        `style="font-weight: bold;">`+
+                        `style="font-weight: var(--base-text-weight-semibold, 600);">`+
                         `Description`+
                     `</label>`+
                     `<input `+
@@ -293,8 +292,8 @@
                     `<label `+
                         `for="hook-url-${hook.internalId}" `+
                         `class="form-label" `+
-                        `style="margin-top: 1em; font-weight: bold;">`+
-                        `URL`+
+                        `style="margin-top: 0.6em; font-weight: var(--base-text-weight-semibold, 600);">`+
+                        `URL <span style="color: #b50000;">*</span>`+
                     `</label>`+
                     `<input `+
                         `type="text" `+
@@ -307,7 +306,7 @@
                     `<label `+
                         `for="hook-delay-${hook.internalId}" `+
                         `class="form-label" `+
-                        `style="margin-top: 1em; font-weight: bold;">`+
+                        `style="margin-top: 0.6em; font-weight: var(--base-text-weight-semibold, 600);">`+
                         `Delay [seconds]`+
                     `</label>`+
                     `<input `+
@@ -321,7 +320,7 @@
                     `<label `+
                         `for="hook-last-result-${hook.internalId}" `+
                         `class="form-label" `+
-                        `style="margin-top: 1em; font-weight: bold;">`+
+                        `style="margin-top: 0.6em; font-weight: var(--base-text-weight-semibold, 600);">`+
                         `Last Result`+
                     `</label>`+
                     `<input `+
