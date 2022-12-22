@@ -1214,7 +1214,7 @@ function linearizeHooks(hooks, task, delay, internalId) {
       };
       internalId++;
       if(hooks[i].hasOwnProperty('delay')) {
-        hookTmp.delay = delay + hooks[i].delay;
+        hookTmp.delay = parseInt(delay) + parseInt(hooks[i].delay);
       } else {
         hookTmp.delay = delay;
       }
