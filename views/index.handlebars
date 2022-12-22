@@ -90,6 +90,9 @@
 
 <div class="container" style="margin-bottom: 2em;">
     <h3 style="margin-top: 3rem;" data-i18n="dashboard"></h3>
+    
+    <hr style="margin-top: 1.8em;">
+
     <h4 style="margin-top: 2rem;"><span data-i18n="files"></span></h4>
     
     <button 
@@ -103,6 +106,8 @@
     <div id="files" class="d-flex flex-wrap" style="margin-top: 1em;">
     </div>
 
+    <hr style="margin-top: 1.8em;">
+
     <h4 style="margin-top: 2rem;"><span data-i18n="hooks"></span></h4>
     <button 
         type="button" 
@@ -113,8 +118,8 @@
     <span class="spinner" id="trigger-hooks-spinner" style="display: none;"></span>
     <div class="accordion" id="hooks" style="margin-top: 1em;">
     </div>
-    <div id="hooksResults">
-    </div>
+
+    <hr style="margin-top: 2.8em;">
 
     <h4 style="margin-top: 2rem;" data-i18n="configuration"></h4>
     <table class="table table-sm table-hover table-striped">
@@ -402,12 +407,12 @@
 
                     var entryTmp = 
                     `<div class="card" style="margin-bottom:1em; margin-right: 1em;">`+
-                        `<h5 class="card-header">${file.filename}</h5>`+
+                        `<h5 class="card-header">${getIconForMimeType(file.mimeType)} ${file.filename}</h5>`+
                         `<div class="card-body">`+
                             `<!--<h5 class="card-title">${file.filename}</h5>-->`+
                             `<p class="card-text"><span data-i18n="lastChangeDate"></span>: ${lastChangeDate}</p>`+
-                            `<p class="card-text">${formatBytes(file.stats.size)} ${getIconForMimeType(file.mimeType)}</p>`+
-                            `<a href="#" class="btn ${file.exists == false ? 'btn-outline-secondary' : 'btn-primary'} ${file.exists == true ? '': 'disabled'} view-file-button" data-filename="${file.filename}" data-i18n="view_file"></a>`+
+                            `<p class="card-text">${formatBytes(file.stats.size)}</p>`+
+                            `<a href="#" class="btn ${file.exists == false ? 'btn-outline-secondary' : 'btn-primary'} ${file.exists == true ? '': 'disabled'} view-file-button" data-filename="${file.filename}"><span data-i18n="view_file"></span> <i class="fa-regular fa-eye"></i></a>`+
                         `</div>`+
                     `</div>`;
                     $('#files').append(entryTmp);
