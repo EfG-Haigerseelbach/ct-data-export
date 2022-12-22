@@ -9,7 +9,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-light fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="#" data-i18n="navbar.title"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -34,7 +34,6 @@
 </nav>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
 <style>
     #refresh-files {
         transition: transform .7s ease-in-out;
@@ -89,11 +88,11 @@
 </style>
 
 <div class="container" style="margin-bottom: 2em;">
-    <h3 style="margin-top: 3rem;" data-i18n="dashboard"></h3>
+    <h3 style="margin-top: 5rem;" data-i18n="dashboard"></h3>
     
     <hr style="margin-top: 1.8em;">
 
-    <h4 style="margin-top: 2rem;"><span data-i18n="files"></span></h4>
+    <h4 style="margin-top: 2rem; margin-bottom: 1em;"><span data-i18n="files_export"></span> <i class="fa-solid fa-file-import"></i></h4>
     
     <button 
         type="button" 
@@ -108,7 +107,7 @@
 
     <hr style="margin-top: 1.8em;">
 
-    <h4 style="margin-top: 2rem;"><span data-i18n="hooks"></span></h4>
+    <h4 style="margin-top: 2rem; margin-bottom: 1em;"><span data-i18n="hooks"></span> <i class="fa-solid fa-arrows-turn-right"></i></h4>
     <button 
         type="button" 
         id="trigger-hooks-button"
