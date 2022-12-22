@@ -132,7 +132,7 @@
         <tbody id="config-table-body">
         </tbody>
     </table>
-    <button type="button" class="btn btn-success" id="saveConfig"><i class="fa-regular fa-floppy-disk"></i> <span data-i18n="save"></span></button>
+    <button type="button" class="btn btn-sm btn-success" id="saveConfig"><i class="fa-regular fa-floppy-disk"></i> <span data-i18n="save"></span></button>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="fileContentModal" tabindex="-1" aria-labelledby="fileContentModalLabel" aria-hidden="true">
@@ -412,7 +412,7 @@
                             `<!--<h5 class="card-title">${file.filename}</h5>-->`+
                             `<p class="card-text"><span data-i18n="lastChangeDate"></span>: ${lastChangeDate}</p>`+
                             `<p class="card-text">${formatBytes(file.stats.size)}</p>`+
-                            `<a href="#" class="btn ${file.exists == false ? 'btn-outline-secondary' : 'btn-primary'} ${file.exists == true ? '': 'disabled'} view-file-button" data-filename="${file.filename}"><span data-i18n="view_file"></span> <i class="fa-regular fa-eye"></i></a>`+
+                            `<a href="#" class="btn btn-sm ${file.exists == false ? 'btn-outline-secondary' : 'btn-primary'} ${file.exists == true ? '': 'disabled'} view-file-button" data-filename="${file.filename}"><span data-i18n="view_file"></span> <i class="fa-regular fa-eye"></i></a>`+
                         `</div>`+
                     `</div>`;
                     $('#files').append(entryTmp);
