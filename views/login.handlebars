@@ -24,21 +24,40 @@
 <div class="container">
    <h3 style="margin-top: 3rem;" data-i18n="login"></h3>
    <p data-i18n="[html]login_info"></p>
-   <form action="/login" method="POST">
+   
       <div class="row">
          <div class="input-group">
             <span class="input-group-text" id="inputGroup">Token</span>
             <input type="text" id="username" name="username" value="notrelevant" hidden>
             <input type="password" class="form-control" autofocus="autofocus" id="inputPassword" name="password" placeholder="" aria-label="" aria-describedby="inputGroup">
-            <button type="submit" class="btn btn-secondary" data-i18n="login"></button>
+            <button type="submit" id="submit" class="btn btn-secondary" data-i18n="login"></button>
          </div>
+         <div id="invalid-token-label" style="display: none; margin-left: 5em; color: #dc3545; font-size: .875em;" data-i18n="[html]invalid_token"></div>
       </div>
-   </form>
+   
 </div>
 
 <script>
    $(document).ready(function () {
        $('#inputPassword').attr('placeholder', i18next.t('token_placeholder'));
        $('#inputPassword').attr('aria-label', i18next.t('token_placeholder'));
+       $('#submit').click(function() {
+         $.post("/login", `username=notrelevant&password=${encodeURIComponent($('#inputPassword').val())}`)
+            .done(function(data, statusText, xhr) {
+               // Forward the browser to the dashboard.
+               window.location.href = "/";
+            })
+            .fail((xhr, textStatus, errorThrown) => { 
+               if(xhr.status == 401) {
+                  // An incorrect admin token has been provided.
+                  $('#inputPassword').css("border-color", "#dc3545");
+                  $('#inputPassword').css("background-image", "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e\")");
+                  $('#inputPassword').css("background-repeat", "no-repeat");
+                  $('#inputPassword').css("background-position", "right calc(0.375em + 0.1875rem) center");
+                  $('#inputPassword').css("background-size", "calc(0.75em + 0.375rem) calc(0.75em + 0.375rem)");
+                  $('#invalid-token-label').show();
+               }
+         });
+       });
    });
 </script>

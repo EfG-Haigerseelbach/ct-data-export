@@ -6,11 +6,7 @@ var logger = require('morgan');
 var favicon = require('serve-favicon');
 const exphbs  = require('express-handlebars');
 const bodyParser = require('body-parser');
-const expressSession = require('express-session')({
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: true
-});
+const expressSession = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 var config = require('config');
@@ -33,11 +29,22 @@ app.use(bodyParser.json());
 //app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(expressSession);
+
+
+
+/**
+ * --------------- Session Management ---------------
+ */
+app.use(expressSession({
+  secret: 'secret', // TODO use another secret
+  resave: false,
+  saveUninitialized: true
+}));
 // init passport on every route call
 app.use(passport.initialize());
 // allow passport to use "express-session"
 app.use(passport.session());
+
 app.use("/public", express.static(path.join(__dirname, 'public')));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
@@ -52,7 +59,7 @@ function authUser(user, password, done) {
     let authenticated_user = { id: 1, name: "Admin"};
     return done(null, authenticated_user); //done(error, user);
   } else {
-    return done(null, false, { message: 'Invalid admin token'});
+    return done(null, false, { message: "Invalid admin token"});
   }
 }
 

@@ -146,6 +146,8 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         if(contactPersonIdsTmp != null && contactPersonIdsTmp.length > 0) {
           tmp.contactPersons = contactPersonIdsTmp.split(/[\s,;]/);
         }
+        // Remove empty array elements.
+        tmp.contactPersons = tmp.contactPersons.filter((contactPersonId) => { return contactPersonId.length > 0; });
         result.push(tmp);
     });
     result.sort(function compare(group_a, group_b) {
@@ -216,12 +218,6 @@ function replaceGroupsImages(groups) {
         getGroupImageUrl(group.id).then(url => {
           resolveGroupImage({id: group.id, imageUrl: url});
         });
-        /*for(var i = 0; i < groups.length; i++) {
-          if(groups[i].id == group.id) {
-            groups[i].imageUrlNew = url;
-            break;
-          }
-        }*/
       });
     })).then(data => {
       for(var i = 0; i < groups.length; i++) {
@@ -374,67 +370,6 @@ function getAllGroups() {
   }, reason => {
     console.error(reason); 
   });
-}
-
-/**
- * Check if the group with the specified ID has the tag used to mark for export.
- * @param {Number} groupId ID of the group
- * @returns {object} promise
- */
- function hasGroupExportTag(groupId) {
-  var url = `/groups/${groupId}/tags`;
-  console.log(`Querying tags of group via URL: ${url}`);
-  return churchtoolsClient.get(url).then(tags => {
-    return new Promise((resolve, reject) => {
-      assertIsArray(tags, reject);
-      var result = false;
-      
-      tags.forEach(tag => {
-        if(tag.name == config.get('tags.groupsToExport')) {
-            result = true;
-          }
-      });
-      resolve(result);
-    });
-  }, reason => {
-    console.error(reason); 
-  });
-}
-
-/**
- * Check if the person with the specified ID has the tag used to mark for export.
- * @param {Number} personId ID of the person
- * @returns {object} promise
- */
- function hasPersonExportTag(personId) {
-  var url = `/persons/${personId}/tags`;
-  console.log(`Querying tags of person via URL: ${url}`);
-  return churchtoolsClient.get(url).then(tags => {
-    return new Promise((resolve, reject) => {
-      assertIsArray(tags, reject);
-      var result = false;
-      
-      tags.forEach(tag => {
-        if(tag.name == config.get('tags.personsToExport')) {
-            result = true;
-          }
-      });
-      resolve(result);
-    });
-  }, reason => {
-    console.error(reason); 
-  });
-}
-
-async function filterPersons(persons) {
-  var result = [];
-  for(let i = 0; i < persons.length; i++) {
-    var hasTag = await hasPersonExportTag(persons[i].id);
-    if(hasTag) {
-      result.push(persons[i]);
-    }
-  }
-  return result;
 }
 
 function assertIsArray(toCheck, reject) {
@@ -883,6 +818,125 @@ function storeAllContactPersons() {
   });
 }
 
+function updateConfig(newConfig) { // TODO: rework since old properties are written which do not match the JSON-schema
+  return new Promise((resolve, reject) => {
+    var result = {};
+    // Read the current configuration file.
+    var configTmp = JSON.parse(fs.readFileSync('config/default.json')); // TODO: filename is not dynamic
+    // Create a backup.
+    fs.writeFileSync('config/default.json.bak', JSON.stringify(configTmp, null, 4));
+
+    // TODO: perform a connection test with the URL and user/password
+    configTmp.churchtools.url = newConfig.churchtools.url;
+    configTmp.churchtools.username = newConfig.churchtools.username;
+    configTmp.churchtools.password = newConfig.churchtools.password.trim().length > 0 ? newConfig.churchtools.password : configTmp.churchtools.password;
+
+    var allowedFilenameRegex = /^[\w\-.][\w\-. ]*$/;
+    if(allowedFilenameRegex.test(newConfig.storage.groupsData)) {
+      configTmp.storage.groupsData = newConfig.storage.groupsData;
+    } else {
+      result.storage.groupsData = 'The filename contains an invalid character';
+    }
+    if(allowedFilenameRegex.test(newConfig.storage.contactPersonsData)) {
+      configTmp.storage.contactPersonsData = newConfig.storage.contactPersonsData;
+    } else {
+      result.storage.contactPersonsData = 'The filename contains an invalid character';
+    }
+
+    configTmp.storage.mimeTypes = [];
+    if(newConfig.storage.mimeTypes.includes("application/json")) {
+      configTmp.storage.mimeTypes.push("application/json");
+    }
+
+    configTmp.tags.groupsToExport = newConfig.tags.groupsToExport; //JSON.stringify();
+    configTmp.tags.personsToExport = newConfig.tags.personsToExport;//JSON.stringify();
+
+    if(newConfig.logging.level == 'error' ||
+      newConfig.logging.level == 'debug' ||
+      newConfig.logging.level == 'info' ||
+      newConfig.logging.level == 'none') {
+      configTmp.logging.level = newConfig.logging.level;
+    } else {
+      configTmp.logging.level = 'error';
+      result.logging.level = 'The log level is invalid. Set the log level to "error"';
+    }
+
+    var cronPatternRegex = /((\d{1,2}|\*)\s){5}(\d{1,2}|\*)/;
+    if(cronPatternRegex.test(newConfig.cronJob.pattern)) {
+      configTmp.cronJob.pattern = newConfig.cronJob.pattern;
+    }
+
+    // Overwrite the current configuration file.
+    fs.writeFileSync('config/default.json', JSON.stringify(configTmp, null, 4)); // TODO: filename is not dynamic
+
+    // Reload the configuration.
+    delete require.cache[require.resolve('config')];
+    config = require('config');
+
+    resolve();
+  });
+}
+
+function getStatus() {
+  return new Promise((resolve, reject) => {
+    try {
+      var filesToCheck = [];
+
+      config.get('storage.mimeTypes').forEach(mimeType => {
+        if(mimeType == 'application/json') {
+          filesToCheck.push({ "path": path.join('tmp',config.get('storage.groupsData').trim())+".json", 
+            "category": "groupsData", "mimeType":"application/json"});
+          filesToCheck.push({ "path": path.join('tmp',config.get('storage.contactPersonsData').trim())+".json", 
+            "category": "contactPersonsData", "mimeType":"application/json"});
+        }
+      });
+
+      var result = {
+        "files": [],
+        "config": {}
+      };
+      filesToCheck.forEach(file => {
+        if(fs.existsSync(file.path)) {
+          result.files.push({"filename": file.path.replace(/tmp[\\/]/,''), "exists": true, "stats": fs.statSync(file.path), "mimeType":file.mimeType});
+        } else {
+          result.files.push({"filename": file.path.replace(/tmp[\\/]/,''), "exists": false});
+        }
+      });
+
+      result.files.sort(function compare(file_a, file_b) {
+        if (file_a.filename < file_b.filename ){
+          return -1;
+        }
+        if (file_a.filename > file_b.filename ){
+          return 1;
+        }
+        return 0;
+      });
+
+      result.config.churchtools = {
+        "url": config.get('churchtools.url'),
+        "username": config.get('churchtools.username'),
+      };
+      result.config.storage = {
+        "groupsData": config.get('storage.groupsData'),
+        "contactPersonsData": config.get('storage.contactPersonsData'),
+        "mimeTypes": config.get('storage.mimeTypes'),
+      };
+      result.config.tags = config.get('tags');
+
+      result.config.logging = {
+        "level": config.get('logging.level'),
+      };
+      result.config.cronJob = {
+        "pattern": config.get('cronJob.pattern'),
+      };
+      resolve(result);
+    } catch(err) {
+      reject(err);
+    }
+  });
+}
+
 initChurchToolsClient();
 login(config.get('churchtools.username'), config.get('churchtools.password')).then(() => {
   getMasterData();
@@ -894,227 +948,65 @@ login(config.get('churchtools.username'), config.get('churchtools.password')).th
     console.error(errorHelper.getTranslatedErrorMessage(error));
 });
 
-router.get('/storeAllGroupsData', checkAuthenticatedApi, function (req, res, next) {
-  storeAllGroupsData().then(value => {
-    res.setHeader("Content-Type", "text/plain");
-    res.send(value);
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
-});
+function sendEmptyHttp200(response) {
+  response.setHeader("Content-Type", "text/plain");
+  response.send();
+}
 
-router.get('/storeAllContactPersons', checkAuthenticatedApi, function (req, res, next) {
-  storeAllContactPersons().then(value => {
-    res.setHeader("Content-Type", "text/plain");
-    res.send(value);
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
-});
+function sendJsonHttp200(data, response) {
+  response.setHeader("Content-Type", "application/json");
+  response.send(JSON.stringify(data));
+}
 
-router.get('/store', checkAuthenticatedApi, function (req, res, next) {
+function sendHttp500(reason, response) {
+  response.status(500);
+  response.setHeader("Content-Type", "application/json");
+  response.send(JSON.stringify(reason));
+  console.error(reason);
+}
+
+router.post('/store', checkAuthenticatedApi, function (req, res, next) {
   storeAllGroupsData()
     .then(storeAllContactPersons)
-    .then(value => {
-    res.setHeader("Content-Type", "text/plain");
-    res.send("OK");
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
+    .then((value) => { sendEmptyHttp200(res) },
+          reason => sendHttp500(reason, res));
 });
 
 router.get('/hooks', checkAuthenticatedApi, function(req, res, next) {
   getHooks()
-  .then(hooks => {
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(hooks));
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
+    .then(hooks => { sendJsonHttp200(hooks, res) },
+          reason => sendHttp500(reason, res));
 }); 
 
-router.get('/triggerhooks', checkAuthenticatedApi, function(req, res, next) {
-  console.log('Triggering hooks...');
+router.post('/hooks', checkAuthenticatedApi, function(req, res, next) {
   triggerHooks('cron')
-  .then((result) => {
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(result));
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
+    .then(hooksResults => { sendJsonHttp200(hooksResults, res) },
+          reason => sendHttp500(reason, res));
 }); 
-
-
-router.get('/getAllGroups', checkAuthenticatedApi, function (req, res, next) {
-  getAllGroups().then(value => {
-    res.setHeader("Content-Type", "application/json");
-    res.send(value);
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
-});
 
 router.get('/getTags', checkAuthenticatedApi, function (req, res, next) {
-  getTags().then(tagIdsAndNames => {
-    res.setHeader("Content-Type", "application/json");
-    res.send(tagIdsAndNames);
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
+  getTags()
+    .then(tagIdsAndNames => { sendJsonHttp200(tagIdsAndNames, res) },
+          reason => sendHttp500(reason, res));
 });
 
-router.get('/getFile', checkAuthenticatedApi, function (req, res, next) {
-  getFile(req.query.filename).then(file => {
-    res.setHeader("Content-Type", "application/json");
-    res.send(file);
-  }, reason => {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(reason));
-    console.error(reason);
-  });
+router.get('/file', checkAuthenticatedApi, function (req, res, next) {
+  getFile(req.query.filename)
+    .then(file => { sendJsonHttp200(file, res) },
+          reason => sendHttp500(reason, res));
 });
-
 
 router.post('/updateConfig', checkAuthenticatedApi, function (req, res, next) {
-  var result = {};
-  newConfig = req.body;
-  var configTmp = JSON.parse(fs.readFileSync('config/default.json'));
-  fs.writeFileSync('config/default.json.bak', JSON.stringify(configTmp));
-
-  // TODO: perform a connection test with the URL and user/password
-  configTmp.churchtools.url = newConfig.churchtools.url;
-  configTmp.churchtools.username = newConfig.churchtools.username;
-  configTmp.churchtools.password = newConfig.churchtools.password.trim().length > 0 ? newConfig.churchtools.password : configTmp.churchtools.password;
-
-  var allowedFilenameRegex = /^[\w\-.][\w\-. ]*$/;
-  if(allowedFilenameRegex.test(newConfig.storage.groupsData)) {
-    configTmp.storage.groupsData = newConfig.storage.groupsData;
-  } else {
-    result.storage.groupsData = 'The filename contains an invalid character';
-  }
-  if(allowedFilenameRegex.test(newConfig.storage.contactPersonsData)) {
-    configTmp.storage.contactPersonsData = newConfig.storage.contactPersonsData;
-  } else {
-    result.storage.contactPersonsData = 'The filename contains an invalid character';
-  }
-
-  configTmp.storage.mimeTypes = [];
-  if(newConfig.storage.mimeTypes.includes("application/json")) {
-    configTmp.storage.mimeTypes.push("application/json");
-  }
-
-  configTmp.tags.groupsToExport = newConfig.tags.groupsToExport; //JSON.stringify();
-  configTmp.tags.personsToExport = newConfig.tags.personsToExport;//JSON.stringify();
-
-  if(newConfig.logging.level == 'error' ||
-     newConfig.logging.level == 'debug' ||
-     newConfig.logging.level == 'info' ||
-     newConfig.logging.level == 'none') {
-    configTmp.logging.level = newConfig.logging.level;
-  } else {
-    configTmp.logging.level = 'error';
-    result.logging.level = 'The log level is invalid. Set the log level to "error"';
-  }
-
-  var cronPatternRegex = /((\d{1,2}|\*)\s){5}(\d{1,2}|\*)/;
-  if(cronPatternRegex.test(newConfig.cronJob.pattern)) {
-    configTmp.cronJob.pattern = newConfig.cronJob.pattern;
-  }
-
-  console.log(configTmp);
-
-  fs.writeFileSync('config/default.json', JSON.stringify(configTmp, null, 4));
-
-  delete require.cache[require.resolve('config')];
-  config = require('config');
-  res.setHeader("Content-Type", "application/json");
-  res.send({ "result" : "OK" });
+  updateConfig(req.body)
+    .then((value) => { sendEmptyHttp200(res) },
+          reason => sendHttp500(reason, res));
 });
 
 router.get('/status', checkAuthenticatedApi, function (req, res, next) {
-  try {
-    res.setHeader("Content-Type", "application/json");
-    var filesToCheck = [];
-
-    config.get('storage.mimeTypes').forEach(mimeType => {
-      if(mimeType == 'application/json') {
-        filesToCheck.push({ "path": path.join('tmp',config.get('storage.groupsData').trim())+".json", 
-          "category": "groupsData", "mimeType":"application/json"});
-        filesToCheck.push({ "path": path.join('tmp',config.get('storage.contactPersonsData').trim())+".json", 
-          "category": "contactPersonsData", "mimeType":"application/json"});
-      }
-    });
-
-    var result = {
-      "files": [],
-      "config": {}
-    };
-    filesToCheck.forEach(file => {
-      if(fs.existsSync(file.path)) {
-        result.files.push({"filename": file.path.replace(/tmp[\\/]/,''), "exists": true, "stats": fs.statSync(file.path), "mimeType":file.mimeType});
-      } else {
-        result.files.push({"filename": file.path.replace(/tmp[\\/]/,''), "exists": false});
-      }
-    });
-
-    result.files.sort(function compare(file_a, file_b) {
-      if (file_a.filename < file_b.filename ){
-        return -1;
-      }
-      if (file_a.filename > file_b.filename ){
-        return 1;
-      }
-      return 0;
-    });
-
-    result.config.churchtools = {
-      "url": config.get('churchtools.url'),
-      "username": config.get('churchtools.username'),
-    };
-    result.config.storage = {
-      "groupsData": config.get('storage.groupsData'),
-      "contactPersonsData": config.get('storage.contactPersonsData'),
-      "mimeTypes": config.get('storage.mimeTypes'),
-    };
-    result.config.tags = config.get('tags');
-
-    result.config.logging = {
-      "level": config.get('logging.level'),
-    };
-    result.config.cronJob = {
-      "pattern": config.get('cronJob.pattern'),
-    };
-    res.send(result);
-  } catch(err) {
-    res.status(500);
-    res.setHeader("Content-Type", "application/json");
-    res.send(JSON.stringify(err));
-    console.error(err);
-  }
+  getStatus()
+    .then(status => sendJsonHttp200(status, res),
+          reason => sendHttp500(reason, res));
 });
-
 
 router.get('/', checkAuthenticated,  function (req, res, next) {
   res.render('index', {});
@@ -1129,8 +1021,9 @@ router.post('/login', passport.authenticate('local' , {
 function checkLoggedIn(req, res, next) {
   console.log('req.isAuthenticated(): '+req.isAuthenticated());
   if (req.isAuthenticated()) { 
-       return res.redirect("/login");
+      return res.redirect("/login");
    }
+  res.status(401);
   next();
 }
 
@@ -1143,7 +1036,7 @@ router.post("/logout", (req,res) => {
     if (err) { 
       return next(err); 
     }
-    res.redirect("/login")
+    res.redirect("/login");
   });
 });
 

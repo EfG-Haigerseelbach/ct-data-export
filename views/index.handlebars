@@ -84,12 +84,30 @@
         border-top-color: #000;
         animation: spinner .6s linear infinite;
     }
-
+    /*
+     * Enable wrapping of long text inside a pre-tag
+     */
+    pre {
+        overflow-x: auto;
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
+    }
 </style>
 
 <div class="container" style="margin-bottom: 2em;">
     <h3 style="margin-top: 5rem;" data-i18n="dashboard"></h3>
     
+
+    <button 
+        type="button" 
+        id="refresh-button"
+        class="btn btn-outline-secondary btn-sm">
+        Refresh
+    </button>
+
     <hr style="margin-top: 1.8em;">
 
     <h4 style="margin-top: 2rem; margin-bottom: 1em;"><span data-i18n="files_export"></span> <i class="fa-solid fa-file-import"></i></h4>
@@ -355,44 +373,10 @@
         }
     }
 
-    $(document).ready(function () {
-        $('#refresh-files-button').click(function() {
-            $('#refresh-files-button').prop("disabled", true);
-            $('#refresh-files-spinner').show();
-            $.get("/store")
-                .done(function () {
-                    location.reload();
-                })
-                .fail(function (error) {
-                    console.log(error);
-                })
-                .always(function() {
-                    $('#refresh-files-spinner').hide();
-                    $('#refresh-files-button').prop("disabled",false);
-                });
-        });
-
-        getHooks();
-
-        $('#trigger-hooks-button').click(function() {
-            $('#trigger-hooks-button').prop("disabled", true);
-            $('#trigger-hooks-spinner').show();
-            $.ajax({
-                url: "/triggerhooks", 
-                type: 'GET',
-                success: (data) => { displayHooksResults(data); },
-                error: (xhr, textStatus, errorThrown) =>{ console.log(textStatus); console.log(errorThrown); }
-            })
-            .always(function() {
-                $('#trigger-hooks-spinner').hide();
-                $('#trigger-hooks-button').prop("disabled", false);
-            });
-        });
-
-        $('#saveConfig').click(saveConfig);
-
+    function getStatus() {
         $.get("/status")
             .done(function (data) {
+                $('#files').empty();
                 data.files.forEach(file => {
                     var lastChangeDate;
                     if(file.exists == false) {
@@ -419,7 +403,7 @@
                 });
                 $('.view-file-button').click(function(event) {
                     var filename = $(this).data('filename');
-                     $.get("/getFile?filename="+filename)
+                     $.get("/file?filename="+filename)
                         .done(function (file) {
                             var content = file.content;
                             if(filename.endsWith('json')) {
@@ -436,8 +420,10 @@
                         });
                 });
 
+
                 var inputRowTemplate = `<tr><td data-i18n="##key##"></td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
-                
+                $('#config-table-body').empty();
+
                 $('#config-table-body').append(inputRowTemplate
                     .replace('##key##','config.churchtools.url')
                     .replace('##id##','churchtools-url')
@@ -466,13 +452,6 @@
                 }
                 rowTmp = `<tr><td data-i18n="config.storage.json"></td><td><input class="form-check-input" type="checkbox" id="outputJsonCheckBox" ${tmp}></td></tr>`;
                 $('#config-table-body').append(rowTmp);
-
-                //groupExportTag = data.config.tags.groupsToExport;
-                //$('#config-table-body').append('<tr><td data-i18n="config.tags.groupsToExport"></td><td id="tags-groupsToExport"><span class="loader-0"></span></td></tr>');
-
-                //personExportTag = data.config.tags.personsToExport;
-                //$('#config-table-body').append('<tr><td data-i18n="config.tags.personsToExport"></td><td id="tags-personsToExport"><span class="loader-0"></span></td></tr>');
-
 
                 var rowTmp = '<tr><td data-i18n="config.logging.level"></td><td><div class="input-group input-group-sm input-inline"><select class="from-select" id="logLevelSelect">'+
                     `<option value="debug" ${data.config.logging.level == 'debug' ? 'selected' : ''}>Debug</option>`+
@@ -503,5 +482,46 @@
             .fail(function (error) {
                 console.log(error);
             });
+    }
+
+    function refreshFiles() {
+        $('#refresh-files-button').prop("disabled", true);
+        $('#refresh-files-spinner').show();
+        $.post("/store")
+            .done(function () {
+                getStatus();
+            })
+            .fail(function (error) {
+                console.log(error);
+            })
+            .always(function() {
+                $('#refresh-files-spinner').hide();
+                $('#refresh-files-button').prop("disabled",false);
+            });
+    }
+
+    /**
+     * Trigger hooks
+     */
+    function triggerHooks() {
+        $('#trigger-hooks-button').prop("disabled", true);
+        $('#trigger-hooks-spinner').show();
+        $.post("/hooks")
+            .done((data) => displayHooksResults(data))
+            .fail((xhr, textStatus, errorThrown) => { console.log(textStatus); console.log(errorThrown); })
+            .always(function() {
+                $('#trigger-hooks-spinner').hide();
+                $('#trigger-hooks-button').prop("disabled", false);
+            });
+    }
+
+    $(document).ready(function () {
+        $('#refresh-files-button').click(refreshFiles);
+        $('#trigger-hooks-button').click(triggerHooks);
+        $('#refresh-button').click(getStatus);
+        $('#saveConfig').click(saveConfig);
+
+        getStatus();
+        getHooks();
     });
 </script>
