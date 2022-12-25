@@ -87,6 +87,7 @@
                     token_placeholder: 'Enter the token here',
                     invalid_token: 'Invalid token!',
                     help: 'Help',
+                    refresh: 'Refresh',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
@@ -136,6 +137,7 @@
                     token_placeholder: 'Den Anmeldetoken hier eingeben',
                     invalid_token: 'Ungültiger Anmeldetoken!',
                     help: 'Hilfe',
+                    refresh: 'Aktualisieren',
                     config: {
                         churchtools: {
                             url: 'ChurchTools URL',
