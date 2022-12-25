@@ -949,8 +949,7 @@ login(config.get('churchtools.username'), config.get('churchtools.password')).th
 });
 
 function sendEmptyHttp200(response) {
-  response.setHeader("Content-Type", "text/plain");
-  response.send();
+  response.setHeader("Content-Type", "text/plain").status(200).send();
 }
 
 function sendJsonHttp200(data, response) {
@@ -958,9 +957,7 @@ function sendJsonHttp200(data, response) {
 }
 
 function sendHttp500(reason, response) {
-  response.status(500);
-  response.setHeader("Content-Type", "application/json");
-  response.send(JSON.stringify(reason));
+  response.status(500).json(reason);
   console.error(reason);
 }
 
