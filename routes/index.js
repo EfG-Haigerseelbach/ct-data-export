@@ -954,8 +954,9 @@ function sendEmptyHttp200(response) {
 }
 
 function sendJsonHttp200(data, response) {
-  response.setHeader("Content-Type", "application/json");
-  response.send(JSON.stringify(data));
+  //response.setHeader("Content-Type", "application/json");
+  //response.send(JSON.stringify(data));
+  response.json(data);
 }
 
 function sendHttp500(reason, response) {
