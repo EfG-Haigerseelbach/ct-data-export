@@ -164,7 +164,7 @@
                             personsToExport: 'Tag für zu exportierende Personen'
                         },
                         logging: {
-                            level: 'Log Level',
+                            level: 'Detailgrad der Protokollierung',
                             debug: 'Protokollierung jeder HTTP-Anfrage und -Antwort mit deren Inhalt sowie der HTTP-Methode und URL',
                             info: 'Protokollierung jeder HTTP-Anfrage und -Antwort mit HTTP-Methode und URL',
                             error: 'Protokollierung von Fehlern bei HTTP-Anfragen und -Antworten',
