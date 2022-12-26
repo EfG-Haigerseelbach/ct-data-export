@@ -4,8 +4,11 @@
 
 <script src="public/js/i18n.js"></script>
 
-<script src="https://unpkg.com/cronstrue@2.11.0/dist/cronstrue.min.js" async></script>
-<script src="https://unpkg.com/cronstrue@2.11.0/dist/cronstrue-i18n.min.js" async></script>
+<!-- cronstrue - parses a cron expression and outputs a human readable description -->
+<script src="/cronstrue/cronstrue.min.js"></script>
+<script src="/cronstrue/cronstrue-i18n.min.js"></script>
+<!-- cronstrue -->
+
 
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 
@@ -139,17 +142,8 @@
     <hr style="margin-top: 2.8em;">
 
     <h4 style="margin-top: 2rem;" data-i18n="configuration"></h4>
-    <table class="table table-sm table-hover table-striped">
-        <thead>
-            <tr>
-                <th scope="col" data-i18n="key"></th>
-                <th scope="col" data-i18n="value"></th>
-            </tr>
-        </thead>
-        <tbody id="config-table-body">
-        </tbody>
-    </table>
-    <button type="button" class="btn btn-sm btn-success" id="saveConfig"><i class="fa-regular fa-floppy-disk"></i> <span data-i18n="save"></span></button>
+    <div id="config-test"></div>
+    <button type="button" class="btn btn-sm btn-success" id="saveConfig" style="margin-top: 1em;"><i class="fa-regular fa-floppy-disk"></i> <span data-i18n="save_config"></span></button>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="fileContentModal" tabindex="-1" aria-labelledby="fileContentModalLabel" aria-hidden="true">
@@ -373,6 +367,97 @@
         }
     }
 
+    function buildLabelAndInputForConfigurationData(id, value, showHelp = false) {
+        var result =
+        `<label `+
+            //`for="${id}" `+
+            `class="form-label" `+
+            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}">`+
+        `</label>`;
+        if(showHelp) {
+            result +=`<div class="input-group input-group-sm">`+
+                `<input `+
+                    `type="text" `+
+                    `class="form-control" `+
+                    `id="${id}" `+
+                    `value="${value}"`+
+                    `aria-describedby="basic-addon-${id}">`+
+                `<span class="input-group-text" id="basic-addon${id}">`+
+                    `<i class="fa-regular fa-circle-question"></i> <span style="margin-left: 0.5em;" data-i18n="help"></span>`+
+                `</span>`+
+            `</div>`;
+        } else {
+            result += `<input `+
+                `type="text" `+
+                `class="form-control form-control-sm" `+
+                `id="${id}" `+
+                `value="${value}"`+
+                `aria-describedby="basic-addon-${id}">`;
+        }
+
+        return result;
+    }
+
+    function buildLabelAndInputForCronJob(id, value) {
+        var result =
+        `<label `+
+            //`for="${id}" `+
+            `class="form-label" `+
+            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}">`+
+        `</label>`+
+        `<div class="input-group input-group-sm">`+
+            `<input `+
+                `type="text" `+
+                `class="form-control" `+
+                `id="${id}" `+
+                `value="${value}"`+
+                `aria-describedby="basic-addon-${id}">`+
+            `<span class="input-group-text"><i class="fa-solid fa-equals"></i></span>`+
+            `<input type="text" class="form-control" id="${id}-explanation" placeholder="${i18next.t('token_placeholder')}" aria-label="${i18next.t('token_placeholder')}">`+
+            `<span class="input-group-text" id="basic-addon${id}">`+
+                `<i class="fa-regular fa-circle-question"></i> <span style="margin-left: 0.5em;" data-i18n="help"></span>`+
+            `</span>`+
+        `</div>`;
+
+        return result;
+    }
+
+    function buildLabelAndCheckBoxForConfigurationData(id, checked, i18nDescriptionKey) {
+        var result =
+        `<label `+
+            `class="form-label" `+
+            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}">`+
+        `</label>`+
+        `<div class="form-check form-switch">`+
+            `<input `+
+                `type="checkbox" `+
+                `role="switch" `+
+                `class="form-check-input " `+
+                `id="${id}" `+
+                `${ checked ? 'checked' : '' }>`+
+            `<label class="form-check-label" for="${id}" data-i18n="${i18nDescriptionKey}"></label>`+ 
+        `</div>`;
+        return result;
+    }
+
+    function buildLabelAndRadiosForConfigurationData(id, options) {
+        var result =
+        `<label `+
+            `class="form-label" `+
+            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}">`+
+        `</label>`;
+        for(var i = 0; i < options.length; i++) {
+            result +=
+            `<div class="form-check">`+
+                `<input class="form-check-input" type="radio" name="${id}" id="${id}.${(i+1)}" ${options[i].selected ? 'checked' : ''}>`+
+                `<label class="form-check-label" for="${id}.${(i+1)}">`+
+                    `<span>${options[i].name}</span> <span style="color:#777; margin-left: 0.5em;" data-i18n="${options[i].description}"></span>`+
+                `</label>`+
+            `</div>`;
+        }
+        return result;
+    }
+
     function getStatus() {
         $.get("/status")
             .done(function (data) {
@@ -420,64 +505,32 @@
                         });
                 });
 
+                $('#config-test').empty();
 
-                var inputRowTemplate = `<tr><td data-i18n="##key##"></td><td><div class="input-group input-group-sm input-inline"><input id="##id##" type="text" class="form-control" value="##value##"></div></td></tr>`;
-                $('#config-table-body').empty();
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.url', data.config.churchtools.url));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.username', data.config.churchtools.username));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.password', ''));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.storage.groupsData', data.config.storage.groupsData));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.storage.contactPersonsData', data.config.storage.contactPersonsData));
 
-                $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','config.churchtools.url')
-                    .replace('##id##','churchtools-url')
-                    .replace('##value##',data.config.churchtools.url));
-
-                $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','config.churchtools.username')
-                    .replace('##id##','churchtools-username')
-                    .replace('##value##',data.config.churchtools.username));
-
-                $('#config-table-body').append(`<tr><td data-i18n="config.churchtools.password"></td><td><div class="input-group input-group-sm input-inline"><input id="churchtools-password" type="password" class="form-control" placeholder="Enter the new password here"></div></td></tr>`);
-
-                $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','config.storage.groupsData')
-                    .replace('##id##','storage-groupsData')
-                    .replace('##value##',data.config.storage.groupsData));
-
-                $('#config-table-body').append(inputRowTemplate
-                    .replace('##key##','config.storage.contactPersonsData')
-                    .replace('##id##','storage-contactPersonsData')
-                    .replace('##value##',data.config.storage.contactPersonsData));
-
-                var tmp = '';
-                if(data.config.storage.mimeTypes.includes('application/json')) {
-                    tmp = 'checked="checked"';
-                }
-                rowTmp = `<tr><td data-i18n="config.storage.json"></td><td><input class="form-check-input" type="checkbox" id="outputJsonCheckBox" ${tmp}></td></tr>`;
-                $('#config-table-body').append(rowTmp);
-
-                var rowTmp = '<tr><td data-i18n="config.logging.level"></td><td><div class="input-group input-group-sm input-inline"><select class="from-select" id="logLevelSelect">'+
-                    `<option value="debug" ${data.config.logging.level == 'debug' ? 'selected' : ''}>Debug</option>`+
-                    `<option value="info" ${data.config.logging.level == 'info' ? 'selected' : ''}>Info</option>`+
-                    `<option value="error" ${data.config.logging.level == 'error' ? 'selected' : ''}>Error</option>`+
-                    `<option value="none" ${data.config.logging.level == 'none' ? 'selected' : ''}>None</option>`+
-                    `</select></div></td></tr>`;
-                $('#config-table-body').append(rowTmp);
-
-                $('#config-table-body').append(`<tr><td data-i18n="config.cronJob"></td><td><div class="input-group input-group-sm input-inline">`+
-                    `<input id="cronJob-pattern" type="text" class="form-control" value="${data.config.cronJob.pattern}">`+
-                    `<div class="input-group-append"><a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="btn btn-outline-secondary" data-i18n="help"></a></div></div>`+
-                    `<div><span id="cronJob-pattern-explanation"></span></div></td></tr>`);
-                // Display a cron pattern explanation
-                $('#cronJob-pattern-explanation').append(cronstrue.toString($('#cronJob-pattern').val(), { use24HourTimeFormat: true, locale: "de" }));
-                // Update the cron pattern explanation on change
-                $('#cronJob-pattern').change(()=> {
-                    $('#cronJob-pattern-explanation').empty();
-                    // TODO: make locale dynamic
-                    $('#cronJob-pattern-explanation').append(cronstrue.toString($('#cronJob-pattern').val(), { use24HourTimeFormat: true, locale: "de" }));
+                $('#config-test').append(buildLabelAndCheckBoxForConfigurationData('config.storage.json', data.config.storage.mimeTypes.includes('application/json'), 'config.storage.json_explanation'));
+                
+                $('#config-test').append(buildLabelAndRadiosForConfigurationData('config.logging.level', [
+                    { name: 'Debug', description: 'config.logging.debug', selected: data.config.logging.level == 'debug' },
+                    { name: 'Info',  description: 'config.logging.info',  selected: data.config.logging.level == 'info' },
+                    { name: 'Error', description: 'config.logging.error', selected: data.config.logging.level == 'error' },
+                    { name: 'None',  description: 'config.logging.none',  selected: data.config.logging.level == 'none' },
+                ]));
+                    
+                $('#config-test').append(buildLabelAndInputForCronJob('config.cronJob', data.config.cronJob.pattern));
+                $('#config\\.cronJob-explanation').val(cronstrue.toString($('#config\\.cronJob').val(), { use24HourTimeFormat: true, locale: i18next.language }));
+                $('#config\\.cronJob').change(()=> {
+                    $('#config\\.cronJob-explanation').val(cronstrue.toString($('#config\\.cronJob').val(), { use24HourTimeFormat: true, locale: i18next.language }));
                 });
 
                 i18next.changeLanguage("de", () => {
                     rerender();
                 });
-                //getTagIdsAndNames();
             })
             .fail(function (error) {
                 console.log(error);

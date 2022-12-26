@@ -48,6 +48,9 @@ app.use(passport.session());
 app.use("/public", express.static(path.join(__dirname, 'public')));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
+// Serve cronstrue 
+app.use("/cronstrue", express.static(path.join(__dirname, 'node_modules/cronstrue/dist')));
+
 app.use('/', indexRouter);
 
 // The "authUser" is a function that we will define later will contain the steps to authenticate a user, and will return the "authenticated user".

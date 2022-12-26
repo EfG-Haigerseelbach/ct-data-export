@@ -78,7 +78,7 @@
                     configuration: 'Configuration',
                     key: 'Key',
                     value: 'Value',
-                    save: 'Save',
+                    save_config: 'Save configuration',
                     lastChangeDate: 'Last cahge date',
                     view_file: 'View',
                     close: 'Close',
@@ -99,7 +99,8 @@
                             groupsData: 'Filename for data of Groups (w/o extension)',
                             contactPersonsData: 'Filename for data of Persons (w/o extension)',
                             appointmentData: 'Filename for data of Appointments (w/o extension)',
-                            json: 'Output as JSON file (\'application/json\')'
+                            json: 'Output as JSON file (\'application/json\')',
+                            json_explanation: 'Controls the output in a file'
                         },
                         allowedCalendarIds: 'Calendar IDs',
                         tags: {
@@ -107,9 +108,14 @@
                             personsToExport: 'Tag for Persons to Export'
                         },
                         logging: {
-                            level: 'Log Level'
+                            level: 'Log Level',
+                            debug: 'Logs every request and response and outputs HTTP method, URL and request/response body data',
+                            info: 'Logs every request and response, but only outputs HTTP method and URL (no request/response body data)',
+                            error: 'Logs responses having an HTTP error code and unsuccessful requests',
+                            none: 'Do not log at all'
                         },
-                        cronJob: 'Cron Job'
+                        cronJob: 'Cron Job',
+                        cron_pattern: 'Pattern for cron job'
                     }
                 }
               },
@@ -128,7 +134,7 @@
                     configuration: 'Konfiguration',
                     key: 'Schlüssel',
                     value: 'Wert',
-                    save: 'Speichern',
+                    save_config: 'Konfiguration Speichern',
                     lastChangeDate: 'Letztes Änderungsdatum',
                     view_file: 'Anzeigen',
                     close: 'Schließen',
@@ -149,7 +155,8 @@
                             groupsData: 'Dateiname für Gruppendaten (ohne Dateiendung)',
                             contactPersonsData: 'Dateiname für Personendaten (ohne Dateiendung)',
                             appointmentData: 'Dateiname für Termindaten (ohne Dateiendung)',
-                            json: 'Ausgabe as JSON-Datei (\'application/json\')'
+                            json: 'Ausgabe as JSON-Datei (\'application/json\')',
+                            json_explanation: 'Steuert die Ausgabe in einer Datei'
                         },
                         allowedCalendarIds: 'Kalender IDs',
                         tags: {
@@ -157,9 +164,14 @@
                             personsToExport: 'Tag für zu exportierende Personen'
                         },
                         logging: {
-                            level: 'Log Level'
+                            level: 'Log Level',
+                            debug: 'Protokollierung jeder HTTP-Anfrage und -Antwort mit deren Inhalt sowie der HTTP-Methode und URL',
+                            info: 'Protokollierung jeder HTTP-Anfrage und -Antwort mit HTTP-Methode und URL',
+                            error: 'Protokollierung von Fehlern bei HTTP-Anfragen und -Antworten',
+                            none: 'Keine Protokollierung'
                         },
-                        cronJob: 'Cron Job'
+                        cronJob: 'Regelmäßige Ausführung (Cron Job)',
+                        cron_pattern: 'Ausführungsmuster für die regelmäßige Ausführung'
                     }
                 }
               }
