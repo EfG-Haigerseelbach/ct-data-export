@@ -50,6 +50,9 @@
     #trigger-hooks-button:hover > #trigger-hooks {
         transform: rotate(360deg);
     }
+    .help-input-group:hover {
+        filter: brightness(85%);
+    }
     .loader-0 {
         width: 48px;
         height: 48px;
@@ -414,7 +417,7 @@
                 `aria-describedby="basic-addon-${id}">`+
             `<span class="input-group-text"><i class="fa-solid fa-equals"></i></span>`+
             `<input type="text" class="form-control" id="${id}-explanation" placeholder="${i18next.t('token_placeholder')}" aria-label="${i18next.t('token_placeholder')}">`+
-            `<span class="input-group-text" id="basic-addon${id}">`+
+            `<a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="input-group-text help-input-group" id="basic-addon-${id}" style="text-decoration-line: none;">`+
                 `<i class="fa-regular fa-circle-question"></i> <span style="margin-left: 0.5em;" data-i18n="help"></span>`+
             `</span>`+
         `</div>`;
