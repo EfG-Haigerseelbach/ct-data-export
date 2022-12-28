@@ -119,7 +119,7 @@
                             },
                             groupsData: '',
                             contactPersonsData: '',
-                            json: 'Output as JSON file (\'application/json\')',
+                            json: 'Output as JSON file',
                             json_explanation: 'Controls the output in a file'
                         },
                         allowedCalendarIds: 'Calendar IDs',
@@ -194,7 +194,7 @@
                               placeholder: 'Dateiname für Personendaten (ohne Dateiendung)',
                               explanation: 'Name der Datei (ohne Dateiendung) für den Export von Personendaten'
                             },
-                            json: 'Ausgabe as JSON-Datei (\'application/json\')',
+                            json: 'Ausgabe as JSON-Datei',
                             json_explanation: 'Steuert die Ausgabe in einer Datei'
                         },
                         allowedCalendarIds: 'Kalender IDs',
