@@ -937,6 +937,19 @@ function getStatus() {
   });
 }
 
+const cronParser = require("cron-parser");
+
+function validateCronPattern(data) {
+  return new Promise((resolve, reject) => {
+    try {
+      cronParser.parseExpression(data.pattern);
+      resolve({valid: true});
+    } catch(err) {
+      resolve({valid: false, error: err.toString()});
+    }
+  });
+}
+
 initChurchToolsClient();
 login(config.get('churchtools.username'), config.get('churchtools.password')).then(() => {
   getMasterData();
@@ -1001,6 +1014,12 @@ router.post('/updateConfig', checkAuthenticatedApi, function (req, res, next) {
 router.get('/status', checkAuthenticatedApi, function (req, res, next) {
   getStatus()
     .then(status => sendJsonHttp200(status, res),
+          reason => sendHttp500(reason, res));
+});
+
+router.post('/validateCronPattern', checkAuthenticatedApi, function (req, res, next) {
+  validateCronPattern(req.body)
+    .then(result => sendJsonHttp200(result, res),
           reason => sendHttp500(reason, res));
 });
 

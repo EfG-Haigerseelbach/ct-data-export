@@ -101,6 +101,14 @@
         white-space: -o-pre-wrap;
         word-wrap: break-word;
     }
+
+    .invalid-input { 
+        border-color: #dc3545 !important;
+        background-image: url("/public/error.svg");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
 </style>
 
 <div class="container" style="margin-bottom: 2em;">
@@ -144,9 +152,14 @@
 
     <hr style="margin-top: 2.8em;">
 
-    <h4 style="margin-top: 2rem;"><span data-i18n="configuration"></span> <i class="fa-solid fa-gears"></i></h4>
+    <h4 style="margin-top: 2rem;">
+        <span data-i18n="configuration"></span> <i class="fa-solid fa-gears"></i>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="button" id="display-explanation-button" style="float: right;">
+            <span data-i18n="help"></span> <i class="fa-regular fa-circle-question"></i>
+        </button>
+    </h4>
     <div id="config-test"></div>
-    <button type="button" class="btn btn-sm btn-success" id="saveConfig" style="margin-top: 1em;"><i class="fa-regular fa-floppy-disk"></i> <span data-i18n="save_config"></span></button>
+    <button type="button" class="btn btn-sm btn-success" id="saveConfig" style="margin-top: 1em;"><span data-i18n="save_config"></span> <i class="fa-regular fa-floppy-disk"></i></button>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="fileContentModal" tabindex="-1" aria-labelledby="fileContentModalLabel" aria-hidden="true">
@@ -251,15 +264,11 @@
             newConfig.storage.mimeTypes.push('application/json');
         } 
 
-        newConfig.tags = {};
-        newConfig.tags.groupsToExport = $( ".groups-to-export-tag-radio:checked" ).attr('data-name');
-        newConfig.tags.personsToExport = $( ".persons-to-export-tag-radio:checked" ).attr('data-name');
-
         newConfig.logging = {};
         newConfig.logging.level = $( "#logLevelSelect option:selected" ).attr('value');        
 
         newConfig.cronJob = {};
-        newConfig.cronJob.pattern = "00 00 23 * * *";
+        newConfig.cronJob.pattern = $('#config.cronJob').val();
 
         $.ajax({
             url: "/updateConfig", 
@@ -375,20 +384,17 @@
         `<label `+
             //`for="${id}" `+
             `class="form-label" `+
-            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}">`+
+            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}.name">`+
         `</label>`;
         if(showHelp) {
-            result +=`<div class="input-group input-group-sm">`+
-                `<input `+
-                    `type="text" `+
-                    `class="form-control" `+
-                    `id="${id}" `+
-                    `value="${value}"`+
-                    `aria-describedby="basic-addon-${id}">`+
-                `<span class="input-group-text" id="basic-addon${id}">`+
-                    `<i class="fa-regular fa-circle-question"></i> <span style="margin-left: 0.5em;" data-i18n="help"></span>`+
-                `</span>`+
-            `</div>`;
+            result += `<input `+
+                `type="text" `+
+                `class="form-control form-control-sm" `+
+                `id="${id}" `+
+                `value="${value}"`+
+                `placeholder="${i18next.t(id+'.placeholder')}"`+ // TODO: language change not possible
+                `aria-describedby="basic-addon-${id}">`+
+                `<div class="form-text input-explanation" style="visibility: hidden;" data-i18n="[html]${id}.explanation"><div>`;
         } else {
             result += `<input `+
                 `type="text" `+
@@ -510,11 +516,11 @@
 
                 $('#config-test').empty();
 
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.url', data.config.churchtools.url));
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.username', data.config.churchtools.username));
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.password', ''));
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.storage.groupsData', data.config.storage.groupsData));
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.storage.contactPersonsData', data.config.storage.contactPersonsData));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.url', data.config.churchtools.url, true));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.username', data.config.churchtools.username, true));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.password', '', true));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.storage.groupsData', data.config.storage.groupsData, true));
+                $('#config-test').append(buildLabelAndInputForConfigurationData('config.storage.contactPersonsData', data.config.storage.contactPersonsData, true));
 
                 $('#config-test').append(buildLabelAndCheckBoxForConfigurationData('config.storage.json', data.config.storage.mimeTypes.includes('application/json'), 'config.storage.json_explanation'));
                 
@@ -528,7 +534,42 @@
                 $('#config-test').append(buildLabelAndInputForCronJob('config.cronJob', data.config.cronJob.pattern));
                 $('#config\\.cronJob-explanation').val(cronstrue.toString($('#config\\.cronJob').val(), { use24HourTimeFormat: true, locale: i18next.language }));
                 $('#config\\.cronJob').change(()=> {
-                    $('#config\\.cronJob-explanation').val(cronstrue.toString($('#config\\.cronJob').val(), { use24HourTimeFormat: true, locale: i18next.language }));
+                    $.ajax({
+                        url: "/validateCronPattern", 
+                        data: JSON.stringify({ pattern: $('#config\\.cronJob').val() }), 
+                        contentType: 'application/json',
+                        type: 'POST',
+                        success: (data) => {
+                            if(data.valid) {                                
+                                $('#config\\.cronJob-explanation').val(cronstrue.toString($('#config\\.cronJob').val(), { use24HourTimeFormat: true, locale: i18next.language }));
+
+                                $('#config\\.cronJob').removeClass('invalid-input');
+
+                                /*$('#config\\.cronJob').css("border-color", "#dc3545");
+                                $('#config\\.cronJob').css("background-image", 'url("/public/error.svg"');
+                                $('#config\\.cronJob').css("background-repeat", "no-repeat");
+                                $('#config\\.cronJob').css("background-position", "right calc(0.375em + 0.1875rem) center");
+                                $('#config\\.cronJob').css("background-size", "calc(0.75em + 0.375rem) calc(0.75em + 0.375rem)");*/
+                            } else {
+                                $('#config\\.cronJob-explanation').val(i18next.t('config.cron_pattern_invalid'));
+                                
+                                $('#config\\.cronJob').addClass('invalid-input');
+                            }
+                        },
+                        error: (xhr, textStatus, errorThrown) =>{
+                            console.log(textStatus);
+                            console.log(errorThrown);
+                        }
+                        });
+                    
+                });
+
+                $('#display-explanation-button').click(() => {
+                    if($('#display-explanation-button').hasClass('active')) {
+                        $('.input-explanation').css('visibility', 'inherit');
+                    } else {
+                        $('.input-explanation').css('visibility', 'hidden');
+                    }
                 });
 
                 i18next.changeLanguage("de", () => {

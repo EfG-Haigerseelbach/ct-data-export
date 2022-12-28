@@ -90,15 +90,35 @@
                     refresh: 'Refresh',
                     config: {
                         churchtools: {
-                            url: 'ChurchTools URL',
-                            username: 'ChurchTools API user',
-                            password: 'ChurchTools API password'
+                            url: {
+                              name: 'ChurchTools URL',
+                              placeholder: 'URL to your ChurchTools instance',
+                              explanation: 'The URL to a hostet ChurchTools instance is \'https://MY_CHURCH.church.tools/\'.'
+                            },
+                            username: {
+                              name: 'ChurchTools API user',
+                              placeholder: 'ChurchTools API user',
+                              explanation: 'Name of the user for the authentification at the ChurchTools API'
+                            },
+                            password: {
+                              name: 'ChurchTools API password',
+                              placeholder: 'ChurchTools API password',
+                              explanation: 'ChurchTools API password'
+                            }
                         },
                         storage: {
-                            path: 'Path to store exported data',
-                            groupsData: 'Filename for data of Groups (w/o extension)',
-                            contactPersonsData: 'Filename for data of Persons (w/o extension)',
-                            appointmentData: 'Filename for data of Appointments (w/o extension)',
+                            groupsData: {
+                              name: 'Filename for data of Groups (w/o extension)',
+                              placeholder: 'Filename for data of Groups (w/o extension)',
+                              explanation: 'Name of the file (without file extension) for the export of group data'
+                            },
+                            contactPersonsData: {
+                              name: 'Filename for data of Persons (w/o extension)',
+                              placeholder: 'Filename for data of persons (w/o extension)',
+                              explanation: 'Name of the file (without file extension) for the export of person data'
+                            },
+                            groupsData: '',
+                            contactPersonsData: '',
                             json: 'Output as JSON file (\'application/json\')',
                             json_explanation: 'Controls the output in a file'
                         },
@@ -115,7 +135,8 @@
                             none: 'Do not log at all'
                         },
                         cronJob: 'Cron Job',
-                        cron_pattern: 'Pattern for cron job'
+                        cron_pattern: 'Pattern for cron job',
+                        cron_pattern_invalid: 'Invalid cron pattern'
                     }
                 }
               },
@@ -146,15 +167,33 @@
                     refresh: 'Aktualisieren',
                     config: {
                         churchtools: {
-                            url: 'ChurchTools URL',
-                            username: 'ChurchTools API Benutzer',
-                            password: 'ChurchTools API Passwort'
+                            url: {
+                              name: 'ChurchTools URL',
+                              placeholder: 'URL zu deiner ChurchTools Instanz',
+                              explanation: 'Die URL zu einer gehosteten ChurchTools Instanz ist <span style="font-family: monospace;">https://MEINE_GEMEINDE.church.tools/</span>.'
+                            },
+                            username: {
+                              name: 'ChurchTools API Benutzer',
+                              placeholder: 'ChurchTools API Benutzer',
+                              explanation: 'Name des Benutzers für die Authentifizierung an der ChurchTools API'
+                            },
+                            password: {
+                              name: 'ChurchTools API Password',
+                              placeholder: 'ChurchTools API Password',
+                              explanation: 'ChurchTools API Password'
+                            }
                         },
                         storage: {
-                            path: 'Speicherpfad für exportierte Daten',
-                            groupsData: 'Dateiname für Gruppendaten (ohne Dateiendung)',
-                            contactPersonsData: 'Dateiname für Personendaten (ohne Dateiendung)',
-                            appointmentData: 'Dateiname für Termindaten (ohne Dateiendung)',
+                            groupsData: {
+                              name: 'Dateiname für Gruppendaten (ohne Dateiendung)',
+                              placeholder: 'Dateiname für Gruppendaten (ohne Dateiendung)',
+                              explanation: 'Name der Datei (ohne Dateiendung) für den Export von Gruppendaten'
+                            },
+                            contactPersonsData: {
+                              name: 'Dateiname für Personendaten (ohne Dateiendung)',
+                              placeholder: 'Dateiname für Personendaten (ohne Dateiendung)',
+                              explanation: 'Name der Datei (ohne Dateiendung) für den Export von Personendaten'
+                            },
                             json: 'Ausgabe as JSON-Datei (\'application/json\')',
                             json_explanation: 'Steuert die Ausgabe in einer Datei'
                         },
@@ -171,7 +210,8 @@
                             none: 'Keine Protokollierung'
                         },
                         cronJob: 'Regelmäßige Ausführung (Cron Job)',
-                        cron_pattern: 'Ausführungsmuster für die regelmäßige Ausführung'
+                        cron_pattern: 'Ausführungsmuster für die regelmäßige Ausführung',
+                        cron_pattern_invalid: 'Ungültiges Ausführungsmuster'
                     }
                 }
               }
