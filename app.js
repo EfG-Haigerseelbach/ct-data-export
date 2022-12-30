@@ -107,7 +107,9 @@ res.render("dashboard.ejs", {name: req.user.name})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  console.error(req);
+  //console.error(req);
+  var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  console.error('Did not find any handler for request with URL: '+fullUrl);
   next(createError(404));
 });
 
