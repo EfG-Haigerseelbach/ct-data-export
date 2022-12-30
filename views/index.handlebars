@@ -319,7 +319,8 @@
                         `class="form-control form-control-sm" `+
                         `id="hook-description-${hook.internalId}" `+
                         `placeholder="Description" `+
-                        `value="${hooks[i].description}">`+
+                        `value="${hooks[i].description}" `+
+                        `readonly>`+
                     `<label `+
                         `for="hook-url-${hook.internalId}" `+
                         `class="form-label" `+
@@ -331,7 +332,8 @@
                         `class="form-control form-control-sm" `+
                         `id="hook-url-${hook.internalId}" `+
                         `placeholder="URL" `+
-                        `value="${hooks[i].url}">`;
+                        `value="${hooks[i].url}" `+
+                        `readonly>`;
             if(hooks[i].hasOwnProperty('delay')) {
                 hookTemp += 
                     `<label `+
@@ -345,7 +347,8 @@
                         `class="form-control form-control-sm" `+
                         `id="hook-delay-${hook.internalId}" `+
                         `placeholder="Delay in seconds" `+
-                        `value="${hooks[i].delay}">`;
+                        `value="${hooks[i].delay}" `+
+                        `readonly>`;
             }
              hookTemp += 
                     `<label `+
