@@ -3,6 +3,7 @@
 <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@6.1.3/i18nextBrowserLanguageDetector.min.js"></script>
 
 <script src="public/js/i18n.js"></script>
+<script src="public/js/validation.js"></script>
 
 <!-- cronstrue - parses a cron expression and outputs a human readable description -->
 <script src="/cronstrue/cronstrue.min.js"></script>
@@ -108,6 +109,9 @@
         background-repeat: no-repeat;
         background-position: right calc(0.375em + 0.1875rem) center;
         background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    .input-error {
+        color: #dc3545 !important;
     }
 </style>
 
@@ -249,34 +253,33 @@
     function saveConfig() {
         var newConfig = {
             "churchtools": {
-                "url": $('#churchtools-url').val(),
-                "username": $('#churchtools-username').val(),
-                "password": $('#churchtools-password').val().trim().length > 0 ? $('#churchtools-password').val() : '',
+                "url": $('#config\\.churchtools\\.url').val(),
+                "username": $('#config\\.churchtools\\.username').val(),
+                "password": $('#config\\.churchtools\\.password').val().trim().length > 0 ? $('#config\\.churchtools\\.password').val() : '',
             },
             "storage": {
-                "path": $('#storage-path').val(),
-                "groupsData": $('#storage-groupsData').val(),
-                "contactPersonsData": $('#storage-contactPersonsData').val(),
-                "mimeTypes" : [ ]
+                "output": $('#config\\.storage\\.json').is(':checked'),
+                "groupsData": $('#config\\.storage\\.groupsData').val(),
+                "contactPersonsData": $('#config\\.storage\\.contactPersonsData').val()
+            },
+            "logging": {
+                "level": $('[name="config\\.logging\\.level"]:checked').data('level').toLowerCase()
+            },
+            "cronJob": {
+                "pattern": $('#config\\.cronJob').val()
             }
         };
-        if($('#outputJsonCheckBox').is(':checked')) {
-            newConfig.storage.mimeTypes.push('application/json');
-        } 
-
-        newConfig.logging = {};
-        newConfig.logging.level = $( "#logLevelSelect option:selected" ).attr('value');        
-
-        newConfig.cronJob = {};
-        newConfig.cronJob.pattern = $('#config.cronJob').val();
 
         $.ajax({
             url: "/updateConfig", 
             data: JSON.stringify(newConfig), 
             contentType: 'application/json',
             type: 'POST',
-            success: () => {
-                 location.reload();
+            success: (data) => {
+                if(data.result.changed) {
+                    // Reload page
+                    location.reload(); 
+                }
             },
             error: (xhr, textStatus, errorThrown) =>{
                 console.log(textStatus);
@@ -379,40 +382,71 @@
         }
     }
 
-    function buildLabelAndInputForConfigurationData(id, value, showHelp = false) {
+    function showValidationError(id, type) {
+        $('#'+id+'-error').empty();
+        $('#'+id+'-error').append(i18next.t('validation.'+type));
+        $('#'+id+'-error').show();
+    }
+
+    function buildLabelAndInputForConfigurationData(id, value, type, parent) {
         var result =
         `<label `+
             //`for="${id}" `+
             `class="form-label" `+
             `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}.name">`+
-        `</label>`;
-        if(showHelp) {
-            result += `<input `+
-                `type="text" `+
-                `class="form-control form-control-sm" `+
-                `id="${id}" `+
-                `value="${value}"`+
-                `placeholder="${i18next.t(id+'.placeholder')}"`+ // TODO: language change not possible
-                `aria-describedby="basic-addon-${id}">`+
-                `<div class="form-text input-explanation" style="visibility: hidden;" data-i18n="[html]${id}.explanation"><div>`;
-        } else {
-            result += `<input `+
-                `type="text" `+
-                `class="form-control form-control-sm" `+
-                `id="${id}" `+
-                `value="${value}"`+
-                `aria-describedby="basic-addon-${id}">`;
-        }
+        `</label>`+
+        `<input `+
+            `type="text" `+
+            `class="form-control form-control-sm" `+
+            `id="${id}" `+
+            `value="${value}" `+
+            `data-i18n-id="${id}+'.placeholder'" `;
+        result += type === null ? '' : `data-type="${type}" `;
+        result += 
+            `placeholder="${i18next.t(id+'.placeholder')}" `+ // TODO: language change not possible
+            `aria-describedby="basic-addon-${id}">`+
+        `<div class="form-text input-error" id="${id}-error" style="display:none;"></div>`+
+        `<div class="form-text input-explanation" style="visibility: hidden;" data-i18n="[html]${id}.explanation"><div>`;
 
-        return result;
+        parent.append(result);
+
+        var escapedId = id.replace(/\./g, '\\.');
+        $('#'+escapedId).change(function() {
+            var idTmp = $(this).attr('id').replace(/\./g, '\\.');
+            var currentValue = $( this ).val();
+            if(currentValue.trim().length == 0) {
+                $( this ).addClass('invalid-input');
+                $('#saveConfig').prop("disabled", true);
+                return;
+            }
+            var type = $( this ).data('type');
+            if(type != undefined && type != null) {
+                if(type == 'url' && !isValidHttpUrl(currentValue)) {
+                    $( this ).addClass('invalid-input');
+                    $('#saveConfig').prop("disabled", true);
+
+                    showValidationError(idTmp, type);
+                    return;
+                } else if(type == 'filename' && !isValidFilename(currentValue)) {
+                    $( this ).addClass('invalid-input');
+                    $('#saveConfig').prop("disabled", true);
+
+                    showValidationError(idTmp, type);
+                    return;
+                }
+            }
+            $('#'+idTmp+'-error').hide();
+            $( this ).removeClass('invalid-input');
+            $('#saveConfig').prop("disabled", false);
+        });
     }
 
-    function buildLabelAndInputForCronJob(id, value) {
+    function buildLabelAndInputForCronJob(id, value, parent) {
         var result =
         `<label `+
             //`for="${id}" `+
             `class="form-label" `+
-            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}">`+
+            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}.name">`+
         `</label>`+
         `<div class="input-group input-group-sm">`+
             `<input `+
@@ -420,22 +454,55 @@
                 `class="form-control" `+
                 `id="${id}" `+
                 `value="${value}"`+
+                `placeholder="${i18next.t(id+'.placeholder')}" `+
                 `aria-describedby="basic-addon-${id}">`+
             `<span class="input-group-text"><i class="fa-solid fa-equals"></i></span>`+
             `<input type="text" class="form-control" id="${id}-explanation" placeholder="${i18next.t('token_placeholder')}" aria-label="${i18next.t('token_placeholder')}">`+
             `<a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="input-group-text help-input-group" id="basic-addon-${id}" style="text-decoration-line: none;">`+
                 `<i class="fa-regular fa-circle-question"></i> <span style="margin-left: 0.5em;" data-i18n="help"></span>`+
             `</span>`+
-        `</div>`;
+        `</div>`+
+        `<div class="form-text input-explanation" style="visibility: hidden;" data-i18n="[html]${id}.explanation"><div>`;
 
-        return result;
+        parent.append(result);
+        var escapedId = id.replace(/\./g, '\\.');
+
+        $('#'+escapedId+'-explanation').val(cronstrue.toString($('#'+escapedId).val(), { use24HourTimeFormat: true, locale: i18next.language }));
+        $('#'+escapedId).change(function() {
+            const id = $(this).attr('id');
+            const escapedId = id.replace(/\./g, '\\.');
+            $.ajax({
+                url: "/validateCronPattern", 
+                data: JSON.stringify({ pattern: $('#'+escapedId).val() }), 
+                contentType: 'application/json',
+                type: 'POST',
+                success: (data) => {
+                    if(data.valid) {                                
+                        $('#'+escapedId).val(data.normalizedPattern);
+                        $('#'+escapedId+'-explanation').val(cronstrue.toString($('#'+escapedId).val(), { use24HourTimeFormat: true, locale: i18next.language }));
+
+                        $('#'+escapedId).removeClass('invalid-input');
+                        $('#saveConfig').prop("disabled",false);
+                    } else {
+                        $('#'+escapedId+'-explanation').val(i18next.t(id+'.pattern_invalid'));
+                        
+                        $('#'+escapedId).addClass('invalid-input');
+                        $('#saveConfig').prop("disabled",true);
+                    }
+                },
+                error: (xhr, textStatus, errorThrown) =>{
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                }
+            });
+        });
     }
 
-    function buildLabelAndCheckBoxForConfigurationData(id, checked, i18nDescriptionKey) {
+    function buildLabelAndCheckBoxForConfigurationData(id, checked, parent) {
         var result =
         `<label `+
             `class="form-label" `+
-            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}">`+
+            `style="margin-top: 0.5rem; font-weight: var(--base-text-weight-semibold, 600);" data-i18n="${id}.name">`+
         `</label>`+
         `<div class="form-check form-switch">`+
             `<input `+
@@ -444,9 +511,21 @@
                 `class="form-check-input " `+
                 `id="${id}" `+
                 `${ checked ? 'checked' : '' }>`+
-            `<label class="form-check-label" for="${id}" data-i18n="${i18nDescriptionKey}"></label>`+ 
-        `</div>`;
-        return result;
+            `<label class="form-check-label" for="${id}" id="${id}-label" data-i18n="${id}.active"></label>`+ 
+        `</div>`+
+        `<div class="form-text input-explanation" style="visibility: hidden;" data-i18n="[html]${id}.explanation"><div>`;
+
+        parent.append(result);
+        var escapedId = id.replace(/\./g, '\\.');
+        $('#'+escapedId).change(function() {
+            var id = $(this).attr('id');
+            var escapedId = id.replace(/\./g, '\\.');
+            if($("#"+escapedId).is(':checked')) {
+                $('#'+escapedId+'-label').html(i18next.t(id+'.active'));
+            } else {
+                $('#'+escapedId+'-label').html(i18next.t(id+'.inactive'));
+            }
+        });
     }
 
     function buildLabelAndRadiosForConfigurationData(id, options) {
@@ -458,7 +537,7 @@
         for(var i = 0; i < options.length; i++) {
             result +=
             `<div class="form-check">`+
-                `<input class="form-check-input" type="radio" name="${id}" id="${id}.${(i+1)}" ${options[i].selected ? 'checked' : ''}>`+
+                `<input class="form-check-input" type="radio" data-level="${options[i].name}" name="${id}" id="${id}.${(i+1)}" ${options[i].selected ? 'checked' : ''}>`+
                 `<label class="form-check-label" for="${id}.${(i+1)}">`+
                     `<span>${options[i].name}</span> <span style="color:#777; margin-left: 0.5em;" data-i18n="${options[i].description}"></span>`+
                 `</label>`+
@@ -515,14 +594,14 @@
                 });
 
                 $('#config-test').empty();
+                var parentTmp = $('#config-test');
+                buildLabelAndInputForConfigurationData('config.churchtools.url', data.config.churchtools.url, 'url', parentTmp);
+                buildLabelAndInputForConfigurationData('config.churchtools.username', data.config.churchtools.username, null, parentTmp);
+                buildLabelAndInputForConfigurationData('config.churchtools.password', '', null, parentTmp);
+                buildLabelAndInputForConfigurationData('config.storage.groupsData', data.config.storage.groupsData, 'filename', parentTmp);
+                buildLabelAndInputForConfigurationData('config.storage.contactPersonsData', data.config.storage.contactPersonsData, 'filename', parentTmp);
 
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.url', data.config.churchtools.url, true));
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.username', data.config.churchtools.username, true));
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.churchtools.password', '', true));
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.storage.groupsData', data.config.storage.groupsData, true));
-                $('#config-test').append(buildLabelAndInputForConfigurationData('config.storage.contactPersonsData', data.config.storage.contactPersonsData, true));
-
-                $('#config-test').append(buildLabelAndCheckBoxForConfigurationData('config.storage.json', data.config.storage.mimeTypes.includes('application/json'), 'config.storage.json_explanation'));
+                buildLabelAndCheckBoxForConfigurationData('config.storage.json', data.config.storage.mimeTypes.includes('application/json'), $('#config-test'));
                 
                 $('#config-test').append(buildLabelAndRadiosForConfigurationData('config.logging.level', [
                     { name: 'Debug', description: 'config.logging.debug', selected: data.config.logging.level == 'debug' },
@@ -531,38 +610,7 @@
                     { name: 'None',  description: 'config.logging.none',  selected: data.config.logging.level == 'none' },
                 ]));
                     
-                $('#config-test').append(buildLabelAndInputForCronJob('config.cronJob', data.config.cronJob.pattern));
-                $('#config\\.cronJob-explanation').val(cronstrue.toString($('#config\\.cronJob').val(), { use24HourTimeFormat: true, locale: i18next.language }));
-                $('#config\\.cronJob').change(()=> {
-                    $.ajax({
-                        url: "/validateCronPattern", 
-                        data: JSON.stringify({ pattern: $('#config\\.cronJob').val() }), 
-                        contentType: 'application/json',
-                        type: 'POST',
-                        success: (data) => {
-                            if(data.valid) {                                
-                                $('#config\\.cronJob-explanation').val(cronstrue.toString($('#config\\.cronJob').val(), { use24HourTimeFormat: true, locale: i18next.language }));
-
-                                $('#config\\.cronJob').removeClass('invalid-input');
-
-                                /*$('#config\\.cronJob').css("border-color", "#dc3545");
-                                $('#config\\.cronJob').css("background-image", 'url("/public/error.svg"');
-                                $('#config\\.cronJob').css("background-repeat", "no-repeat");
-                                $('#config\\.cronJob').css("background-position", "right calc(0.375em + 0.1875rem) center");
-                                $('#config\\.cronJob').css("background-size", "calc(0.75em + 0.375rem) calc(0.75em + 0.375rem)");*/
-                            } else {
-                                $('#config\\.cronJob-explanation').val(i18next.t('config.cron_pattern_invalid'));
-                                
-                                $('#config\\.cronJob').addClass('invalid-input');
-                            }
-                        },
-                        error: (xhr, textStatus, errorThrown) =>{
-                            console.log(textStatus);
-                            console.log(errorThrown);
-                        }
-                        });
-                    
-                });
+                buildLabelAndInputForCronJob('config.cronJob', data.config.cronJob.pattern, $('#config-test'));
 
                 $('#display-explanation-button').click(() => {
                     if($('#display-explanation-button').hasClass('active')) {

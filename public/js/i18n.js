@@ -88,6 +88,10 @@
                     invalid_token: 'Invalid token!',
                     help: 'Help',
                     refresh: 'Refresh',
+                    validation: {
+                      url: 'Invalid URL',
+                      filename: 'Invalid Dateiname'
+                    },
                     config: {
                         churchtools: {
                             url: {
@@ -119,8 +123,12 @@
                             },
                             groupsData: '',
                             contactPersonsData: '',
-                            json: 'Output as JSON file',
-                            json_explanation: 'Controls the output in a file'
+                            json: {
+                              name: 'Ausgabe als Datei',
+                              active: 'Output as JSON file',
+                              inactive: 'No output',
+                              explanation: 'Controls the output in a file. In case this switch is off there will be no file output.'
+                            }
                         },
                         allowedCalendarIds: 'Calendar IDs',
                         tags: {
@@ -134,9 +142,12 @@
                             error: 'Logs responses having an HTTP error code and unsuccessful requests',
                             none: 'Do not log at all'
                         },
-                        cronJob: 'Cron Job',
-                        cron_pattern: 'Pattern for cron job',
-                        cron_pattern_invalid: 'Invalid cron pattern'
+                        cronJob: {
+                          name: 'Recurrent Execution (Cron Job)',
+                          placeholder: 'Pattern for recurrent execution',
+                          pattern_invalid: 'Invalid cron pattern',
+                          explanation: 'The points in time for recurrent data export execution are controlled by this pattern.'
+                        },   
                     }
                 }
               },
@@ -165,6 +176,10 @@
                     invalid_token: 'Ungültiger Anmeldetoken!',
                     help: 'Hilfe',
                     refresh: 'Aktualisieren',
+                    validation: {
+                      url: 'Ungültige URL',
+                      filename: 'Ungültiger Dateiname'
+                    },
                     config: {
                         churchtools: {
                             url: {
@@ -194,8 +209,12 @@
                               placeholder: 'Dateiname für Personendaten (ohne Dateiendung)',
                               explanation: 'Name der Datei (ohne Dateiendung) für den Export von Personendaten'
                             },
-                            json: 'Ausgabe as JSON-Datei',
-                            json_explanation: 'Steuert die Ausgabe in einer Datei'
+                            json: {
+                              name: 'Ausgabe als Datei',
+                              active: 'Ausgabe als JSON-Datei',
+                              inactive: 'Keine Ausgabe',
+                              explanation: 'Steuert die Ausgabe in einer Datei. Wenn dieser Schalter aus ist, erfolgt keine Ausgabe in einer Datei.'
+                            }
                         },
                         allowedCalendarIds: 'Kalender IDs',
                         tags: {
@@ -209,9 +228,12 @@
                             error: 'Protokollierung von Fehlern bei HTTP-Anfragen und -Antworten',
                             none: 'Keine Protokollierung'
                         },
-                        cronJob: 'Regelmäßige Ausführung (Cron Job)',
-                        cron_pattern: 'Ausführungsmuster für die regelmäßige Ausführung',
-                        cron_pattern_invalid: 'Ungültiges Ausführungsmuster'
+                        cronJob: {
+                          name: 'Regelmäßige Ausführung (Cron Job)',
+                          placeholder: 'Ausführungsmuster für die regelmäßige Ausführung',
+                          pattern_invalid: 'Ungültiges Ausführungsmuster',
+                          explanation: 'Die Zeitpunkte der regelmäßigen Ausführung des Datenexports werden über dieses Muster gesteuert.'
+                        },                        
                     }
                 }
               }

@@ -1,0 +1,67 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "Product",
+    "description": "This schema describes valid a valid JSON for changing the configuration",
+    "type": "object",
+    "properties": {
+        "churchtools": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "description": "The URL of your ChurchTools instance. If hosted, the pattern is https://<church-name>.church.tools"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "Name of the user to authenticate against the ChurchTools API"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Password of this user"
+                }
+            },
+            "required": ["url", "username", "password"],
+            "additionalProperties": false
+        },
+        "storage": {
+            "type": "object",
+            "properties": {
+                "output": {
+                    "type": "boolean",
+                    "description": "Indicator whether or not to write the acquired data to a file"
+                },
+                "groupsData": {
+                    "type": "string",
+                    "description": "Path (optional) and filename for data of groups without file type extension (e.g. .csv)"
+                },
+                "contactPersonsData": {
+                    "type": "string",
+                    "description": "Path (optional) and filename for data of contact persons without file type extension (e.g. .csv)"
+                }
+            },
+            "required": ["output", "groupsData", "contactPersonsData"],
+            "additionalProperties": false
+        },
+        "logging": {
+            "type": "object",
+            "properties": {
+                "level": { "enum" : ["error", "debug", "info", "none"] }
+            },
+            "required": ["level"],
+            "additionalProperties": false
+        },
+        "cronJob": {
+            "type": "object",
+            "properties": {
+                "pattern": {
+                    "type": "string"
+                }
+            },
+            "required": ["pattern"],
+            "additionalProperties": false
+        }
+    },
+    "required": ["churchtools", "storage", "logging", "cronJob"],
+    "additionalProperties": false
+  }

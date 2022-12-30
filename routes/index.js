@@ -12,7 +12,7 @@ const { has } = require('config');
 var moment = require('moment');
 const { getSystemErrorMap } = require('util');
 const marked = require('marked');
-
+var { Draft07 } = require ('json-schema-library');
 
 var CronJob = require('cron').CronJob;
 
@@ -818,62 +818,105 @@ function storeAllContactPersons() {
   });
 }
 
-function updateConfig(newConfig) { // TODO: rework since old properties are written which do not match the JSON-schema
+function updateConfig(newConfig) {
   return new Promise((resolve, reject) => {
+
+    var configSchema = require('../config/configChangeSchema.json');
+    
+    const configJsonSchema = new Draft07(configSchema);
+    var errors = configJsonSchema.validate(newConfig);
+    
+    if(errors != undefined && errors.length > 0) {
+      // The configuration is not valid.
+      console.error(errors);
+      reject(errors);
+    }
+
     var result = {};
     // Read the current configuration file.
     var configTmp = JSON.parse(fs.readFileSync('config/default.json')); // TODO: filename is not dynamic
-    // Create a backup.
-    fs.writeFileSync('config/default.json.bak', JSON.stringify(configTmp, null, 4));
-
+    
     // TODO: perform a connection test with the URL and user/password
-    configTmp.churchtools.url = newConfig.churchtools.url;
-    configTmp.churchtools.username = newConfig.churchtools.username;
-    configTmp.churchtools.password = newConfig.churchtools.password.trim().length > 0 ? newConfig.churchtools.password : configTmp.churchtools.password;
+    var configChanged = false;
+    if(configTmp.churchtools.url != newConfig.churchtools.url) {
+      configTmp.churchtools.url = newConfig.churchtools.url;
+      configChanged = true;
+    }
+    
+    if(configTmp.churchtools.username != newConfig.churchtools.username) {
+      configTmp.churchtools.username = newConfig.churchtools.username;
+      configChanged = true;
+    }
 
+    if(newConfig.churchtools.password.trim().length > 0 && configTmp.churchtools.password != newConfig.churchtools.password) {
+      configTmp.churchtools.password = newConfig.churchtools.password.trim().length > 0 ? newConfig.churchtools.password : configTmp.churchtools.password;
+      configChanged = true;
+    }
+    
     var allowedFilenameRegex = /^[\w\-.][\w\-. ]*$/;
-    if(allowedFilenameRegex.test(newConfig.storage.groupsData)) {
-      configTmp.storage.groupsData = newConfig.storage.groupsData;
-    } else {
-      result.storage.groupsData = 'The filename contains an invalid character';
+    if(configTmp.storage.groupsData != newConfig.storage.groupsData) {
+      if(allowedFilenameRegex.test(newConfig.storage.groupsData)) {
+        configTmp.storage.groupsData = newConfig.storage.groupsData;
+        configChanged = true;
+      } else {
+        result.storage.groupsData = 'The filename contains an invalid character';
+      }
     }
-    if(allowedFilenameRegex.test(newConfig.storage.contactPersonsData)) {
-      configTmp.storage.contactPersonsData = newConfig.storage.contactPersonsData;
-    } else {
-      result.storage.contactPersonsData = 'The filename contains an invalid character';
+    if(configTmp.storage.contactPersonsData != newConfig.storage.contactPersonsData) {
+      if(allowedFilenameRegex.test(newConfig.storage.contactPersonsData)) {
+        configTmp.storage.contactPersonsData = newConfig.storage.contactPersonsData;
+        configChanged = true;
+      } else {
+        result.storage.contactPersonsData = 'The filename contains an invalid character';
+      }
     }
-
-    configTmp.storage.mimeTypes = [];
-    if(newConfig.storage.mimeTypes.includes("application/json")) {
-      configTmp.storage.mimeTypes.push("application/json");
+    
+    if(configTmp.storage.output != newConfig.storage.output) {
+      configTmp.storage.output = newConfig.storage.output;
+      configChanged = true;
     }
-
-    configTmp.tags.groupsToExport = newConfig.tags.groupsToExport; //JSON.stringify();
-    configTmp.tags.personsToExport = newConfig.tags.personsToExport;//JSON.stringify();
-
-    if(newConfig.logging.level == 'error' ||
+    
+    if(configTmp.logging.level != newConfig.logging.level) {
+      if(newConfig.logging.level == 'error' ||
       newConfig.logging.level == 'debug' ||
       newConfig.logging.level == 'info' ||
       newConfig.logging.level == 'none') {
-      configTmp.logging.level = newConfig.logging.level;
+        configTmp.logging.level = newConfig.logging.level;
+        configChanged = true;
+      } else {
+        result.logging.level = 'The log level is invalid. Keeping the current log level.';
+      }
+    }
+    
+    if(configTmp.cronJob.pattern != newConfig.cronJob.pattern) {
+      try {
+        if(validateCronPatternSync(newConfig.cronJob.pattern)) {
+          configTmp.cronJob.pattern = newConfig.cronJob.pattern;
+          configChanged = true;
+        }
+      } catch(patternError) {
+        result.cronJob = {};
+        result.cronJob.pattern = patternError.message;
+      }
+    }
+    
+    if(configChanged) {
+      result.changed = true;
+      console.log("Configuration changed");
+      // Create a backup.
+      //fs.writeFileSync('config/default.json.bak', JSON.stringify(configTmp, null, 4));
+      // Overwrite the current configuration file.
+      //fs.writeFileSync('config/default.json', JSON.stringify(configTmp, null, 4)); // TODO: filename is not dynamic
+      
+      // Reload the configuration.
+      delete require.cache[require.resolve('config')];
+      config = require('config');
+
+      resolve(result);
     } else {
-      configTmp.logging.level = 'error';
-      result.logging.level = 'The log level is invalid. Set the log level to "error"';
+      console.log("No changes to the configuration.");
+      resolve({result: { changed: false, message: "Config not changed"}});
     }
-
-    var cronPatternRegex = /((\d{1,2}|\*)\s){5}(\d{1,2}|\*)/;
-    if(cronPatternRegex.test(newConfig.cronJob.pattern)) {
-      configTmp.cronJob.pattern = newConfig.cronJob.pattern;
-    }
-
-    // Overwrite the current configuration file.
-    fs.writeFileSync('config/default.json', JSON.stringify(configTmp, null, 4)); // TODO: filename is not dynamic
-
-    // Reload the configuration.
-    delete require.cache[require.resolve('config')];
-    config = require('config');
-
-    resolve();
   });
 }
 
@@ -939,11 +982,20 @@ function getStatus() {
 
 const cronParser = require("cron-parser");
 
+function validateCronPatternSync(data) {
+  try {
+    var interval = cronParser.parseExpression(data);
+    return interval.stringify();
+  } catch(err) {
+    throw err;
+  }
+}
+
 function validateCronPattern(data) {
   return new Promise((resolve, reject) => {
     try {
-      cronParser.parseExpression(data.pattern);
-      resolve({valid: true});
+      var normalizedPattern = validateCronPatternSync(data.pattern);
+      resolve({valid: true, normalizedPattern: normalizedPattern });
     } catch(err) {
       resolve({valid: false, error: err.toString()});
     }
@@ -1007,7 +1059,7 @@ router.get('/file', checkAuthenticatedApi, function (req, res, next) {
 
 router.post('/updateConfig', checkAuthenticatedApi, function (req, res, next) {
   updateConfig(req.body)
-    .then((value) => { sendEmptyHttp200(res) },
+    .then((result) => { sendJsonHttp200(result, res) },
           reason => sendHttp500(reason, res));
 });
 
