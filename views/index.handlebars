@@ -103,13 +103,6 @@
         word-wrap: break-word;
     }
 
-    .invalid-input { 
-        border-color: #dc3545 !important;
-        background-image: url("/public/error.svg");
-        background-repeat: no-repeat;
-        background-position: right calc(0.375em + 0.1875rem) center;
-        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-    }
     .input-error {
         color: #dc3545 !important;
     }
@@ -196,10 +189,6 @@
     }
     function getIconForMimeType(mimeType) {
         return '<i class="fa-solid fa-file"></i>';
-    }
-
-    function cronJobPatternToString(pattern) {
-
     }
 
     var groupExportTag;
@@ -418,20 +407,20 @@
             var idTmp = $(this).attr('id').replace(/\./g, '\\.');
             var currentValue = $( this ).val();
             if(currentValue.trim().length == 0) {
-                $( this ).addClass('invalid-input');
+                $( this ).addClass('is-invalid');
                 $('#saveConfig').prop("disabled", true);
                 return;
             }
             var type = $( this ).data('type');
             if(type != undefined && type != null) {
                 if(type == 'url' && !isValidHttpUrl(currentValue)) {
-                    $( this ).addClass('invalid-input');
+                    $( this ).addClass('is-invalid');
                     $('#saveConfig').prop("disabled", true);
 
                     showValidationError(idTmp, type);
                     return;
                 } else if(type == 'filename' && !isValidFilename(currentValue)) {
-                    $( this ).addClass('invalid-input');
+                    $( this ).addClass('is-invalid');
                     $('#saveConfig').prop("disabled", true);
 
                     showValidationError(idTmp, type);
@@ -439,7 +428,7 @@
                 }
             }
             $('#'+idTmp+'-error').hide();
-            $( this ).removeClass('invalid-input');
+            $( this ).removeClass('is-invalid');
             $('#saveConfig').prop("disabled", false);
         });
     }
@@ -459,18 +448,18 @@
                 `value="${value}"`+
                 `placeholder="${i18next.t(id+'.placeholder')}" `+
                 `aria-describedby="basic-addon-${id}">`+
-            `<span class="input-group-text"><i class="fa-solid fa-equals"></i></span>`+
-            `<input type="text" class="form-control" id="${id}-explanation" placeholder="${i18next.t('token_placeholder')}" aria-label="${i18next.t('token_placeholder')}">`+
             `<a href="https://github.com/node-cron/node-cron#cron-syntax" target="_blank" class="input-group-text help-input-group" id="basic-addon-${id}" style="text-decoration-line: none;">`+
                 `<i class="fa-regular fa-circle-question"></i> <span style="margin-left: 0.5em;" data-i18n="help"></span>`+
-            `</span>`+
+            `</a>`+
         `</div>`+
-        `<div class="form-text input-explanation" style="visibility: hidden;" data-i18n="[html]${id}.explanation"><div>`;
+        `<div class="form-text input-explanation" style="visibility: hidden;" data-i18n="[html]${id}.explanation"></div>`+
+        //`<input type="text" class="form-control form-control-plaintext" id="${id}-explanation" placeholder="${i18next.t('token_placeholder')}" aria-label="${i18next.t('token_placeholder')}">`;
+        `<label class="form-label" id="${id}-explanation"></label>`;
 
         parent.append(result);
         var escapedId = id.replace(/\./g, '\\.');
 
-        $('#'+escapedId+'-explanation').val(cronstrue.toString($('#'+escapedId).val(), { use24HourTimeFormat: true, locale: i18next.language }));
+        $('#'+escapedId+'-explanation').html(cronstrue.toString($('#'+escapedId).val(), { use24HourTimeFormat: true, locale: i18next.language }));
         $('#'+escapedId).change(function() {
             const id = $(this).attr('id');
             const escapedId = id.replace(/\./g, '\\.');
@@ -482,14 +471,14 @@
                 success: (data) => {
                     if(data.valid) {                                
                         $('#'+escapedId).val(data.normalizedPattern);
-                        $('#'+escapedId+'-explanation').val(cronstrue.toString($('#'+escapedId).val(), { use24HourTimeFormat: true, locale: i18next.language }));
+                        $('#'+escapedId+'-explanation').html(cronstrue.toString($('#'+escapedId).val(), { use24HourTimeFormat: true, locale: i18next.language }));
 
-                        $('#'+escapedId).removeClass('invalid-input');
+                        $('#'+escapedId).removeClass('is-invalid');
                         $('#saveConfig').prop("disabled",false);
                     } else {
-                        $('#'+escapedId+'-explanation').val(i18next.t(id+'.pattern_invalid'));
+                        $('#'+escapedId+'-explanation').html(i18next.t(id+'.pattern_invalid'));
                         
-                        $('#'+escapedId).addClass('invalid-input');
+                        $('#'+escapedId).addClass('is-invalid');
                         $('#saveConfig').prop("disabled",true);
                     }
                 },
