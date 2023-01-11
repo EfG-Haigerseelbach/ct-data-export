@@ -1002,16 +1002,32 @@ function validateCronPattern(data) {
   });
 }
 
-initChurchToolsClient();
-login(config.get('churchtools.username'), config.get('churchtools.password')).then(() => {
-  getMasterData();
-  getTags();
-}).catch(error => {
-    console.error(error.stack);
-    // getTranslatedErrorMessage returns a human readable translated error message
-    // from either a full response object, response data or Exception or Error instances.
-    console.error(errorHelper.getTranslatedErrorMessage(error));
-});
+function clientInitializationAndLogin() {
+  console.log("(Re-)initialization of the ChurchTools client");
+  initChurchToolsClient();
+  console.log("Login using the configured API user...");
+  login(config.get('churchtools.username'), config.get('churchtools.password')).then(() => {
+    console.log("Login successful!");
+    getMasterData();
+    getTags();
+  }).catch(error => {
+      console.error("Login not successful!");
+      console.error(error.stack);
+      // getTranslatedErrorMessage returns a human readable translated error message
+      // from either a full response object, response data or Exception or Error instances.
+      console.error(errorHelper.getTranslatedErrorMessage(error));
+  });
+}
+
+clientInitializationAndLogin();
+// Start the job for recurrent client initialization and login
+new CronJob(
+	'0 0 1 * * *', // every night at 1:00:00
+	clientInitializationAndLogin,
+	null,
+	true,
+	'Europe/Berlin'
+);
 
 function sendEmptyHttp200(response) {
   response.setHeader("Content-Type", "text/plain").status(200).send();
