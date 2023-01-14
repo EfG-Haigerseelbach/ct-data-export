@@ -377,9 +377,11 @@
             success: (data) => { 
                 //console.log(data);
                 displayHooksResults(data.linearizedHooks);
-                if(data.finished == true) { clearInterval(intervalId); }  
-                $('#trigger-hooks-spinner').hide(); 
-                $('#trigger-hooks-button').prop("disabled", false); },
+                if(data.finished == true) { 
+                    clearInterval(intervalId);   
+                    $('#trigger-hooks-spinner').hide(); 
+                    $('#trigger-hooks-button').prop("disabled", false); } 
+                },
             error: (xhr, textStatus, errorThrown) => { console.log(textStatus); console.log(errorThrown); }
         });
     }
