@@ -1057,6 +1057,12 @@ router.get('/hooks', checkAuthenticatedApi, function(req, res, next) {
 
 router.post('/hooks', checkAuthenticatedApi, function(req, res, next) {
   triggerHooks('cron')
+    .then(result => { sendJsonHttp200(result, res) },
+          reason => sendHttp500(reason, res));
+}); 
+
+router.get('/hooks/status', checkAuthenticatedApi, function(req, res, next) {
+  getHooksResults()
     .then(hooksResults => { sendJsonHttp200(hooksResults, res) },
           reason => sendHttp500(reason, res));
 }); 
@@ -1205,8 +1211,15 @@ function linearizeHooks(hooks, task, delay, internalId) {
   return linearizedHooks;
 }
 
+var lastHookResults = { start: null, results: [], finished: false, linearizedHooks: [] };
+
 function triggerHooks(task) {
   return new Promise((resolve, reject) => {
+    lastHookResults = {
+      start: moment().format("YYYY.MM.DD hh:mm:ss"),
+      results: [],
+      finished: false
+    };
     var pathToHooks = './config/hooks.json';
     if(!fs.existsSync(pathToHooks)) {
       console.log('No hooks defined.');
@@ -1216,6 +1229,7 @@ function triggerHooks(task) {
     hooks = JSON.parse(hooks);
 
     linearizedHooks = linearizeHooks(hooks, task, 0, 0);
+    lastHookResults.linearizedHooks = linearizedHooks;
 
     Promise.allSettled(linearizedHooks.map(hook => {
       return new Promise((resolveHook, rejectHook) => {
@@ -1226,12 +1240,18 @@ function triggerHooks(task) {
         }, hook.delay * 1000);
       });
     })).then(data => {
-      var result = [];
       for(var i = 0; i < data.length; i++) {
-        result.push(data[i].value);
+        lastHookResults.results.push(data[i].value);
       }
-      resolve(result);
+      lastHookResults.finished = true;
     });
+    resolve("Hooks started");
+  });
+}
+
+function getHooksResults() {
+  return new Promise((resolve, reject) => {
+    resolve(lastHookResults);
   });
 }
 

@@ -357,6 +357,7 @@
             `</div>`;
             $('#hooks').append(hookTemp);
         }
+        getLastHooksResults();
     }
 
     function getHooks() {
@@ -365,6 +366,30 @@
             type: 'GET',
             success: (data) => { displayHooks(data); },
             error: (xhr, textStatus, errorThrown) =>{ console.log(textStatus); console.log(errorThrown); }
+        });
+    }
+
+    var intervalId;
+    function checkForHooksResults() {
+        $.ajax({
+            url: "/hooks/status", 
+            type: 'GET',
+            success: (data) => { 
+                //console.log(data);
+                displayHooksResults(data.linearizedHooks);
+                if(data.finished == true) { clearInterval(intervalId); }  
+                $('#trigger-hooks-spinner').hide(); 
+                $('#trigger-hooks-button').prop("disabled", false); },
+            error: (xhr, textStatus, errorThrown) => { console.log(textStatus); console.log(errorThrown); }
+        });
+    }
+
+    function getLastHooksResults() {
+        $.ajax({
+            url: "/hooks/status", 
+            type: 'GET',
+            success: (data) => displayHooksResults(data.linearizedHooks),
+            error: (xhr, textStatus, errorThrown) => { console.log(textStatus); console.log(errorThrown); }
         });
     }
 
@@ -644,7 +669,7 @@
         $('#trigger-hooks-button').prop("disabled", true);
         $('#trigger-hooks-spinner').show();
         $.post("/hooks")
-            .done((data) => displayHooksResults(data))
+            .done((data) => { intervalId = setInterval(checkForHooksResults, 5000); })
             .fail((xhr, textStatus, errorThrown) => { console.log(textStatus); console.log(errorThrown); })
             .always(function() {
                 $('#trigger-hooks-spinner').hide();
