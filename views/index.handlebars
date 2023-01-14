@@ -672,11 +672,7 @@
         $('#trigger-hooks-spinner').show();
         $.post("/hooks")
             .done((data) => { intervalId = setInterval(checkForHooksResults, 5000); })
-            .fail((xhr, textStatus, errorThrown) => { console.log(textStatus); console.log(errorThrown); })
-            .always(function() {
-                $('#trigger-hooks-spinner').hide();
-                $('#trigger-hooks-button').prop("disabled", false);
-            });
+            .fail((xhr, textStatus, errorThrown) => { console.log(textStatus); console.log(errorThrown); });
     }
 
     $(document).ready(function () {
