@@ -1141,16 +1141,21 @@ function callHookUrl(hook) {
           data.push(chunk);
         });
         res.on('end', () => {
-          console.log(moment().format('YYYY.MM.DD HH:mm:ss')+' - Received result for hook URL: '+hook.url);
-          try{
-            var tmp = JSON.parse(Buffer.concat(data).toString());
-            tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
-            hook.result = tmp;
-          } catch(error) {
-            // Seems to be no JSON, use the result as plain text
-            hook.result = Buffer.concat(data).toString();
+          console.log('Response Status Code: '+res.statusCode);
+          if(res.statusCode >= 400 && res.statusCode < 600) {
+            resolve(callHookUrl(hook));
+          } else {
+            console.log(moment().format('YYYY.MM.DD HH:mm:ss')+' - Received result for hook URL: '+hook.url);
+            try{
+              var tmp = JSON.parse(Buffer.concat(data).toString());
+              tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
+              hook.result = tmp;
+            } catch(error) {
+              // Seems to be no JSON, use the result as plain text
+              hook.result = Buffer.concat(data).toString();
+            }
+            resolve(hook);
           }
-          resolve(hook);
         });
       }).on('error', err => {
         console.log(`An error occurred when calling the hook URL ${hook.url}: `, err.message);
