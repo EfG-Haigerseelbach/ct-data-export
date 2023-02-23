@@ -687,7 +687,7 @@ function getAllContactPersons() {
   console.log(`Querying all groups URL: ${url}`);
   return churchtoolsClient.getAllPages(url)
     .then(persons => buildPersonsExport(persons))
-    .then(persons => expandContactForGroups(persons))
+    //.then(persons => expandContactForGroups(persons))
     .then(persons => filterForToBeExportedPersons(persons))
     .then(persons => replacePersonsImages(persons))
     .catch(reason => console.error(reason));
