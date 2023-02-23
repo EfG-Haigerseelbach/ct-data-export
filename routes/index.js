@@ -128,7 +128,12 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         var targetGroupsIdsTmp = getProperty(config.get('export.accessPath.targetGroupIds'), group);
         if(targetGroupsIdsTmp != null) {
           for(var [id, value] of Object.entries(targetGroupsIdsTmp)) {
-            tmp.targetGroups.push(getMasterDataById("targetGroups",id).nameTranslated);
+            var masterDataTmp = getMasterDataById("targetGroups",id);
+            if(masterDataTmp != null) {
+              tmp.targetGroups.push(masterDataTmp.nameTranslated);
+            } else {
+              console.error(`No person master data (/person/masterdata) for 'targetGroups' with id ${id} found!`);
+            }
           }
         }
         tmp.ageCategory = '';
