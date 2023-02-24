@@ -116,7 +116,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         var categories = getProperty(config.get('export.accessPath.categoryData'), group);
         if(categories != null) {
           for(var [id, value] of Object.entries(categories)) {
-            var groupCategory = getMasterDataById("groupCategories", id);
+            var groupCategory = getMasterDataById("groupCategories", value);
             if(groupCategory != undefined) {
               tmp.categories.push(groupCategory.nameTranslated);
             } else {
@@ -128,7 +128,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         var targetGroupsIdsTmp = getProperty(config.get('export.accessPath.targetGroupIds'), group);
         if(targetGroupsIdsTmp != null) {
           for(var [id, value] of Object.entries(targetGroupsIdsTmp)) {
-            var masterDataTmp = getMasterDataById("targetGroups",id);
+            var masterDataTmp = getMasterDataById("targetGroups", value);
             if(masterDataTmp != null) {
               tmp.targetGroups.push(masterDataTmp.nameTranslated);
             } else {
