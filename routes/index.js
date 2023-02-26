@@ -94,6 +94,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
         var tmp = {};
         tmp.id = group.id;
         tmp.name = group.name;
+        
         tmp.startDate = group.information.dateOfFoundation != null ? group.information.dateOfFoundation : '';
         tmp.startDate = tmp.startDate.length == 0 ? '' : moment(tmp.startDate, "YYYY-MM-DD").format("DD.MM.YYYY");
         
@@ -1164,6 +1165,7 @@ function callHookUrl(hook) {
         });
       }).on('error', err => {
         console.log(`An error occurred when calling the hook URL ${hook.url}: `, err.message);
+        console.log(JSON.stringify(err));
         hook.result = err.message;
         reject(hook);
       });
