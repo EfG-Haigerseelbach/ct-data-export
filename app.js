@@ -45,7 +45,7 @@ app.use(passport.initialize());
 // allow passport to use "express-session"
 app.use(passport.session());
 
-app.use("/public", express.static(path.join(__dirname, 'public')));
+app.use("/", express.static(path.join(__dirname, 'public')));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
 // Serve cronstrue 
