@@ -121,7 +121,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
             if(groupCategory != undefined) {
               tmp.categories.push(groupCategory.nameTranslated);
             } else {
-              console.error(`For group with ID ${group.id} (name: ${group.name}) the data field ${config.get('export.accessPath.categoryData')} contains value ${id} but there is no such master data for 'groupCategories'!`);
+              console.error(`For group with ID ${group.id} (name: ${group.name}) the data field ${config.get('export.accessPath.categoryData')} contains value ${value} but there is no such master data for 'groupCategories'!`);
             }
           }
         }
@@ -133,7 +133,7 @@ function buildGroupsExport(groupsDataFromChurchToolsApi) {
             if(masterDataTmp != null) {
               tmp.targetGroups.push(masterDataTmp.nameTranslated);
             } else {
-              console.error(`No person master data (/person/masterdata) for 'targetGroups' with id ${id} found!`);
+              console.error(`Error while processing group ${tmp.name} ${tmp.id}: No person master data (/person/masterdata) for 'targetGroups' with id ${value} found!`);
             }
           }
         }
