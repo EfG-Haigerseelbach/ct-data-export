@@ -69,17 +69,17 @@ function getProperty(path, obj) {
 function getWeekdayById(id) {
   if(id == 0) {
     return 'Sonntag';
-  } else if(id == 0) {
+  } else if(id == 1) {
     return 'Montag';
-  } else if(id == 0) {
+  } else if(id == 2) {
     return 'Dienstag';
-  } else if(id == 0) {
+  } else if(id == 3) {
     return 'Mittwoch';
-  } else if(id == 0) {
+  } else if(id == 4) {
     return 'Donnerstag';
-  } else if(id == 0) {
+  } else if(id == 5) {
     return 'Freitag';
-  } else if(id == 0) {
+  } else if(id == 6) {
     return 'Samstag';
   } else {
     return '';
