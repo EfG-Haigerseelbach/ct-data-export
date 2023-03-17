@@ -556,9 +556,17 @@ function buildPersonsExport(personsDataFromChurchToolsApi) {
         tmp.email = null;
         if(person.emails != null && person.emails.length > 0) {
           for(var i = 0; i < person.emails.length; i++) {
-            if(person.emails[i].isDefault) {
+            if(person.emails[i].contactLabelId == 7 /*7=Webseite*/) {
               tmp.email = person.emails[i].email;
               break;
+            }
+          }
+          if(tmp.email == null) {
+            for(var i = 0; i < person.emails.length; i++) {
+              if(person.emails[i].isDefault) {
+                tmp.email = person.emails[i].email;
+                break;
+              }
             }
           }
           // No email is flagged as default. Take the first one.
