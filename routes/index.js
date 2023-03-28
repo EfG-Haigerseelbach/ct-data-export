@@ -1290,6 +1290,7 @@ function getHooks() {
 }
 
 console.log(`Cron job pattern: ${config.get('cronJob.pattern')}`);
+
 var job = new CronJob(
 	config.get('cronJob.pattern'), 
 	function() {
@@ -1301,8 +1302,8 @@ var job = new CronJob(
     }, reason => {
       console.error(`Job ended with error. See below.`)
       console.error(reason);
-    })
-    .then(triggerHooks('cron'));
+    });
+    //.then(triggerHooks('cron'));
 	},
 	null,
 	true,
