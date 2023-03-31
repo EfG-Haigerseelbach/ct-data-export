@@ -1169,7 +1169,7 @@ function callHookUrl(hook) {
               // {"status":200,"message":"#5 Cron Job ausgel\u00f6st"}
               // {"status":200,"message":"Records Processed 21. Records imported 20 of 24."}
               // {"status":200,"message":"Import #5 Fertiggestellt."}
-              if(!tmp.message.includes("Fertiggestellt")) {
+              if(!tmp.message.includes("Fertiggestellt") || !tmp.message.includes("Cron Job ausgel")) {
                 // We received a result (HTTP 200) but the hook is still not completely processed.
                 // Trigger it again.
                 console.log(moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message);
