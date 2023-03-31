@@ -1317,7 +1317,7 @@ var job = new CronJob(
       console.error(`Job ended with error. See below.`)
       console.error(reason);
     });
-    //.then(triggerHooks('cron'));
+    .then(triggerHooks('cron'));
 	},
 	null,
 	true,
