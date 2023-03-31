@@ -1162,8 +1162,22 @@ function callHookUrl(hook) {
             console.log(moment().format('YYYY.MM.DD HH:mm:ss')+' - Received result for hook URL: '+hook.url);
             try{
               var tmp = JSON.parse(Buffer.concat(data).toString());
-              tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
-              hook.result = tmp;
+              // {"status":200,"message":"#6 Cron Job ausgel\u00f6st"}
+              // {"status":200,"message":"Records Processed 13. Records imported 12 of 16."}
+              // {"status":200,"message":"Import #6 Fertiggestellt."}
+              // 
+              // {"status":200,"message":"#5 Cron Job ausgel\u00f6st"}
+              // {"status":200,"message":"Records Processed 21. Records imported 20 of 24."}
+              // {"status":200,"message":"Import #5 Fertiggestellt."}
+              if(!tmp.message.includes("Fertiggestellt")) {
+                // We received a result (HTTP 200) but the hook is still not completely processed.
+                // Trigger it again.
+                console.log(moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message);
+                resolve(callHookUrl(hook));
+              } else {
+                tmp = moment().format('YYYY.MM.DD HH:mm:ss') + ': '+tmp.message;
+                hook.result = tmp;
+              }
             } catch(error) {
               // Seems to be no JSON, use the result as plain text
               hook.result = Buffer.concat(data).toString();
