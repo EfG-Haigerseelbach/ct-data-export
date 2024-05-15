@@ -460,7 +460,19 @@ Please note that there are at maximum *two* persons exported. Although further I
 
 ## Usage
 
-to be done
+### Using plesk-git integration
+1) Specify the repository URL `https://github.com/EfG-Haigerseelbach/ct-data-export.git`
+2) Choose branch `main`
+3) Deployment mode: automatic
+4) Enable additional deployment actions: yes
+5) Deploy actions:
+```
+/usr/local/bin/pm2 -s stop ct-data-export
+/usr/bin/npm install
+/usr/local/bin/pm2 start bin/www --name ct-data-export
+```
+
+
 
 ## To Be Done
 
