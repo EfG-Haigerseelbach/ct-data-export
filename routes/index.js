@@ -750,7 +750,7 @@ function getPersons(personIds) {
               }
             }
             tmp.imageUrl = person.imageUrl;
-            if(tmp.imageUrl.length == 0) {
+            if(tmp.imageUrl == null || tmp.imageUrl.length == 0) {
               // Person has no avatar image. Use the default image.
               tmp.imageUrl = config.get('churchtools.url') + '/system/assets/img/nobody-new.jpg';
             }
